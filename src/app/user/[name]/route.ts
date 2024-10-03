@@ -5,7 +5,6 @@ export async function GET(
   { params }: { params: { name: string } }
 ) {
   const username = params.name;
-  console.log(process.env.API_DOMAIN);
   const res = await fetch(
     `${process.env.API_DOMAIN}/id?character_name=${username}`,
     {

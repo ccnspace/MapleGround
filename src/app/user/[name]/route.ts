@@ -1,18 +1,48 @@
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
+
+const commonHeader = {
+  headers: {
+    "x-nxopen-api-key": process.env.API_KEY || "",
+  },
+};
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: { name: string } }
 ) {
   const username = params.name;
-  const res = await fetch(
+  const ocidResponse = await fetch(
     `${process.env.API_DOMAIN}/id?character_name=${username}`,
-    {
-      headers: {
-        "x-nxopen-api-key": process.env.API_KEY || "",
-      },
-    }
+    commonHeader
   );
-  const data = await res.json();
-  return Response.json({ data });
+
+  if (!ocidResponse.ok) {
+    const response = await ocidResponse.json();
+    return Response.json(
+      { errorCode: response.error.name },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  const ocidData = (await ocidResponse.json()) as { ocid: string };
+
+  const characterResponse = await fetch(
+    `${process.env.API_DOMAIN}/character/basic?ocid=${ocidData.ocid}`,
+    commonHeader
+  );
+
+  if (!characterResponse.ok) {
+    const response = await characterResponse.json();
+    return Response.json(
+      { errorCode: response.error.name },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  const characterData = await characterResponse.json();
+  return Response.json(characterData);
 }

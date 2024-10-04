@@ -6,6 +6,9 @@ module.exports = {
       fontFamily: {
         pretendard: ["var(--font-pretendard)"],
       },
+      colors: {
+        coreNavy: "#131625",
+      },
     },
   },
   plugins: [],

@@ -9,6 +9,8 @@ import Image from "next/image";
 import { Badge } from "./Badge";
 import { BackIcon } from "./svg/BackIcon";
 import CharacterImg from "@/images/0.png";
+import { useCharacterStore } from "@/stores/character";
+import { useShallow } from "zustand/shallow";
 
 const EmptyAltText = () => {
   return (
@@ -28,17 +30,24 @@ const EmptyAltText = () => {
 // FIXME: setter를 useState 대신 상태관리 라이브러리 혹은 context 활용
 type EmptyProfileProps = {
   setLoading: (loading: boolean) => void;
-  setCharacter: (character: CharacterBase | null) => void;
 };
-const ProfileSearch = ({ setLoading, setCharacter }: EmptyProfileProps) => {
+const ProfileSearch = ({ setLoading }: EmptyProfileProps) => {
   const [inputValue, setValue] = useState("");
+  const { setCharacterBase, setCharacterStatus } = useCharacterStore(
+    useShallow((state) => ({
+      setCharacterBase: state.setCharacterBase,
+      setCharacterStatus: state.setStatus,
+    }))
+  );
 
   const requestCharacterInfo = async (nickname: string) => {
     try {
       const response = await getCharacterBaseInfo(nickname);
-      setCharacter(response);
+      setCharacterBase(response);
+      setCharacterStatus("success");
     } catch (e) {
-      setCharacter(null);
+      setCharacterBase(null);
+      setCharacterStatus("error");
     } finally {
       setLoading(false);
     }
@@ -153,16 +162,33 @@ const Profile = ({ characterBase }: ProfileProps) => {
 
 export const ProfileWrapper = () => {
   const [isLoading, setLoading] = useState(false);
-  const [characterBase, setCharacter] = useState<CharacterBase | null>();
-  const isEmptyProfile = characterBase === undefined && !isLoading;
+  const {
+    characterBase,
+    characterStatus,
+    setCharacterBase,
+    setCharacterStatus,
+  } = useCharacterStore(
+    useShallow((state) => ({
+      characterBase: state.characterBase,
+      characterStatus: state.status,
+      setCharacterBase: state.setCharacterBase,
+      setCharacterStatus: state.setStatus,
+    }))
+  );
+
+  const isEmptyProfile =
+    !characterBase && characterStatus === "idle" && !isLoading;
   const hasProfile = characterBase && !isLoading;
-  const isSearchError = characterBase === null;
+  const isSearchError = characterStatus === "error";
 
   const bgColor = !hasProfile
     ? "bg-slate-800"
     : "bg-slate-900 border-2 border-slate-600";
 
-  const resetProfile = () => setCharacter(undefined);
+  const resetProfile = () => {
+    setCharacterBase(null);
+    setCharacterStatus("idle");
+  };
 
   return (
     <div
@@ -174,7 +200,7 @@ export const ProfileWrapper = () => {
       {isLoading && <Spinner />}
       {isEmptyProfile && (
         <>
-          <ProfileSearch setLoading={setLoading} setCharacter={setCharacter} />
+          <ProfileSearch setLoading={setLoading} />
           <Image
             src={CharacterImg}
             alt=""

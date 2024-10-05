@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { SideBar } from "@/components/SideBar";
+import { NoticeSideBar } from "@/components/NoticeSideBar";
 
 const pretendard = localFont({
   src: "./fonts/PretendardVariable.woff2",
@@ -25,8 +26,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${pretendard.variable} font-pretendard`}>
         <Header />
-        <SideBar />
-        <main>{children}</main>
+        <div className="flex flex-row h-full gap-4">
+          <SideBar />
+          {children}
+          <NoticeSideBar />
+        </div>
       </body>
     </html>
   );

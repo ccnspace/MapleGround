@@ -104,7 +104,7 @@ const Profile = ({ characterBase }: ProfileProps) => {
             <Badge bgColor="lime" text={"이름"} />
             <span
               className="underline underline-offset-4
-          decoration-2 decoration-lime-300 text-lime-300 text-base"
+          decoration-2 decoration-lime-300 text-lime-300"
             >
               {character_name}
             </span>
@@ -158,8 +158,8 @@ export const ProfileWrapper = () => {
   const isSearchError = characterBase === null;
 
   const bgColor = !hasProfile
-    ? "bg-slate-800 border-2 border-slate-700"
-    : "bg-slate-800 border-2 border-slate-600";
+    ? "bg-slate-800"
+    : "bg-slate-900 border-2 border-slate-600";
 
   const resetProfile = () => setCharacter(undefined);
 

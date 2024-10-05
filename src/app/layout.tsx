@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
+import "react-calendar/dist/Calendar.css";
 import { Header } from "@/components/Header";
 import { SideBar } from "@/components/SideBar";
 import { NoticeSideBar } from "@/components/NoticeSideBar";
-
-const pretendard = localFont({
-  src: "./fonts/PretendardVariable.woff2",
-  variable: "--font-pretendard",
-  weight: "100 900",
-  display: "swap",
-});
+import { pretendard } from "./fonts/pretendard";
 
 export const metadata: Metadata = {
   title: "MapleDot: 메닷",

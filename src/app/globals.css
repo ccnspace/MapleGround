@@ -6,3 +6,39 @@ html,
 body {
   height: 100%;
 }
+
+.react-calendar {
+  border: none !important;
+  border-radius: 12px;
+  width: 280px !important;
+  font-size: 16px;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.react-calendar button {
+  border-radius: 8px;
+}
+
+.react-calendar__tile--now {
+  background: #bfc2ce !important;
+}
+
+.react-calendar__year-view .react-calendar__tile,
+.react-calendar__decade-view .react-calendar__tile,
+.react-calendar__century-view .react-calendar__tile {
+  padding: 1.5em 0.5em !important;
+}
+
+.react-calendar__tile {
+  padding: 8px 6.6667px !important;
+}
+
+.react-calendar__navigation__arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+abbr:where([title]) {
+  text-decoration: none;
+}

@@ -15,8 +15,8 @@ export default function Page() {
         </PlainBox>
       </div>
       <div className="flex flex-row gap-3 mt-5">
-        <CharacterCard direction="left" />
-        <CharacterCard direction="right" />
+        <CharacterCard type="first" direction="left" />
+        <CharacterCard type="second" direction="right" />
       </div>
     </div>
   );

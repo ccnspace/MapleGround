@@ -8,6 +8,7 @@ import { Spinner } from "./svg/Spinner";
 import Image from "next/image";
 import { Badge } from "./Badge";
 import { BackIcon } from "./svg/BackIcon";
+import CharacterImg from "@/images/0.png";
 
 const EmptyAltText = () => {
   return (
@@ -52,7 +53,7 @@ const ProfileSearch = ({ setLoading, setCharacter }: EmptyProfileProps) => {
   return (
     <form
       name="searchProfile"
-      className="flex items-center flex-col gap-2"
+      className="flex items-center flex-col gap-2 z-10"
       onSubmit={handleSubmit}
     >
       <p className="text-base text-slate-200">
@@ -172,7 +173,15 @@ export const ProfileWrapper = () => {
     >
       {isLoading && <Spinner />}
       {isEmptyProfile && (
-        <ProfileSearch setLoading={setLoading} setCharacter={setCharacter} />
+        <>
+          <ProfileSearch setLoading={setLoading} setCharacter={setCharacter} />
+          <Image
+            src={CharacterImg}
+            alt=""
+            width={110}
+            className="absolute opacity-5 -z-0"
+          />
+        </>
       )}
       {isSearchError && (
         <p className="text-white text-base">검색결과가 없습니다.</p>

@@ -2,6 +2,7 @@ import type { ItemEquipment } from "@/types/Equipment";
 import Image from "next/image";
 import { EquipOptionBuilder } from "@/utils/EquipmentOptionBuilder";
 import { Fragment } from "react";
+import { StarIcon } from "./svg/StarIcon";
 
 type EquipValueProps = {
   equipData: ItemEquipment;
@@ -45,6 +46,10 @@ type Props = {
   equipData: ItemEquipment;
 };
 export const EquipDetailCard = ({ equipData }: Props) => {
+  const isAmazingForce = equipData.starforce_scroll_flag === "사용";
+  const showStarforceBadge =
+    !!equipData.starforce && equipData.starforce !== "0";
+
   return (
     <div
       className="flex flex-col min-w-80  max-w-80
@@ -53,10 +58,15 @@ export const EquipDetailCard = ({ equipData }: Props) => {
      rounded-lg px-5 pt-4 pb-4"
     >
       {/* title */}
-      {equipData.starforce !== "0" && (
-        <p className="flex justify-center text-yellow-300 text-sm font-medium">
-          {`⭐ x ${equipData.starforce}`}
-        </p>
+      {showStarforceBadge && (
+        <div
+          className={`flex justify-center items-center font-bold text-sm ${
+            isAmazingForce ? "text-sky-400" : "text-yellow-400"
+          }`}
+        >
+          <StarIcon isAmazingForce={isAmazingForce} />
+          {` x ${equipData.starforce}`}
+        </div>
       )}
       <p className="flex justify-center text-white text-lg font-medium">
         {equipData.item_name}

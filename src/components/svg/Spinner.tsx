@@ -1,8 +1,14 @@
-export const Spinner = () => (
+export const Spinner = ({
+  width = "2em",
+  height = "2em",
+}: {
+  width?: string;
+  height?: string;
+}) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="2em"
-    height="2em"
+    width={width}
+    height={height}
     viewBox="0 0 24 24"
   >
     <circle cx="4" cy="12" r="3" fill="white">

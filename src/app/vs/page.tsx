@@ -1,6 +1,6 @@
 import { PlainBox } from "@/components/PlainBox";
 import { InfoIcon } from "@/components/svg/InfoIcon";
-import { ReportContainer } from "./Report";
+import { ReportContainer } from "./ReportContainer";
 
 export default function Page() {
   return (

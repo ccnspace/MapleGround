@@ -1,4 +1,4 @@
-export type CharacterBase = {
+export type CharacterBasic = {
   date: null;
   character_name: string;
   world_name: string;

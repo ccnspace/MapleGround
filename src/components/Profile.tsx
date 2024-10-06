@@ -48,6 +48,7 @@ const ProfileSearch = ({ setLoading }: EmptyProfileProps) => {
     try {
       const response = await getCharacterAllInfo(nickname);
       setCharacterAllInfo(response);
+      setFetchStatus("success");
     } catch (e) {
       resetCharacterData();
       setFetchStatus("error");

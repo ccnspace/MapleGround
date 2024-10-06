@@ -6,6 +6,7 @@ import { ItemEquipment } from "@/types/Equipment";
 import Image from "next/image";
 import { useState, type MouseEvent } from "react";
 import { EquipDetailCard } from "./EquiqDetailCard";
+import { StarIcon } from "./svg/StarIcon";
 
 const ItemIcon = ({ item }: { item: ItemEquipment }) => (
   <Image
@@ -31,9 +32,12 @@ const AndroidIcon = ({ icon }: { icon: AndroidEquipment["android_icon"] }) => (
 
 const StarForceBadge = ({ item }: { item: ItemEquipment }) => {
   const starforce = parseInt(item?.starforce);
-  if (!item?.starforce || starforce < 17) return null;
+  const isAmazingForce = item.starforce_scroll_flag === "사용";
+
+  if (!item?.starforce || (!isAmazingForce && starforce < 17)) return null;
 
   const forceKey = (() => {
+    if (isAmazingForce) return "amazing";
     if (starforce >= 17 && starforce < 22) return "17+";
     if (starforce === 22) return "22";
     if (starforce === 23) return "23";
@@ -42,6 +46,7 @@ const StarForceBadge = ({ item }: { item: ItemEquipment }) => {
   })();
 
   const starforceStyle = {
+    amazing: "bg-slate-500 text-blue-200",
     "17+": "bg-blue-500",
     "22": "bg-lime-600",
     "23": "bg-cyan-900",
@@ -51,9 +56,11 @@ const StarForceBadge = ({ item }: { item: ItemEquipment }) => {
 
   return (
     <div
-      className={`absolute shadow top-0 left-0 font-medium text-white rounded-sm text-xs px-0.5 pt-0.25 pb-0.25 ${starforceStyle[forceKey]}`}
+      className={`absolute flex items-center shadow top-0 left-0 font-medium text-white rounded-sm
+        text-xs px-0.5 pt-0.25 pb-0.25 ${starforceStyle[forceKey]}`}
     >
-      {`⭐${starforce}`}
+      <StarIcon size={"size-3"} isAmazingForce={isAmazingForce} />
+      {`${starforce}`}
     </div>
   );
 };

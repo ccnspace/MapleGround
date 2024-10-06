@@ -1,12 +1,12 @@
 import type { CharacterBase } from "@/types/Character";
 import { apiFetcher } from "./apiFetcher";
-import { Ability } from "@/types/Ability";
-import { AndroidEquipment } from "@/types/AndroidEquipment";
-import { CashEquipmentInfo } from "@/types/CashEquipment";
-import { EquipmentInfo } from "@/types/Equipment";
-import { SymbolEquipmentInfo } from "@/types/SymbolEquipment";
-import { PetEquipment } from "@/types/PetEquipment";
-import { CharacterStat } from "@/types/CharacterStat";
+import type { Ability } from "@/types/Ability";
+import type { AndroidEquipment } from "@/types/AndroidEquipment";
+import type { CashEquipmentInfo } from "@/types/CashEquipment";
+import type { EquipmentInfo } from "@/types/Equipment";
+import type { SymbolEquipmentInfo } from "@/types/SymbolEquipment";
+import type { PetEquipment } from "@/types/PetEquipment";
+import type { CharacterStat } from "@/types/CharacterStat";
 
 export type CharacterAllInfo = {
   ability: Ability;

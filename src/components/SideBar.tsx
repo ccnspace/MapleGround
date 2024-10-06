@@ -34,7 +34,7 @@ const sidebarItem: SideBarItemType[] = [
 
 export const SideBar = () => {
   return (
-    <div className="flex-shrink-0 h-full w-96 bg-coreNavy font-bold text-lg">
+    <div className="flex-shrink-0 h-full w-96 rounded-r-xl bg-coreNavy font-bold text-lg">
       <ProfileWrapper />
       <ul className="text-white">
         {sidebarItem.map((item, i) => (

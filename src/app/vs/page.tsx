@@ -9,7 +9,7 @@ export default function Page() {
         <p className="text-2xl font-bold">과거의 나와 대결</p>
         <PlainBox>
           <div className="flex flex-col gap-2">
-            <p className="flex gap-1 items-center font-bold text-slate-700">
+            <p className="flex gap-1 items-center font-medium text-slate-700 dark:text-white">
               <InfoIcon />
               사용 전 확인!
             </p>

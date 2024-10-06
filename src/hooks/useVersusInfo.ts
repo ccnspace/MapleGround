@@ -1,6 +1,4 @@
-import { getCharacterBaseInfo } from "@/apis/getCharacterBaseInfo";
-import { getCharacterStat } from "@/apis/getCharacterStat";
-import { getAllEquipmentsInfo } from "@/apis/getEquipment";
+import { getCharacterAllInfo } from "@/apis/getCharacterAllInfo";
 import { useCharacterStore } from "@/stores/character";
 import { useVersusStore } from "@/stores/versus";
 import { openModal } from "@/utils/openModal";
@@ -9,28 +7,16 @@ import { useShallow } from "zustand/shallow";
 
 export const useVersusInfo = () => {
   const [isLoading, setLoading] = useState(false);
-  const {
-    firstPersonBase,
-    firstPersonStat,
-    firstPersonEquipment,
-    secondPersonBase,
-    secondPersonStat,
-    secondPersonEquipment,
-  } = useVersusStore(
+  const { firstPersonInfo, secondPersonInfo } = useVersusStore(
     useShallow((state) => ({
-      firstPersonBase: state.firstPersonBase,
-      firstPersonStat: state.firstPersonStat,
-      firstPersonEquipment: state.firstPersonEquipment,
-      secondPersonBase: state.secondPersonBase,
-      secondPersonStat: state.secondPersonStat,
-      secondPersonEquipment: state.secondPersonEquipment,
+      firstPersonInfo: state.firstPersonInfo,
+      secondPersonInfo: state.secondPersonInfo,
     }))
   );
 
   const isCharacterSuccessFetched = () => {
-    const { fetchStatus } = useCharacterStore.getState();
-    const hasCharacterFetched = fetchStatus === "success";
-    if (!hasCharacterFetched) {
+    const { characterAllInfo } = useCharacterStore.getState();
+    if (!characterAllInfo) {
       openModal({ message: "먼저 왼쪽에서 캐릭터명을 검색해 주세요." });
       return false;
     }
@@ -62,57 +48,25 @@ export const useVersusInfo = () => {
     setLoading(true);
 
     const nickname = characterAllInfo.basic.character_name;
-    const {
-      firstPersonDate,
-      secondPersonDate,
-      setPersonBase,
-      setPersonStat,
-      setPersonEquipment,
-    } = useVersusStore.getState();
-    const [
-      firstBase,
-      secondBase,
-      firstStat,
-      secondStat,
-      firstEquipment,
-      secondEquipment,
-    ] = await Promise.all([
-      getCharacterBaseInfo(nickname, firstPersonDate),
-      getCharacterBaseInfo(nickname, secondPersonDate),
-      getCharacterStat(nickname, firstPersonDate),
-      getCharacterStat(nickname, secondPersonDate),
-      getAllEquipmentsInfo(nickname, firstPersonDate),
-      getAllEquipmentsInfo(nickname, secondPersonDate),
+    const { firstPersonDate, secondPersonDate, setPersonInfo } =
+      useVersusStore.getState();
+
+    const [firstPersonResponse, secondePersonResponse] = await Promise.all([
+      getCharacterAllInfo(nickname, firstPersonDate),
+      getCharacterAllInfo(nickname, secondPersonDate),
     ]);
 
-    setPersonBase("first", firstBase);
-    setPersonStat("first", firstStat);
-    setPersonEquipment("first", firstEquipment);
-
-    setPersonBase("second", secondBase);
-    setPersonStat("second", secondStat);
-    setPersonEquipment("second", secondEquipment);
+    setPersonInfo("first", firstPersonResponse);
+    setPersonInfo("second", secondePersonResponse);
 
     setLoading(false);
-  };
-
-  const firstPersonData = {
-    base: firstPersonBase,
-    stat: firstPersonStat,
-    equipment: firstPersonEquipment,
-  };
-
-  const secondPersonData = {
-    base: secondPersonBase,
-    stat: secondPersonStat,
-    equipment: secondPersonEquipment,
   };
 
   return {
     validateReport,
     requestPersonData,
-    firstPersonData,
-    secondPersonData,
+    firstPersonInfo,
+    secondPersonInfo,
     isLoading,
   };
 };

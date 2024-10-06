@@ -1,4 +1,4 @@
-import type { CharacterBase } from "@/types/Character";
+import type { CharacterBasic } from "@/types/Character";
 import { apiFetcher } from "./apiFetcher";
 import type { Ability } from "@/types/Ability";
 import type { AndroidEquipment } from "@/types/AndroidEquipment";
@@ -11,7 +11,7 @@ import type { CharacterStat } from "@/types/CharacterStat";
 export type CharacterAllInfo = {
   ability: Ability;
   androidEquip: AndroidEquipment;
-  basic: CharacterBase;
+  basic: CharacterBasic;
   cashEquip: CashEquipmentInfo;
   normalEquip: EquipmentInfo;
   symbolEquip: SymbolEquipmentInfo;

@@ -7,8 +7,8 @@ import { DimmedLayer } from "@/components/DimmedLayer";
 
 export const ReportContainer = () => {
   const {
-    firstPersonData,
-    secondPersonData,
+    firstPersonInfo,
+    secondPersonInfo,
     requestPersonData,
     validateReport,
     isLoading,
@@ -31,12 +31,12 @@ export const ReportContainer = () => {
           <CharacterCard
             type="first"
             direction="left"
-            characterImageUrl={firstPersonData?.base?.character_image}
+            characterImageUrl={firstPersonInfo?.basic?.character_image}
           />
           <CharacterCard
             type="second"
             direction="right"
-            characterImageUrl={secondPersonData?.base?.character_image}
+            characterImageUrl={secondPersonInfo?.basic?.character_image}
           />
         </div>
         <button

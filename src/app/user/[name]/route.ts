@@ -12,7 +12,7 @@ export async function GET(
 ) {
   const username = params.name;
   const ocidResponse = await fetch(
-    `${process.env.API_DOMAIN}/id?character_name=${username}`,
+    `${process.env.NEXON_API_DOMAIN}/id?character_name=${username}`,
     commonHeader
   );
 
@@ -29,7 +29,7 @@ export async function GET(
   const ocidData = (await ocidResponse.json()) as { ocid: string };
 
   const characterResponse = await fetch(
-    `${process.env.API_DOMAIN}/character/basic?ocid=${ocidData.ocid}`,
+    `${process.env.NEXON_API_DOMAIN}/character/basic?ocid=${ocidData.ocid}`,
     commonHeader
   );
 

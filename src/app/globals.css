@@ -5,6 +5,7 @@
 html,
 body {
   height: 100%;
+  transition: background-color 0.2s ease;
 }
 
 .react-calendar {
@@ -17,6 +18,13 @@ body {
 
 .react-calendar button {
   border-radius: 8px;
+}
+
+.react-calendar__month-view__days__day,
+.react-calendar__month-view__weekdays__weekday,
+.react-calendar__navigation__label__labelText--from,
+.react-calendar__year-view__months__month {
+  color: black;
 }
 
 .react-calendar__tile--now {

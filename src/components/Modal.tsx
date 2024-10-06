@@ -60,9 +60,9 @@ export const Modal = () => {
   return (
     <>
       <div
-        className="flex shrink-0 w-[340px] z-50 absolute left-[45%] top-1/3 flex-col
-         bg-white shadow rounded-lg gap-2 text-center
-      px-3 pt-7 pb-7"
+        className="flex shrink-0 w-[350px] z-50 absolute left-[45%] top-1/3 flex-col
+         bg-white dark:bg-[#121212] shadow rounded-lg gap-2 text-center
+      px-3 pt-6 pb-6"
       >
         <p className="flex text-[18px] pt-2 pb-2 justify-center font-medium">
           {message}

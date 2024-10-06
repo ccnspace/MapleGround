@@ -6,6 +6,7 @@ import { SideBar } from "@/components/SideBar";
 import { NoticeSideBar } from "@/components/NoticeSideBar";
 import { pretendard } from "./fonts/pretendard";
 import { Modal } from "@/components/Modal";
+import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
   title: "MapleDot: 메닷",
@@ -18,15 +19,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${pretendard.variable} font-pretendard`}>
-        <Header />
-        <Modal />
-        <div className="flex flex-row h-full gap-4">
-          <SideBar />
-          {children}
-          <NoticeSideBar />
-        </div>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${pretendard.variable} font-pretendard bg-white dark:bg-[#131313]`}
+      >
+        <ThemeProvider attribute="class" defaultTheme="system">
+          <Header />
+          <Modal />
+          <div className="flex flex-row h-full gap-4">
+            <SideBar />
+            {children}
+            <NoticeSideBar />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

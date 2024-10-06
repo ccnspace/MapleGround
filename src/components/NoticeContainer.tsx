@@ -20,6 +20,7 @@ export const NoticeContainer = () => {
 
   useEffect(() => {
     if (notices) return;
+
     const requestNotices = async () => {
       const response = await getAllNotices();
       useNoticeStore.getState().setNotice(response);

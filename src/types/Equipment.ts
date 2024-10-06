@@ -128,9 +128,3 @@ export type EquipmentInfo = {
   dragon_equipment: [];
   mechanic_equipment: [];
 };
-
-export type AllEquipmentsInfo = {
-  cash: CashEquipmentInfo;
-  normal: EquipmentInfo;
-  symbol: SymbolEquipmentInfo;
-};

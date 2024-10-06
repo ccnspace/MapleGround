@@ -2,8 +2,6 @@
 
 import { FormEvent, useState } from "react";
 import { EnterIcon } from "./svg/EnterIcon";
-import { getCharacterBaseInfo } from "@/apis/getCharacterBaseInfo";
-import { CharacterBase } from "@/types/Character";
 import { Spinner } from "./svg/Spinner";
 import Image from "next/image";
 import { Badge } from "./Badge";
@@ -11,8 +9,10 @@ import { BackIcon } from "./svg/BackIcon";
 import CharacterImg from "@/images/0.png";
 import { useCharacterStore } from "@/stores/character";
 import { useShallow } from "zustand/shallow";
-import { getCharacterStat } from "@/apis/getCharacterStat";
-import { getAllEquipmentsInfo } from "@/apis/getEquipment";
+import {
+  CharacterAllInfo,
+  getCharacterAllInfo,
+} from "@/apis/getCharacterAllInfo";
 
 const EmptyAltText = () => {
   return (
@@ -35,36 +35,22 @@ type EmptyProfileProps = {
 };
 const ProfileSearch = ({ setLoading }: EmptyProfileProps) => {
   const [inputValue, setValue] = useState("");
-  const {
-    setCharacterBase,
-    setCharacterEquipments,
-    setCharacterStats,
-    setCharacterStatus,
-    resetCharacterData,
-  } = useCharacterStore(
-    useShallow((state) => ({
-      setCharacterBase: state.setCharacterBase,
-      setCharacterStatus: state.setStatus,
-      setCharacterEquipments: state.setCharacterEquipments,
-      setCharacterStats: state.setCharacterStats,
-      resetCharacterData: state.resetCharacterData,
-    }))
-  );
+  const { setCharacterAllInfo, setFetchStatus, resetCharacterData } =
+    useCharacterStore(
+      useShallow((state) => ({
+        setCharacterAllInfo: state.setCharacterAllInfo,
+        setFetchStatus: state.setFetchStatus,
+        resetCharacterData: state.resetCharacterData,
+      }))
+    );
 
   const requestCharacterInfo = async (nickname: string) => {
     try {
-      const [base, equipments, stats] = await Promise.all([
-        getCharacterBaseInfo(nickname),
-        getAllEquipmentsInfo(nickname),
-        getCharacterStat(nickname),
-      ]);
-      setCharacterBase(base);
-      setCharacterEquipments(equipments);
-      setCharacterStats(stats);
-      setCharacterStatus("success");
+      const response = await getCharacterAllInfo(nickname);
+      setCharacterAllInfo(response);
     } catch (e) {
       resetCharacterData();
-      setCharacterStatus("error");
+      setFetchStatus("error");
     } finally {
       setLoading(false);
     }
@@ -98,9 +84,9 @@ const ProfileSearch = ({ setLoading }: EmptyProfileProps) => {
 };
 
 type ProfileProps = {
-  characterBase: CharacterBase;
+  characterAllInfo: CharacterAllInfo;
 };
-const Profile = ({ characterBase }: ProfileProps) => {
+const Profile = ({ characterAllInfo }: ProfileProps) => {
   const {
     character_class,
     character_level,
@@ -109,7 +95,7 @@ const Profile = ({ characterBase }: ProfileProps) => {
     character_image,
     character_exp_rate,
     world_name,
-  } = characterBase;
+  } = characterAllInfo.basic;
 
   const currentDate = new Date().toLocaleString("ko-kr", {
     dateStyle: "long",
@@ -179,32 +165,27 @@ const Profile = ({ characterBase }: ProfileProps) => {
 
 export const ProfileWrapper = () => {
   const [isLoading, setLoading] = useState(false);
-  const {
-    characterBase,
-    characterStatus,
-    setCharacterBase,
-    setCharacterStatus,
-  } = useCharacterStore(
-    useShallow((state) => ({
-      characterBase: state.characterBase,
-      characterStatus: state.status,
-      setCharacterBase: state.setCharacterBase,
-      setCharacterStatus: state.setStatus,
-    }))
-  );
+  const { fetchStatus, characterAllInfo, resetCharacterData } =
+    useCharacterStore(
+      useShallow((state) => ({
+        fetchStatus: state.fetchStatus,
+        characterAllInfo: state.characterAllInfo,
+        setFetchStatus: state.setFetchStatus,
+        resetCharacterData: state.resetCharacterData,
+      }))
+    );
 
   const isEmptyProfile =
-    !characterBase && characterStatus === "idle" && !isLoading;
-  const hasProfile = characterBase && !isLoading;
-  const isSearchError = characterStatus === "error";
+    !characterAllInfo && fetchStatus === "idle" && !isLoading;
+  const hasProfile = fetchStatus && characterAllInfo && !isLoading;
+  const isSearchError = fetchStatus === "error";
 
   const bgColor = !hasProfile
     ? "bg-slate-800"
     : "bg-slate-900 border-2 border-slate-600";
 
   const resetProfile = () => {
-    setCharacterBase(null);
-    setCharacterStatus("idle");
+    resetCharacterData();
   };
 
   return (
@@ -229,7 +210,7 @@ export const ProfileWrapper = () => {
       {isSearchError && (
         <p className="text-white text-base">검색결과가 없습니다.</p>
       )}
-      {hasProfile && <Profile characterBase={characterBase} />}
+      {hasProfile && <Profile characterAllInfo={characterAllInfo} />}
       {(hasProfile || isSearchError) && (
         <div
           className="absolute right-0 top-0 px-3 pt-3 hover:cursor-pointer"

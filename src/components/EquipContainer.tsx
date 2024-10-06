@@ -1,15 +1,16 @@
 "use client";
 
 import { useCharacterInfo } from "@/hooks/useCharacterInfo";
-import { AndroidEquipment } from "@/types/AndroidEquipment";
+import type { AndroidEquipment } from "@/types/AndroidEquipment";
 import { ItemEquipment } from "@/types/Equipment";
 import Image from "next/image";
-import { type MouseEvent } from "react";
+import { useState, type MouseEvent } from "react";
+import { EquipDetailCard } from "./EquiqDetailCard";
 
 const ItemIcon = ({ item }: { item: ItemEquipment }) => (
   <Image
-    src={item.item_icon}
-    alt={item.item_equipment_part}
+    src={item?.item_icon}
+    alt={item?.item_equipment_part}
     unoptimized
     width={52}
     height={60}
@@ -17,9 +18,9 @@ const ItemIcon = ({ item }: { item: ItemEquipment }) => (
   />
 );
 
-const AndroidIcon = ({ item }: { item: AndroidEquipment }) => (
+const AndroidIcon = ({ icon }: { icon: AndroidEquipment["android_icon"] }) => (
   <Image
-    src={item.android_icon}
+    src={icon as string}
     alt={"안드로이드"}
     unoptimized
     width={52}
@@ -27,6 +28,35 @@ const AndroidIcon = ({ item }: { item: AndroidEquipment }) => (
     style={{ width: "auto", height: "auto" }}
   />
 );
+
+const StarForceBadge = ({ item }: { item: ItemEquipment }) => {
+  const starforce = parseInt(item?.starforce);
+  if (!item?.starforce || starforce < 17) return null;
+
+  const forceKey = (() => {
+    if (starforce >= 17 && starforce < 22) return "17+";
+    if (starforce === 22) return "22";
+    if (starforce === 23) return "23";
+    if (starforce === 24) return "24";
+    return "25";
+  })();
+
+  const starforceStyle = {
+    "17+": "bg-blue-500",
+    "22": "bg-lime-600",
+    "23": "bg-cyan-900",
+    "24": "bg-pink-800",
+    "25": "bg-slate-800",
+  };
+
+  return (
+    <div
+      className={`absolute shadow top-0 left-0 font-medium text-white rounded-sm text-xs px-0.5 pt-0.25 pb-0.25 ${starforceStyle[forceKey]}`}
+    >
+      {`⭐${starforce}`}
+    </div>
+  );
+};
 
 const potentialStyle: { [key: string]: string } = {
   레전드리: "border-2 border-lime-400",
@@ -36,23 +66,57 @@ const potentialStyle: { [key: string]: string } = {
 };
 
 const commonEquipStyle =
-  "flex justify-center items-center bg-slate-300 dark:bg-[#4f515a] w-16 h-16 rounded-md cursor-pointer";
+  "flex relative justify-center items-center bg-slate-300 dark:bg-[#4f515a] w-16 h-16 rounded-md cursor-pointer";
+
+type EquipItemProps = {
+  name: string;
+  equipData: { [key: string]: ItemEquipment } | undefined;
+  customClass?: string;
+};
+const Equipment = ({ name, equipData, customClass }: EquipItemProps) => {
+  const getPotentialStyle = (name: string) => {
+    const potentialTitle = equipData?.[name]?.potential_option_grade;
+    return equipData && potentialTitle && potentialStyle[potentialTitle];
+  };
+  return (
+    <div
+      id={name}
+      className={`${getPotentialStyle(
+        name
+      )} ${commonEquipStyle} ${customClass}`}
+    >
+      {equipData?.[name] && (
+        <>
+          <StarForceBadge item={equipData[name]} />
+          <ItemIcon item={equipData[name]} />
+        </>
+      )}
+    </div>
+  );
+};
+
+const AndroidEquipment = ({
+  equipData,
+}: {
+  equipData: AndroidEquipment | undefined;
+}) => {
+  return (
+    <div id={"안드로이드"} className={`${commonEquipStyle}`}>
+      {equipData?.android_icon && <AndroidIcon icon={equipData.android_icon} />}
+    </div>
+  );
+};
 
 export const EquipContainer = () => {
-  // const [clickedEquip, setClickedEquip] = useState("");
+  const [clickedEquip, setClickedEquip] = useState("");
   const { characterData } = useCharacterInfo();
   const { normal, android } = characterData.equipments || {};
-
-  const getPotentialStyle = (slot: string) => {
-    const potentialTitle = normal?.[slot]?.potential_option_grade;
-    return normal && potentialTitle && potentialStyle[potentialTitle];
-  };
 
   const handleClickIcon = (e: MouseEvent) => {
     const target = e.target as Element;
     const id = target.id || target.parentElement?.id;
     if (!id) return;
-    // setClickedEquip(id);
+    setClickedEquip(id);
   };
 
   return (
@@ -66,166 +130,50 @@ export const EquipContainer = () => {
           onClick={handleClickIcon}
           className="grid grid-cols-5 grid-flow-row gap-2"
         >
-          <div
-            id="반지4"
-            className={`${commonEquipStyle} ${getPotentialStyle("반지4")}`}
-          >
-            {normal && <ItemIcon item={normal["반지4"]} />}
-          </div>
-          <div
-            id="모자"
-            className={`${commonEquipStyle} ${getPotentialStyle("모자")}
-    col-start-3 col-end-5`}
-          >
-            {normal && <ItemIcon item={normal["모자"]} />}
-          </div>
-          <div
-            id="엠블렘"
-            className={`${commonEquipStyle} ${getPotentialStyle("엠블렘")}`}
-          >
-            {normal && <ItemIcon item={normal["엠블렘"]} />}
-          </div>
-          <div
-            id="반지3"
-            className={`${commonEquipStyle} ${getPotentialStyle("반지3")}`}
-          >
-            {normal && <ItemIcon item={normal["반지3"]} />}
-          </div>
-          <div
-            id="펜던트2"
-            className={`${commonEquipStyle} ${getPotentialStyle("펜던트2")}`}
-          >
-            {normal && <ItemIcon item={normal["펜던트2"]} />}
-          </div>
-          <div
-            id="얼굴장식"
-            className={`${commonEquipStyle} ${getPotentialStyle("얼굴장식")}
-    col-start-3 col-end-5`}
-          >
-            {normal && <ItemIcon item={normal["얼굴장식"]} />}
-          </div>
-          <div
-            id="뱃지"
-            className={`${commonEquipStyle} ${getPotentialStyle("뱃지")}`}
-          >
-            {normal && <ItemIcon item={normal["뱃지"]} />}
-          </div>
-          <div
-            id="반지2"
-            className={`${commonEquipStyle} ${getPotentialStyle("반지2")}`}
-          >
-            {normal && <ItemIcon item={normal["반지2"]} />}
-          </div>
-          <div
-            id="펜던트"
-            className={`${commonEquipStyle} ${getPotentialStyle("펜던트")}`}
-          >
-            {normal && <ItemIcon item={normal["펜던트"]} />}
-          </div>
-          <div
-            id="눈장식"
-            className={`${commonEquipStyle} ${getPotentialStyle("눈장식")}`}
-          >
-            {normal && <ItemIcon item={normal["눈장식"]} />}
-          </div>
-          <div
-            id="귀고리"
-            className={`${commonEquipStyle} ${getPotentialStyle("귀고리")}`}
-          >
-            {normal && <ItemIcon item={normal["귀고리"]} />}
-          </div>
-          <div
-            id="훈장"
-            className={`${commonEquipStyle} ${getPotentialStyle("훈장")}`}
-          >
-            {normal && <ItemIcon item={normal["훈장"]} />}
-          </div>
-          <div
-            id="반지1"
-            className={`${commonEquipStyle} ${getPotentialStyle("반지1")}`}
-          >
-            {normal && <ItemIcon item={normal["반지1"]} />}
-          </div>
-          <div
-            id="무기"
-            className={`${commonEquipStyle} ${getPotentialStyle("무기")}`}
-          >
-            {normal && <ItemIcon item={normal["무기"]} />}
-          </div>
-          <div
-            id="상의"
-            className={`${commonEquipStyle} ${getPotentialStyle("상의")}`}
-          >
-            {normal && <ItemIcon item={normal["상의"]} />}
-          </div>
-          <div
-            id="어깨장식"
-            className={`${commonEquipStyle} ${getPotentialStyle("어깨장식")}`}
-          >
-            {normal && <ItemIcon item={normal["어깨장식"]} />}
-          </div>
-          <div
-            id="보조무기"
-            className={`${commonEquipStyle} ${getPotentialStyle("보조무기")}`}
-          >
-            {normal && <ItemIcon item={normal["보조무기"]} />}
-          </div>
-          <div
-            id="포켓 아이템"
-            className={`${commonEquipStyle} ${getPotentialStyle("아이템")}`}
-          >
-            {normal && <ItemIcon item={normal["포켓 아이템"]} />}
-          </div>
-          <div
-            id="벨트"
-            className={`${commonEquipStyle} ${getPotentialStyle("벨트")}`}
-          >
-            {normal && <ItemIcon item={normal["벨트"]} />}
-          </div>
-          <div
-            id="하의"
-            className={`${commonEquipStyle} ${getPotentialStyle("하의")}`}
-          >
-            {normal && <ItemIcon item={normal["하의"]} />}
-          </div>
-          <div
-            id="장갑"
-            className={`${commonEquipStyle} ${getPotentialStyle("장갑")}`}
-          >
-            {normal && <ItemIcon item={normal["장갑"]} />}
-          </div>
-          <div
-            id="망토"
-            className={`${commonEquipStyle} ${getPotentialStyle("망토")}`}
-          >
-            {normal && <ItemIcon item={normal["망토"]} />}
-          </div>
-          <div
-            id="신발"
-            className={`${commonEquipStyle} ${getPotentialStyle(
-              "신발"
-            )} col-start-3`}
-          >
-            {normal && <ItemIcon item={normal["신발"]} />}
-          </div>
-          <div
-            id="안드로이드"
-            className={`${commonEquipStyle} ${getPotentialStyle("안드로이드")}`}
-          >
-            {android && <AndroidIcon item={android} />}
-          </div>
-          <div
-            id="기계 심장"
-            className={`${commonEquipStyle} ${getPotentialStyle("기계 심장")}`}
-          >
-            {normal && <ItemIcon item={normal["기계 심장"]} />}
-          </div>
+          <Equipment name="반지4" equipData={normal} />
+          <Equipment
+            name="모자"
+            equipData={normal}
+            customClass="col-start-3 col-end-5"
+          />
+          <Equipment name="엠블렘" equipData={normal} />
+          <Equipment name="반지3" equipData={normal} />
+          <Equipment name="펜던트2" equipData={normal} />
+          <Equipment
+            name="얼굴장식"
+            equipData={normal}
+            customClass="col-start-3 col-end-5"
+          />
+          <Equipment name="뱃지" equipData={normal} />
+          <Equipment name="반지2" equipData={normal} />
+          <Equipment name="펜던트" equipData={normal} />
+          <Equipment name="눈장식" equipData={normal} />
+          <Equipment name="귀고리" equipData={normal} />
+          <Equipment name="훈장" equipData={normal} />
+
+          <Equipment name="반지1" equipData={normal} />
+          <Equipment name="무기" equipData={normal} />
+          <Equipment name="상의" equipData={normal} />
+          <Equipment name="어깨장식" equipData={normal} />
+          <Equipment name="보조무기" equipData={normal} />
+
+          <Equipment name="포켓 아이템" equipData={normal} />
+          <Equipment name="벨트" equipData={normal} />
+          <Equipment name="하의" equipData={normal} />
+          <Equipment name="장갑" equipData={normal} />
+          <Equipment name="망토" equipData={normal} />
+          <Equipment name="신발" equipData={normal} customClass="col-start-3" />
+          <AndroidEquipment equipData={android} />
+          <Equipment name="기계 심장" equipData={normal} />
         </div>
       </div>
 
       {/* 프리뷰 */}
       <div className="flex rounded-lg px-4 pt-4 pb-4 min-w-[320px]">
         {/* TODO: 장비 프리뷰 컴포넌트 */}
+        {!!normal && !!clickedEquip && (
+          <EquipDetailCard equipData={normal[clickedEquip]} />
+        )}
       </div>
     </div>
   );

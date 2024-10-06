@@ -25,10 +25,10 @@ type AndroidCashItem = {
 
 export type AndroidEquipment = {
   date: string | null;
-  android_name: string;
-  android_nickname: string;
-  android_icon: string;
-  android_description: string;
+  android_name: string | null;
+  android_nickname: string | null;
+  android_icon: string | null;
+  android_description: string | null;
   android_hair: {
     hair_name: string | null;
     base_color: string | null;
@@ -43,11 +43,11 @@ export type AndroidEquipment = {
   };
   android_skin: string | null;
   android_cash_item_equipment: AndroidCashItem[];
-  android_ear_sensor_clip_flag: string;
-  android_gender: string;
-  android_grade: string;
-  android_non_humanoid_flag: string;
-  android_shop_usable_flag: string;
+  android_ear_sensor_clip_flag: string | null;
+  android_gender: string | null;
+  android_grade: string | null;
+  android_non_humanoid_flag: string | null;
+  android_shop_usable_flag: string | null;
   preset_no: number;
   /** TODO: 안드로이드 프리셋 지원 */
 };

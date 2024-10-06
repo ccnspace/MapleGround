@@ -11,6 +11,8 @@ import { BackIcon } from "./svg/BackIcon";
 import CharacterImg from "@/images/0.png";
 import { useCharacterStore } from "@/stores/character";
 import { useShallow } from "zustand/shallow";
+import { getCharacterStat } from "@/apis/getCharacterStat";
+import { getAllEquipmentsInfo } from "@/apis/getEquipment";
 
 const EmptyAltText = () => {
   return (
@@ -33,20 +35,35 @@ type EmptyProfileProps = {
 };
 const ProfileSearch = ({ setLoading }: EmptyProfileProps) => {
   const [inputValue, setValue] = useState("");
-  const { setCharacterBase, setCharacterStatus } = useCharacterStore(
+  const {
+    setCharacterBase,
+    setCharacterEquipments,
+    setCharacterStats,
+    setCharacterStatus,
+    resetCharacterData,
+  } = useCharacterStore(
     useShallow((state) => ({
       setCharacterBase: state.setCharacterBase,
       setCharacterStatus: state.setStatus,
+      setCharacterEquipments: state.setCharacterEquipments,
+      setCharacterStats: state.setCharacterStats,
+      resetCharacterData: state.resetCharacterData,
     }))
   );
 
   const requestCharacterInfo = async (nickname: string) => {
     try {
-      const response = await getCharacterBaseInfo(nickname);
-      setCharacterBase(response);
+      const [base, equipments, stats] = await Promise.all([
+        getCharacterBaseInfo(nickname),
+        getAllEquipmentsInfo(nickname),
+        getCharacterStat(nickname),
+      ]);
+      setCharacterBase(base);
+      setCharacterEquipments(equipments);
+      setCharacterStats(stats);
       setCharacterStatus("success");
     } catch (e) {
-      setCharacterBase(null);
+      resetCharacterData();
       setCharacterStatus("error");
     } finally {
       setLoading(false);

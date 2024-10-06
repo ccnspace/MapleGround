@@ -16,15 +16,21 @@ export async function GET(
   const urlParams = new URLSearchParams();
   if (date) urlParams.append("date", date);
 
-  const cash = await (
-    await fetch(`${getBaseUrl("cash", params.name)}?${urlParams.toString()}`)
-  ).json();
-  const normal = await (
-    await fetch(`${getBaseUrl("normal", params.name)}?${urlParams.toString()}`)
-  ).json();
-  const symbol = await (
-    await fetch(`${getBaseUrl("symbol", params.name)}?${urlParams.toString()}`)
-  ).json();
+  const [normal, cash, symbol] = await Promise.all([
+    (
+      await fetch(
+        `${getBaseUrl("normal", params.name)}?${urlParams.toString()}`
+      )
+    ).json(),
+    (
+      await fetch(`${getBaseUrl("cash", params.name)}?${urlParams.toString()}`)
+    ).json(),
+    (
+      await fetch(
+        `${getBaseUrl("symbol", params.name)}?${urlParams.toString()}`
+      )
+    ).json(),
+  ]);
 
   return Response.json({ cash, normal, symbol });
 }

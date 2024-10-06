@@ -1,6 +1,3 @@
-import { CashEquipmentInfo } from "./CashEquipment";
-import { SymbolEquipmentInfo } from "./SymbolEquipment";
-
 type ItemOption = {
   str: string;
   dex: string;
@@ -91,6 +88,7 @@ export type ItemEquipment = {
   additional_potential_option_3: string;
   equipment_level_increase: number;
   item_exceptional_option: ExceptionalOption;
+  /** 추가옵션 */
   item_add_option: ItemAddOption;
   growth_exp: number;
   growth_level: number;
@@ -101,6 +99,7 @@ export type ItemEquipment = {
   scroll_upgradeable_count: string;
   soul_name: string | null;
   soul_option: string | null;
+  /** 주문의 흔적 */
   item_etc_option: ItemEtcOption;
   starforce: string;
   starforce_scroll_flag: string;

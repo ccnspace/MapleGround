@@ -4,7 +4,8 @@ import { useCharacterInfo } from "@/hooks/useCharacterInfo";
 import type { AndroidEquipment } from "@/types/AndroidEquipment";
 import { ItemEquipment } from "@/types/Equipment";
 import Image from "next/image";
-import type { MouseEvent } from "react";
+import { useState, type MouseEvent } from "react";
+import { EquipDetailCard } from "./EquiqDetailCard";
 
 const ItemIcon = ({ item }: { item: ItemEquipment }) => (
   <Image
@@ -107,7 +108,7 @@ const AndroidEquipment = ({
 };
 
 export const EquipContainer = () => {
-  // const [clickedEquip, setClickedEquip] = useState("");
+  const [clickedEquip, setClickedEquip] = useState("");
   const { characterData } = useCharacterInfo();
   const { normal, android } = characterData.equipments || {};
 
@@ -115,7 +116,7 @@ export const EquipContainer = () => {
     const target = e.target as Element;
     const id = target.id || target.parentElement?.id;
     if (!id) return;
-    // setClickedEquip(id);
+    setClickedEquip(id);
   };
 
   return (
@@ -170,6 +171,9 @@ export const EquipContainer = () => {
       {/* 프리뷰 */}
       <div className="flex rounded-lg px-4 pt-4 pb-4 min-w-[320px]">
         {/* TODO: 장비 프리뷰 컴포넌트 */}
+        {!!normal && !!clickedEquip && (
+          <EquipDetailCard equipData={normal[clickedEquip]} />
+        )}
       </div>
     </div>
   );

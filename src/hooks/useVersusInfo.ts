@@ -28,7 +28,7 @@ export const useVersusInfo = () => {
   );
 
   const isCharacterSuccessFetched = () => {
-    const { status: fetchStatus } = useCharacterStore.getState();
+    const { fetchStatus } = useCharacterStore.getState();
     const hasCharacterFetched = fetchStatus === "success";
     if (!hasCharacterFetched) {
       openModal({ message: "먼저 왼쪽에서 캐릭터명을 검색해 주세요." });
@@ -56,12 +56,12 @@ export const useVersusInfo = () => {
   };
 
   const requestPersonData = async () => {
-    const { characterBase } = useCharacterStore.getState();
-    if (!characterBase) return;
+    const { characterAllInfo } = useCharacterStore.getState();
+    if (!characterAllInfo) return;
 
     setLoading(true);
 
-    const nickname = characterBase.character_name;
+    const nickname = characterAllInfo.basic.character_name;
     const {
       firstPersonDate,
       secondPersonDate,

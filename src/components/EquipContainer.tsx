@@ -1,14 +1,26 @@
 "use client";
 
 import { useCharacterInfo } from "@/hooks/useCharacterInfo";
+import { AndroidEquipment } from "@/types/AndroidEquipment";
 import { ItemEquipment } from "@/types/Equipment";
 import Image from "next/image";
-import { useState, type MouseEvent } from "react";
+import { type MouseEvent } from "react";
 
 const ItemIcon = ({ item }: { item: ItemEquipment }) => (
   <Image
     src={item.item_icon}
     alt={item.item_equipment_part}
+    unoptimized
+    width={52}
+    height={60}
+    style={{ width: "auto", height: "auto" }}
+  />
+);
+
+const AndroidIcon = ({ item }: { item: AndroidEquipment }) => (
+  <Image
+    src={item.android_icon}
+    alt={"안드로이드"}
     unoptimized
     width={52}
     height={60}
@@ -27,19 +39,20 @@ const commonEquipStyle =
   "flex justify-center items-center bg-slate-300 dark:bg-[#4f515a] w-16 h-16 rounded-md cursor-pointer";
 
 export const EquipContainer = () => {
+  // const [clickedEquip, setClickedEquip] = useState("");
   const { characterData } = useCharacterInfo();
-  const { normal, cash, symbol } = characterData.equipments || {};
+  const { normal, android } = characterData.equipments || {};
+
   const getPotentialStyle = (slot: string) => {
     const potentialTitle = normal?.[slot]?.potential_option_grade;
     return normal && potentialTitle && potentialStyle[potentialTitle];
   };
-  const [clickedEquip, setClickedEquip] = useState("");
 
   const handleClickIcon = (e: MouseEvent) => {
     const target = e.target as Element;
     const id = target.id || target.parentElement?.id;
     if (!id) return;
-    setClickedEquip(id);
+    // setClickedEquip(id);
   };
 
   return (
@@ -199,7 +212,7 @@ export const EquipContainer = () => {
             id="안드로이드"
             className={`${commonEquipStyle} ${getPotentialStyle("안드로이드")}`}
           >
-            {/* {normal && <ItemIcon item={normal["안드로이드"]} />} */}
+            {android && <AndroidIcon item={android} />}
           </div>
           <div
             id="기계 심장"

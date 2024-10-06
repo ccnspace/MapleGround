@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { NoticeContainer } from "./NoticeContainer";
 import { RightIcon } from "./svg/RightIcon";
 import { LeftIcon } from "./svg/LeftIcon";

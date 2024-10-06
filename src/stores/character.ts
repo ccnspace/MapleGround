@@ -1,45 +1,31 @@
-import { CharacterBase } from "@/types/Character";
-import { CharacterStat } from "@/types/CharacterStat";
-import { AllEquipmentsInfo } from "@/types/Equipment";
+import type { CharacterAllInfo } from "@/apis/getCharacterAllInfo";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 type CharacterState = {
-  status: "success" | "error" | "idle";
-  characterBase: CharacterBase | null;
-  characterEquipments: AllEquipmentsInfo | null;
-  characterStats: CharacterStat | null;
+  fetchStatus: "success" | "error" | "idle";
+  characterAllInfo: CharacterAllInfo | null;
 };
 
 type CharacterAction = {
-  setCharacterBase: (data: CharacterBase | null) => void;
-  setCharacterEquipments: (data: AllEquipmentsInfo | null) => void;
-  setCharacterStats: (data: CharacterStat | null) => void;
-  setStatus: (status: "success" | "error" | "idle") => void;
+  setFetchStatus: (status: "success" | "error" | "idle") => void;
+  setCharacterAllInfo: (allInfo: CharacterAllInfo) => void;
   resetCharacterData: () => void;
 };
 
 const initialState: CharacterState = {
-  status: "idle",
-  characterBase: null,
-  characterEquipments: null,
-  characterStats: null,
+  fetchStatus: "idle",
+  characterAllInfo: null,
 };
 
 export const useCharacterStore = create<CharacterState & CharacterAction>()(
   devtools((set) => ({
     ...initialState,
-    setCharacterBase: (characterBase) => {
-      set({ characterBase });
+    setCharacterAllInfo: (characterAllInfo) => {
+      set({ characterAllInfo });
     },
-    setCharacterEquipments(characterEquipments) {
-      set({ characterEquipments });
-    },
-    setCharacterStats(characterStats) {
-      set({ characterStats });
-    },
-    setStatus: (status) => {
-      set({ status });
+    setFetchStatus: (fetchStatus) => {
+      set({ fetchStatus });
     },
     resetCharacterData: () => {
       set({ ...initialState });

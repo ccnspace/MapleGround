@@ -1,4 +1,4 @@
-type CashItemOption = {
+export type CashItemOption = {
   option_type: string;
   option_value: string;
 };

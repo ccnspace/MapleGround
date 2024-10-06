@@ -32,17 +32,17 @@ export async function GET(
   const searchParams = request.nextUrl.searchParams;
   const date = searchParams.get("date") ?? "";
 
-  const baseUrl = `${process.env.NEXON_API_DOMAIN}/character/stat`;
+  const baseUrl = `${process.env.NEXON_API_DOMAIN}/character/item-equipment`;
   const urlParams = new URLSearchParams();
   if (ocidData.ocid) urlParams.append("ocid", ocidData.ocid);
   if (date) urlParams.append("date", date);
 
   const requestUrl = `${baseUrl}?${urlParams.toString()}`;
 
-  const detailResponse = await fetch(requestUrl, commonHeader);
+  const equipResponse = await fetch(requestUrl, commonHeader);
 
-  if (!detailResponse.ok) {
-    const response = await detailResponse.json();
+  if (!equipResponse.ok) {
+    const response = await equipResponse.json();
     return Response.json(
       { errorCode: response.error.name },
       {
@@ -51,6 +51,6 @@ export async function GET(
     );
   }
 
-  const detailStatData = await detailResponse.json();
-  return Response.json(detailStatData);
+  const equipData = await equipResponse.json();
+  return Response.json(equipData);
 }

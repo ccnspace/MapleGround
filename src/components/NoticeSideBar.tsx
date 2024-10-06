@@ -25,7 +25,7 @@ export const NoticeSideBar = () => {
 
   return (
     <div
-      className={`flex-shrink-0 h-full relative
+      className={`flex-shrink-0 h-full relative bg-white dark:bg-[#121212]
       shadow-xl
       px-4 ${isFold ? "w-0" : "w-80"} pt-3 pb-3
       font-medium text-lg`}

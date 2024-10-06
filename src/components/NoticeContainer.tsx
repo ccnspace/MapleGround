@@ -19,12 +19,13 @@ export const NoticeContainer = () => {
   const notices = useNoticeStore(useShallow((state) => state.notices));
 
   useEffect(() => {
+    if (notices) return;
     const requestNotices = async () => {
       const response = await getAllNotices();
       useNoticeStore.getState().setNotice(response);
     };
     requestNotices();
-  }, []);
+  }, [notices]);
 
   if (!notices) {
     return (

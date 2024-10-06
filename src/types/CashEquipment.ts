@@ -3,7 +3,7 @@ type CashItemOption = {
   option_value: string;
 };
 
-type BaseCashItemOption = {
+export type CashItemEquipment = {
   cash_item_equipment_part: string;
   cash_item_equipment_slot: string;
   cash_item_name: string;
@@ -23,12 +23,12 @@ export type CashEquipmentInfo = {
   character_class: string;
   character_look_mode: string;
   preset_no: number;
-  cash_item_equipment_base: BaseCashItemOption[];
-  cash_item_equipment_preset_1: BaseCashItemOption[];
-  cash_item_equipment_preset_2: BaseCashItemOption[];
-  cash_item_equipment_preset_3: BaseCashItemOption[];
-  additional_cash_item_equipment_base: BaseCashItemOption[];
-  additional_cash_item_equipment_preset_1: BaseCashItemOption[];
-  additional_cash_item_equipment_preset_2: BaseCashItemOption[];
-  additional_cash_item_equipment_preset_3: BaseCashItemOption[];
+  cash_item_equipment_base: CashItemEquipment[];
+  cash_item_equipment_preset_1: CashItemEquipment[];
+  cash_item_equipment_preset_2: CashItemEquipment[];
+  cash_item_equipment_preset_3: CashItemEquipment[];
+  additional_cash_item_equipment_base: CashItemEquipment[];
+  additional_cash_item_equipment_preset_1: CashItemEquipment[];
+  additional_cash_item_equipment_preset_2: CashItemEquipment[];
+  additional_cash_item_equipment_preset_3: CashItemEquipment[];
 };

@@ -68,7 +68,7 @@ type ItemEtcOption = {
 };
 type StarforceOption = ItemEtcOption;
 
-type ItemEquipment = {
+export type ItemEquipment = {
   item_equipment_part: string;
   item_equipment_slot: string;
   item_name: string;

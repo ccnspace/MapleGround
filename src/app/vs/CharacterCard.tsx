@@ -12,12 +12,17 @@ import { useShallow } from "zustand/shallow";
 type Props = {
   type: "first" | "second";
   direction?: "left" | "right";
+  characterImageUrl?: string;
 };
 
 export type DatePiece = Date | null;
 export type SelectedDate = DatePiece | [DatePiece, DatePiece];
 
-export const CharacterCard = ({ type, direction }: Props) => {
+export const CharacterCard = ({
+  type,
+  direction,
+  characterImageUrl,
+}: Props) => {
   const { setPersonDate } = useVersusStore(
     useShallow((state) => ({
       setPersonDate: state.setPersonDate,
@@ -30,13 +35,14 @@ export const CharacterCard = ({ type, direction }: Props) => {
     Array.isArray(selectedDate) ? selectedDate[0] : selectedDate
   ).format("YYYY-MM-DD");
 
-  const alignStyle = direction === "right" ? "ml-auto" : "";
-  const absoluteStyle = direction === "right" ? "right-3" : "";
-
   const checkFutureDate = (value: Date | null) => {
     if (value && value > new Date(Date.now())) return true;
     return false;
   };
+
+  const patternStyle = characterImageUrl
+    ? "conic-gradient(#d0caeb 25%, #c7c0e7 25% 50%, #d0caeb 50% 75%, #c7c0e7 75%)"
+    : "conic-gradient(#dfe6ee 25%, #e6ebf1 25% 50%, #dfe6ee 50% 75%, #e6ebf1 75%)";
 
   useEffect(() => {
     setPersonDate(type, dayjs(selectedDate as Date).format("YYYY-MM-DD"));
@@ -45,19 +51,19 @@ export const CharacterCard = ({ type, direction }: Props) => {
   return (
     <div
       style={{
-        background:
-          "conic-gradient(#dfe6ee 25%, #e6ebf1 25% 50%, #dfe6ee 50% 75%, #e6ebf1 75%)",
+        backgroundImage: patternStyle,
         backgroundSize: "30px 30px",
       }}
-      className="flex flex-col px-3 pt-3 pb-3 w-full h-full relative 
+      className="flex bg-[length:30px_30px] items-center justify-center flex-col
+      px-3 pt-3 pb-3 w-full h-full min-h-[368px] relative 
    bg-slate-300 border-2 border-slate-400
    rounded-lg"
     >
       <div
         onClick={() => setCalendar((prev) => !prev)}
         className={`flex justify-center gap-1 rounded-lg bg-slate-500
-    border border-slate-400 px-2 pt-2 pb-2 w-64 cursor-pointer
-    hover:bg-slate-600 transition-colors ${alignStyle}`}
+    border border-slate-400 px-2 pt-2 pb-2 w-full cursor-pointer
+    hover:bg-slate-600 transition-colors`}
       >
         <CalendarIcon />
         <span className="flex text-lg text-white font-bold">
@@ -65,7 +71,7 @@ export const CharacterCard = ({ type, direction }: Props) => {
         </span>
       </div>
       {showCalendar && (
-        <div className={`absolute top-[64px] z-10 ${absoluteStyle}`}>
+        <div className={`absolute top-[64px] z-10`}>
           <CustomCalendar
             calendarType="gregory"
             onChange={(value) => {
@@ -77,14 +83,20 @@ export const CharacterCard = ({ type, direction }: Props) => {
           />
         </div>
       )}
-      <Image
-        className={alignStyle}
-        style={direction === "left" ? { transform: "scale(-1, 1)" } : {}}
-        src={pesronShadow}
-        alt="person"
-        unoptimized
-        width={256}
-      />
+      <div className="flex mt-2 min-h-[368px] min-w-[360px] justify-center">
+        <Image
+          className="flex"
+          style={{
+            imageRendering: "pixelated",
+            ...(direction === "left" ? { transform: "scale(-1, 1)" } : {}),
+          }}
+          src={characterImageUrl ?? pesronShadow}
+          alt="person"
+          unoptimized
+          width={characterImageUrl ? 368 : 240}
+          height={368}
+        />
+      </div>
     </div>
   );
 };

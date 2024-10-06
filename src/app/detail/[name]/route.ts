@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -31,11 +32,12 @@ export async function GET(
   const ocidData = (await ocidResponse.json()) as { ocid: string };
   const searchParams = request.nextUrl.searchParams;
   const date = searchParams.get("date") ?? "";
+  const isToday = dayjs(Date.now()).format("YYYY-MM-DD") === date;
 
   const baseUrl = `${process.env.NEXON_API_DOMAIN}/character/stat`;
   const urlParams = new URLSearchParams();
   if (ocidData.ocid) urlParams.append("ocid", ocidData.ocid);
-  if (date) urlParams.append("date", date);
+  if (date && !isToday) urlParams.append("date", date);
 
   const requestUrl = `${baseUrl}?${urlParams.toString()}`;
 

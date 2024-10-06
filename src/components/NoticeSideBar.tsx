@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { NoticeContainer } from "./NoticeContainer";
 import { RightIcon } from "./svg/RightIcon";
 import { LeftIcon } from "./svg/LeftIcon";
 
 export const NoticeSideBar = () => {
-  const [isFold, setFold] = useState(
-    localStorage.getItem("foldStatus") === "fold"
-  );
+  const [isFold, setFold] = useState<boolean>(true);
+
+  useEffect(() => {
+    setFold(localStorage.getItem("foldStatus") === "fold");
+  }, []);
 
   const handleClick = () => {
     const foldStatus = localStorage.getItem("foldStatus");

@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -13,8 +14,10 @@ export async function GET(
 ) {
   const searchParams = request.nextUrl.searchParams;
   const date = searchParams.get("date") ?? "";
+  const isToday = dayjs(Date.now()).format("YYYY-MM-DD") === date;
+
   const urlParams = new URLSearchParams();
-  if (date) urlParams.append("date", date);
+  if (date && !isToday) urlParams.append("date", date);
 
   const [normal, cash, symbol] = await Promise.all([
     (

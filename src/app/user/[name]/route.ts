@@ -1,3 +1,6 @@
+import dayjs from "dayjs";
+import { NextRequest } from "next/server";
+
 export const dynamic = "force-dynamic";
 
 const commonHeader = {
@@ -7,7 +10,7 @@ const commonHeader = {
 };
 
 export async function GET(
-  _request: Request,
+  request: NextRequest,
   { params }: { params: { name: string } }
 ) {
   const username = params.name;
@@ -27,14 +30,21 @@ export async function GET(
   }
 
   const ocidData = (await ocidResponse.json()) as { ocid: string };
+  const searchParams = request.nextUrl.searchParams;
+  const date = searchParams.get("date") ?? "";
+  const isToday = dayjs(Date.now()).format("YYYY-MM-DD") === date;
 
-  const characterResponse = await fetch(
-    `${process.env.NEXON_API_DOMAIN}/character/basic?ocid=${ocidData.ocid}`,
-    commonHeader
-  );
+  const baseUrl = `${process.env.NEXON_API_DOMAIN}/character/basic`;
+  const urlParams = new URLSearchParams();
+  if (ocidData.ocid) urlParams.append("ocid", ocidData.ocid);
+  if (date && !isToday) urlParams.append("date", date);
 
-  if (!characterResponse.ok) {
-    const response = await characterResponse.json();
+  const requestUrl = `${baseUrl}?${urlParams.toString()}`;
+
+  const userResponse = await fetch(requestUrl, commonHeader);
+
+  if (!userResponse.ok) {
+    const response = await userResponse.json();
     return Response.json(
       { errorCode: response.error.name },
       {
@@ -43,6 +53,6 @@ export async function GET(
     );
   }
 
-  const characterData = await characterResponse.json();
-  return Response.json(characterData);
+  const userData = await userResponse.json();
+  return Response.json(userData);
 }

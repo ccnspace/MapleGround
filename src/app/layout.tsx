@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { SideBar } from "@/components/SideBar";
 import { NoticeSideBar } from "@/components/NoticeSideBar";
 import { pretendard } from "./fonts/pretendard";
+import { Modal } from "@/components/Modal";
 
 export const metadata: Metadata = {
   title: "MapleDot: 메닷",
@@ -20,6 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${pretendard.variable} font-pretendard`}>
         <Header />
+        <Modal />
         <div className="flex flex-row h-full gap-4">
           <SideBar />
           {children}

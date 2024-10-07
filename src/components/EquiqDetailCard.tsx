@@ -1,165 +1,138 @@
 import type { ItemEquipment } from "@/types/Equipment";
-import Image from "next/image";
-import { EquipOptionBuilder } from "@/utils/EquipmentOptionBuilder";
-import { Fragment } from "react";
-import { StarIcon } from "./svg/StarIcon";
+import { StarforceBadge } from "./Equip/StarforceBadge";
+import { EquipDescription } from "./Equip/EquipDescription";
+import { EquipDetailValue } from "./Equip/EquipDetailValue";
+import type { Options } from "@/types/Options";
+import { equipOptionList } from "@/consts/EquipOptionList";
+import { PotentialOption } from "./Equip/PotentialOption";
+import { Divider } from "./Equip/Divider";
 
-type EquipValueProps = {
-  equipData: ItemEquipment;
+type EquipDetailItemProps = {
   name: string;
-  isPercentage?: boolean;
+  alias: string;
+  equipData: ItemEquipment;
+  isPercent?: boolean;
 };
-type Options = {
-  [key: string]: string | number;
-};
-const EquipDetailValue = (props: EquipValueProps) => {
-  const { equipData, name, isPercentage = false } = props;
+const EquipDetailItem = (props: EquipDetailItemProps) => {
+  const { name, alias, equipData, isPercent } = props;
+  const totalOption = equipData.item_total_option as Options;
   const baseOption = equipData.item_base_option as Options;
-  const addOption = equipData.item_add_option as Options;
-  const etcOption = equipData.item_etc_option as Options;
-  const starforceOption = equipData.item_starforce_option as Options;
 
-  const baseValue = baseOption[name] as string;
-  const addValue = addOption[name] as string;
-  const etcValue = etcOption[name] as string;
-  const starforceValue = starforceOption[name] as string;
+  // TODO: string or number를 number로 반환해 주는 유틸함수 정의
+  const sign = parseInt(totalOption[name] as string) >= 0 ? "+" : "-";
+  const percent = isPercent ? "%" : "";
+  const isAddedOptions = totalOption[name] !== baseOption[name];
 
-  const element = new EquipOptionBuilder(isPercentage)
-    .applyBaseOption(baseValue)
-    .applyAddOption(addValue)
-    .applyEtcOption(etcValue)
-    .applyStarforceOption(starforceValue)
-    .build();
+  if (totalOption[name] === "0") return null;
 
   return (
-    <>
-      {"("}
-      {element?.map((_element, i) => (
-        <Fragment key={i}>{_element}</Fragment>
-      ))}
-      {")"}
-    </>
+    <p className="flex whitespace-pre text-white">
+      <span
+        className={`${isAddedOptions ? "text-cyan-400" : "text-white"}`}
+      >{`${alias} : ${sign}${totalOption[name]}${percent}`}</span>
+      <EquipDetailValue
+        equipData={equipData}
+        name={name}
+        isPercent={isPercent}
+      />
+    </p>
   );
 };
 
-type Props = {
+type EquipDetailCardProps = {
   equipData: ItemEquipment;
 };
-export const EquipDetailCard = ({ equipData }: Props) => {
+export const EquipDetailCard = ({ equipData }: EquipDetailCardProps) => {
+  const {
+    starforce,
+    item_icon,
+    item_name,
+    item_equipment_part,
+    scroll_upgradeable_count,
+    scroll_resilience_count,
+    cuttable_count,
+    golden_hammer_flag,
+    potential_option_grade,
+    item_description,
+    additional_potential_option_grade,
+    potential_option_1,
+    potential_option_2,
+    potential_option_3,
+    additional_potential_option_1,
+    additional_potential_option_2,
+    additional_potential_option_3,
+  } = equipData;
   const isAmazingForce = equipData.starforce_scroll_flag === "사용";
   const showStarforceBadge =
     !!equipData.starforce && equipData.starforce !== "0";
+  const canCuttableItem = equipData.cuttable_count !== "255";
 
   return (
     <div
-      className="flex flex-col min-w-80  max-w-80
+      className="flex flex-col min-w-80 max-w-80
      bg-slate-950/80 dark:bg-[#121212]/80 
      border border-gray-700
-     rounded-lg px-5 pt-4 pb-4"
+     rounded-lg px-5 pt-3 pb-4"
     >
-      {/* title */}
       {showStarforceBadge && (
-        <div
-          className={`flex justify-center items-center font-bold text-sm ${
-            isAmazingForce ? "text-sky-400" : "text-yellow-400"
-          }`}
-        >
-          <StarIcon isAmazingForce={isAmazingForce} />
-          {` x ${equipData.starforce}`}
-        </div>
+        <StarforceBadge isAmazingForce={isAmazingForce} starforce={starforce} />
       )}
-      <p className="flex justify-center text-white text-lg font-medium">
-        {equipData.item_name}
-      </p>
-      {/* item icon, item 간략정보*/}
-      <div className="flex flex-row items-center gap-2">
-        <div
-          className="flex items-center justify-center rounded-lg
-          mt-5 min-w-[100px] min-h-[100px]
-        bg-gray-600 dark:bg-gray-800 pt-3 pb-3 px-3"
-        >
-          <Image
-            src={equipData.item_icon}
-            unoptimized
-            style={{
-              imageRendering: "pixelated",
-              height: "60px",
-              width: "auto",
-            }}
-            width={60}
-            height={60}
-            alt={equipData.item_name}
-          />
-        </div>
-        <div className="flex text-white text-xs font-light">
-          <p>REQ LEVEL: </p>
-        </div>
-      </div>
-      {/* 아이템 디테일 */}
-      <p className="flex mt-4 mb-4 border-b-2 border-dotted border-b-gray-600"></p>
-      <div className="flex text-[12px] font-light flex-col">
+      <EquipDescription item_icon={item_icon} item_name={item_name} />
+      <Divider />
+      <div className="flex text-xs font-light flex-col gap-[2px]">
         <p className="text-white">
-          장비분류: <span>{equipData.item_equipment_part}</span>
+          장비분류: <span>{item_equipment_part}</span>
         </p>
-        <p className="text-white">
-          STR: {`+${equipData.item_total_option.str} `}
-          <EquipDetailValue equipData={equipData} name="str" />
-        </p>
-        <p className="text-white">
-          DEX: {`+${equipData.item_total_option.dex} `}
-          <EquipDetailValue equipData={equipData} name="dex" />
-        </p>
-        <p className="text-white">
-          INT: {`+${equipData.item_total_option.int} `}
-          <EquipDetailValue equipData={equipData} name="int" />
-        </p>
-        <p className="text-white">
-          LUK: {`+${equipData.item_total_option.luk} `}
-          <EquipDetailValue equipData={equipData} name="luk" />
-        </p>
-        <p className="text-white">
-          최대 HP: {`+${equipData.item_total_option.max_hp} `}
-          <EquipDetailValue equipData={equipData} name="max_hp" />
-        </p>
-        <p className="text-white">
-          최대 MP: {`+${equipData.item_total_option.max_mp} `}
-          <EquipDetailValue equipData={equipData} name="max_mp" />
-        </p>
-        <p className="text-white">
-          최대 HP: {`+${equipData.item_total_option.max_hp_rate}%`}
-        </p>
-        <p className="text-white">
-          최대 MP: {`+${equipData.item_total_option.max_mp_rate}%`}
-        </p>
-        <p className="text-white">
-          공격력: {`+${equipData.item_total_option.attack_power} `}
-          <EquipDetailValue equipData={equipData} name="attack_power" />
-        </p>
-        <p className="text-white">
-          마력: {`+${equipData.item_total_option.magic_power} `}
-          <EquipDetailValue equipData={equipData} name="magic_power" />
-        </p>
-        <p className="text-white">
-          방어력: {`+${equipData.item_total_option.armor} `}
-          <EquipDetailValue equipData={equipData} name="armor" />
-        </p>
-        <p className="text-white">
-          이동속도: {`+${equipData.item_total_option.armor} `}
-          <EquipDetailValue equipData={equipData} name="armor" />
-        </p>
-        <p className="text-white">
-          점프력: {`+${equipData.item_total_option.armor} `}
-          <EquipDetailValue equipData={equipData} name="armor" />
-        </p>
-        <p className="text-white">
-          올스탯: {`+${equipData.item_total_option.all_stat}% `}
-          <EquipDetailValue
+        {equipOptionList.map((item) => (
+          <EquipDetailItem
+            key={item.name}
+            name={item.name}
+            alias={item.alias}
             equipData={equipData}
-            name="all_stat"
-            isPercentage
+            isPercent={item.isPercent}
           />
+        ))}
+        <p className="text-white">
+          업그레이드 가능 횟수: {scroll_upgradeable_count}
+          <span className="text-yellow-500">
+            {` (복구 가능 횟수 : ${scroll_resilience_count})`}
+          </span>
         </p>
+        {golden_hammer_flag === "적용" && (
+          <p className="text-white">황금망치 제련 적용</p>
+        )}
+        {canCuttableItem && (
+          <p className="text-yellow-500">
+            {`가위 사용 가능 횟수 : ${cuttable_count}회`}
+          </p>
+        )}
       </div>
+      {item_description && (
+        <>
+          <Divider />
+          <p className="text-xs text-white whitespace-pre-wrap">
+            {item_description}
+          </p>
+        </>
+      )}
+      {potential_option_grade && (
+        <PotentialOption
+          type="potential"
+          grade={potential_option_grade}
+          options={[potential_option_1, potential_option_2, potential_option_3]}
+        />
+      )}
+      {additional_potential_option_grade && (
+        <PotentialOption
+          type="additional"
+          grade={additional_potential_option_grade}
+          options={[
+            additional_potential_option_1,
+            additional_potential_option_2,
+            additional_potential_option_3,
+          ]}
+        />
+      )}
     </div>
   );
 };

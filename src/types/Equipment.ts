@@ -18,7 +18,7 @@ type ItemOption = {
 };
 
 type BaseItemOption = ItemOption & { base_equipment_level: number };
-type TotalItemOption = ItemOption & {
+export type TotalItemOption = ItemOption & {
   damage: string;
   equipment_level_decrease: number;
 };
@@ -78,10 +78,12 @@ export type ItemEquipment = {
   item_base_option: BaseItemOption;
   potential_option_grade: string;
   additional_potential_option_grade: string;
+  /** 잠재능력 봉인 여부 */
   potential_option_flag: string;
   potential_option_1: string;
   potential_option_2: string;
   potential_option_3: string;
+  /** 에디셔널 잠재능력 봉인 여부 */
   additional_potential_option_flag: string;
   additional_potential_option_1: string;
   additional_potential_option_2: string;

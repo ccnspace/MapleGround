@@ -2,23 +2,22 @@ import type { ReactElement } from "react";
 
 export class EquipOptionBuilder {
   private elements: ReactElement[] = [];
-  private isPercentage = false;
+  private isPercent = false;
 
-  constructor(isPercentage: boolean) {
-    this.isPercentage = isPercentage;
+  constructor(isPercent: boolean) {
+    this.isPercent = isPercent;
   }
 
   private getOptionString({
-    option,
+    option = "0",
     isSign = true,
   }: {
     option: string | undefined;
     isSign?: boolean;
   }) {
-    if (!option) return "";
     const sign = parseInt(option) < 0 ? "-" : "+";
     const customStr = !isSign ? `${option}` : ` ${sign}${option}`;
-    return this.isPercentage ? `${customStr}%` : `${customStr}`;
+    return this.isPercent ? `${customStr}%` : `${customStr}`;
   }
 
   applyBaseOption(option: string) {
@@ -51,7 +50,7 @@ export class EquipOptionBuilder {
   applyStarforceOption(option?: string) {
     if (!option || option === "0") return this;
     this.elements.push(
-      <span className="text-yellow-600">
+      <span className="text-yellow-500">
         {this.getOptionString({ option })}
       </span>
     );

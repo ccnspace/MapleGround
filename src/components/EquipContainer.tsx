@@ -32,7 +32,7 @@ const AndroidIcon = ({ icon }: { icon: AndroidEquipment["android_icon"] }) => (
 
 const StarForceBadge = ({ item }: { item: ItemEquipment }) => {
   const starforce = parseInt(item?.starforce);
-  const isAmazingForce = item.starforce_scroll_flag === "사용";
+  const isAmazingForce = item?.starforce_scroll_flag === "사용";
 
   if (!item?.starforce || (!isAmazingForce && starforce < 17)) return null;
 
@@ -49,7 +49,7 @@ const StarForceBadge = ({ item }: { item: ItemEquipment }) => {
     amazing: "bg-slate-500 text-blue-200",
     "17+": "bg-blue-500",
     "22": "bg-lime-600",
-    "23": "bg-cyan-900",
+    "23": "bg-purple-900",
     "24": "bg-pink-800",
     "25": "bg-slate-800",
   };
@@ -65,7 +65,7 @@ const StarForceBadge = ({ item }: { item: ItemEquipment }) => {
   );
 };
 
-const potentialStyle: { [key: string]: string } = {
+const potentialStyle: Record<string, string> = {
   레전드리: "border-2 border-lime-400",
   유니크: "border-2 border-yellow-400",
   에픽: "border-2 border-purple-500",
@@ -176,7 +176,7 @@ export const EquipContainer = () => {
       </div>
 
       {/* 프리뷰 */}
-      <div className="flex rounded-lg px-4 pt-4 pb-4 min-w-[320px]">
+      <div className="flex items-center rounded-lg px-4 pt-4 pb-4 min-w-[320px] bg-slate-200 dark:bg-[#25272e]">
         {/* TODO: 장비 프리뷰 컴포넌트 */}
         {!!normal && !!clickedEquip && (
           <EquipDetailCard equipData={normal[clickedEquip]} />

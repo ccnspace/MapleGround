@@ -1,48 +1,15 @@
 import type { ItemEquipment } from "@/types/Equipment";
-import { StarforceBadge } from "./Equip/StarforceBadge";
-import { EquipDescription } from "./Equip/EquipDescription";
-import { EquipDetailValue } from "./Equip/EquipDetailValue";
-import type { Options } from "@/types/Options";
+import { PotentialOption } from "./PotentialOption";
+import { Divider } from "../Divider";
+import { EquipDetailItem } from "./EquipDetailItem";
 import { equipOptionList } from "@/consts/EquipOptionList";
-import { PotentialOption } from "./Equip/PotentialOption";
-import { Divider } from "./Equip/Divider";
+import { StarforceBadge } from "../StarforceBadge";
+import { EquipDescription } from "./EquipDescription";
 
-type EquipDetailItemProps = {
-  name: string;
-  alias: string;
-  equipData: ItemEquipment;
-  isPercent?: boolean;
+type Props = {
+  item: ItemEquipment;
 };
-const EquipDetailItem = (props: EquipDetailItemProps) => {
-  const { name, alias, equipData, isPercent } = props;
-  const totalOption = equipData.item_total_option as Options;
-  const baseOption = equipData.item_base_option as Options;
-
-  // TODO: string or number를 number로 반환해 주는 유틸함수 정의
-  const sign = parseInt(totalOption[name] as string) >= 0 ? "+" : "-";
-  const percent = isPercent ? "%" : "";
-  const isAddedOptions = totalOption[name] !== baseOption[name];
-
-  if (totalOption[name] === "0") return null;
-
-  return (
-    <p className="flex whitespace-pre text-white">
-      <span
-        className={`${isAddedOptions ? "text-cyan-400" : "text-white"}`}
-      >{`${alias} : ${sign}${totalOption[name]}${percent}`}</span>
-      <EquipDetailValue
-        equipData={equipData}
-        name={name}
-        isPercent={isPercent}
-      />
-    </p>
-  );
-};
-
-type EquipDetailCardProps = {
-  equipData: ItemEquipment;
-};
-export const EquipDetailCard = ({ equipData }: EquipDetailCardProps) => {
+export const NormalContainer = ({ item }: Props) => {
   const {
     starforce,
     item_icon,
@@ -61,19 +28,13 @@ export const EquipDetailCard = ({ equipData }: EquipDetailCardProps) => {
     additional_potential_option_1,
     additional_potential_option_2,
     additional_potential_option_3,
-  } = equipData;
-  const isAmazingForce = equipData.starforce_scroll_flag === "사용";
-  const showStarforceBadge =
-    !!equipData.starforce && equipData.starforce !== "0";
-  const canCuttableItem = equipData.cuttable_count !== "255";
+  } = item;
+  const isAmazingForce = item.starforce_scroll_flag === "사용";
+  const showStarforceBadge = !!item.starforce && item.starforce !== "0";
+  const canCuttableItem = item.cuttable_count !== "255";
 
   return (
-    <div
-      className="flex flex-col min-w-80 max-w-80
-     bg-slate-950/80 dark:bg-[#121212]/80 
-     border border-gray-700
-     rounded-lg px-5 pt-3 pb-4"
-    >
+    <>
       {showStarforceBadge && (
         <StarforceBadge isAmazingForce={isAmazingForce} starforce={starforce} />
       )}
@@ -83,13 +44,13 @@ export const EquipDetailCard = ({ equipData }: EquipDetailCardProps) => {
         <p className="text-white">
           장비분류: <span>{item_equipment_part}</span>
         </p>
-        {equipOptionList.map((item) => (
+        {equipOptionList.map((option) => (
           <EquipDetailItem
-            key={item.name}
-            name={item.name}
-            alias={item.alias}
-            equipData={equipData}
-            isPercent={item.isPercent}
+            key={option.name}
+            name={option.name}
+            alias={option.alias}
+            equipData={item}
+            isPercent={option.isPercent}
           />
         ))}
         <p className="text-white">
@@ -133,6 +94,6 @@ export const EquipDetailCard = ({ equipData }: EquipDetailCardProps) => {
           ]}
         />
       )}
-    </div>
+    </>
   );
 };

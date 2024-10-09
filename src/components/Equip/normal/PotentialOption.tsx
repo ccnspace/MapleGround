@@ -1,4 +1,4 @@
-import { Divider } from "./Divider";
+import { Divider } from "../Divider";
 
 type Props = {
   grade: string;
@@ -13,6 +13,7 @@ const potentialStyle: Record<string, string> = {
   레어: "text-sky-400",
 };
 
+/** 잠재 능력 컴포넌트 */
 export const PotentialOption = (props: Props) => {
   const { grade, options, type } = props;
   const title =
@@ -22,12 +23,12 @@ export const PotentialOption = (props: Props) => {
   return (
     <>
       <Divider />
-      <p className="flex flex-col text-xs font-light text-white whitespace-pre-wrap gap-[1px]">
+      <div className="flex flex-col text-xs font-light text-white whitespace-pre-wrap gap-[1px]">
         <p className={`${potentialStyle[grade]} text-xs`}>{title}</p>
         {options.map((item, i) => (
           <p key={i}>{item}</p>
         ))}
-      </p>
+      </div>
     </>
   );
 };

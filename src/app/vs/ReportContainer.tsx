@@ -17,8 +17,8 @@ export const ReportContainer = () => {
   const handleClick = async () => {
     if (validateReport()) {
       // TODO: 비교 리포트 만들기
-      const { characterAllInfo } = useCharacterStore.getState();
-      if (!characterAllInfo) return;
+      const { characterAttributes } = useCharacterStore.getState();
+      if (!characterAttributes) return;
 
       await requestPersonData();
     }

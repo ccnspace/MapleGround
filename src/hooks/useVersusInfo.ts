@@ -1,4 +1,4 @@
-import { getCharacterAllInfo } from "@/apis/getCharacterAllInfo";
+import { getCharacterAttributes } from "@/apis/getCharacterAttributes";
 import { useCharacterStore } from "@/stores/character";
 import { useVersusStore } from "@/stores/versus";
 import { openModal } from "@/utils/openModal";
@@ -15,8 +15,8 @@ export const useVersusInfo = () => {
   );
 
   const isCharacterSuccessFetched = () => {
-    const { characterAllInfo } = useCharacterStore.getState();
-    if (!characterAllInfo) {
+    const { characterAttributes } = useCharacterStore.getState();
+    if (!characterAttributes) {
       openModal({ message: "먼저 왼쪽에서 캐릭터명을 검색해 주세요." });
       return false;
     }
@@ -42,18 +42,18 @@ export const useVersusInfo = () => {
   };
 
   const requestPersonData = async () => {
-    const { characterAllInfo } = useCharacterStore.getState();
-    if (!characterAllInfo) return;
+    const { characterAttributes } = useCharacterStore.getState();
+    if (!characterAttributes) return;
 
     setLoading(true);
 
-    const nickname = characterAllInfo.basic.character_name;
+    const nickname = characterAttributes.basic.character_name;
     const { firstPersonDate, secondPersonDate, setPersonInfo } =
       useVersusStore.getState();
 
     const [firstPersonResponse, secondePersonResponse] = await Promise.all([
-      getCharacterAllInfo(nickname, firstPersonDate),
-      getCharacterAllInfo(nickname, secondPersonDate),
+      getCharacterAttributes(nickname, firstPersonDate),
+      getCharacterAttributes(nickname, secondPersonDate),
     ]);
 
     setPersonInfo("first", firstPersonResponse);

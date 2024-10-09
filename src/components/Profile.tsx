@@ -10,9 +10,9 @@ import CharacterImg from "@/images/0.png";
 import { useCharacterStore } from "@/stores/character";
 import { useShallow } from "zustand/shallow";
 import {
-  CharacterAllInfo,
-  getCharacterAllInfo,
-} from "@/apis/getCharacterAllInfo";
+  CharacterAttributes,
+  getCharacterAttributes,
+} from "@/apis/getCharacterAttributes";
 
 const EmptyAltText = () => {
   return (
@@ -35,10 +35,10 @@ type EmptyProfileProps = {
 };
 const ProfileSearch = ({ setLoading }: EmptyProfileProps) => {
   const [inputValue, setValue] = useState("");
-  const { setCharacterAllInfo, setFetchStatus, resetCharacterData } =
+  const { setCharacterAttributes, setFetchStatus, resetCharacterData } =
     useCharacterStore(
       useShallow((state) => ({
-        setCharacterAllInfo: state.setCharacterAllInfo,
+        setCharacterAttributes: state.setCharacterAttributes,
         setFetchStatus: state.setFetchStatus,
         resetCharacterData: state.resetCharacterData,
       }))
@@ -46,8 +46,8 @@ const ProfileSearch = ({ setLoading }: EmptyProfileProps) => {
 
   const requestCharacterInfo = async (nickname: string) => {
     try {
-      const response = await getCharacterAllInfo(nickname);
-      setCharacterAllInfo(response);
+      const response = await getCharacterAttributes(nickname);
+      setCharacterAttributes(response);
       setFetchStatus("success");
     } catch (e) {
       resetCharacterData();
@@ -85,9 +85,9 @@ const ProfileSearch = ({ setLoading }: EmptyProfileProps) => {
 };
 
 type ProfileProps = {
-  characterAllInfo: CharacterAllInfo;
+  characterAttributes: CharacterAttributes;
 };
-const Profile = ({ characterAllInfo }: ProfileProps) => {
+const Profile = ({ characterAttributes }: ProfileProps) => {
   const {
     character_class,
     character_level,
@@ -96,7 +96,7 @@ const Profile = ({ characterAllInfo }: ProfileProps) => {
     character_image,
     character_exp_rate,
     world_name,
-  } = characterAllInfo.basic;
+  } = characterAttributes.basic;
 
   const currentDate = new Date().toLocaleString("ko-kr", {
     dateStyle: "long",
@@ -166,19 +166,19 @@ const Profile = ({ characterAllInfo }: ProfileProps) => {
 
 export const ProfileWrapper = () => {
   const [isLoading, setLoading] = useState(false);
-  const { fetchStatus, characterAllInfo, resetCharacterData } =
+  const { fetchStatus, characterAttributes, resetCharacterData } =
     useCharacterStore(
       useShallow((state) => ({
         fetchStatus: state.fetchStatus,
-        characterAllInfo: state.characterAllInfo,
+        characterAttributes: state.characterAttributes,
         setFetchStatus: state.setFetchStatus,
         resetCharacterData: state.resetCharacterData,
       }))
     );
 
   const isEmptyProfile =
-    !characterAllInfo && fetchStatus === "idle" && !isLoading;
-  const hasProfile = fetchStatus && characterAllInfo && !isLoading;
+    !characterAttributes && fetchStatus === "idle" && !isLoading;
+  const hasProfile = fetchStatus && characterAttributes && !isLoading;
   const isSearchError = fetchStatus === "error";
 
   const bgColor = !hasProfile
@@ -211,7 +211,7 @@ export const ProfileWrapper = () => {
       {isSearchError && (
         <p className="text-white text-base">검색결과가 없습니다.</p>
       )}
-      {hasProfile && <Profile characterAllInfo={characterAllInfo} />}
+      {hasProfile && <Profile characterAttributes={characterAttributes} />}
       {(hasProfile || isSearchError) && (
         <div
           className="absolute right-0 top-0 px-3 pt-3 hover:cursor-pointer"

@@ -1,16 +1,16 @@
-import type { CharacterAllInfo } from "@/apis/getCharacterAllInfo";
+import type { CharacterAttributes } from "@/apis/getCharacterAttributes";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 interface VersusState {
   firstPersonDate: string;
   secondPersonDate: string;
-  firstPersonInfo: CharacterAllInfo | null;
-  secondPersonInfo: CharacterAllInfo | null;
+  firstPersonInfo: CharacterAttributes | null;
+  secondPersonInfo: CharacterAttributes | null;
   setPersonDate: (type: "first" | "second", date: string) => void;
   setPersonInfo: (
     type: "first" | "second",
-    allInfo: CharacterAllInfo | null
+    data: CharacterAttributes | null
   ) => void;
 }
 

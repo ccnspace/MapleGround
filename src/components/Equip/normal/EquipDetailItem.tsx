@@ -8,6 +8,8 @@ type EquipValueProps = {
   name: string;
   isPercent?: boolean;
 };
+
+/** 옵션을 구성하는 자세한 + 수치들 */
 export const EquipDetailValue = (props: EquipValueProps) => {
   const { equipData, name, isPercent = false } = props;
   const baseOption = equipData.item_base_option as Options;
@@ -37,5 +39,37 @@ export const EquipDetailValue = (props: EquipValueProps) => {
       ))}
       {")"}
     </>
+  );
+};
+
+type EquipDetailItemProps = {
+  name: string;
+  alias: string;
+  equipData: ItemEquipment;
+  isPercent?: boolean;
+};
+export const EquipDetailItem = (props: EquipDetailItemProps) => {
+  const { name, alias, equipData, isPercent } = props;
+  const totalOption = equipData.item_total_option as Options;
+  const baseOption = equipData.item_base_option as Options;
+
+  // TODO: string or number를 number로 반환해 주는 유틸함수 정의
+  const sign = parseInt(totalOption[name] as string) >= 0 ? "+" : "-";
+  const percent = isPercent ? "%" : "";
+  const isAddedOptions = totalOption[name] !== baseOption[name];
+
+  if (totalOption[name] === "0") return null;
+
+  return (
+    <p className="flex whitespace-pre text-white">
+      <span
+        className={`${isAddedOptions ? "text-cyan-400" : "text-white"}`}
+      >{`${alias} : ${sign}${totalOption[name]}${percent}`}</span>
+      <EquipDetailValue
+        equipData={equipData}
+        name={name}
+        isPercent={isPercent}
+      />
+    </p>
   );
 };

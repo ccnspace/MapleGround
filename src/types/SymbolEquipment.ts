@@ -1,4 +1,4 @@
-type SymbolOption = {
+export type SymbolOption = {
   symbol_name: string;
   symbol_icon: string;
   symbol_description: string;

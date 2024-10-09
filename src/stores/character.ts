@@ -1,28 +1,28 @@
-import type { CharacterAllInfo } from "@/apis/getCharacterAllInfo";
+import type { CharacterAttributes } from "@/apis/getCharacterAttributes";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 type CharacterState = {
   fetchStatus: "success" | "error" | "idle";
-  characterAllInfo: CharacterAllInfo | null;
+  characterAttributes: CharacterAttributes | null;
 };
 
 type CharacterAction = {
   setFetchStatus: (status: "success" | "error" | "idle") => void;
-  setCharacterAllInfo: (allInfo: CharacterAllInfo) => void;
+  setCharacterAttributes: (data: CharacterAttributes) => void;
   resetCharacterData: () => void;
 };
 
 const initialState: CharacterState = {
   fetchStatus: "idle",
-  characterAllInfo: null,
+  characterAttributes: null,
 };
 
 export const useCharacterStore = create<CharacterState & CharacterAction>()(
   devtools((set) => ({
     ...initialState,
-    setCharacterAllInfo: (characterAllInfo) => {
-      set({ characterAllInfo });
+    setCharacterAttributes: (characterAttributes) => {
+      set({ characterAttributes });
     },
     setFetchStatus: (fetchStatus) => {
       set({ fetchStatus });

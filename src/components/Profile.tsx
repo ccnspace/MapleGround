@@ -13,6 +13,7 @@ import {
   CharacterAttributes,
   getCharacterAttributes,
 } from "@/apis/getCharacterAttributes";
+import { useModalStore } from "@/stores/modal";
 
 const EmptyAltText = () => {
   return (
@@ -186,7 +187,13 @@ export const ProfileWrapper = () => {
     : "bg-slate-900 border-2 border-slate-600";
 
   const resetProfile = () => {
-    resetCharacterData();
+    useModalStore.getState().setModal({
+      type: "confirm",
+      message: "설정된 캐릭터를 초기화 하시겠어요?",
+      confirmCallback: () => {
+        resetCharacterData();
+      },
+    });
   };
 
   return (

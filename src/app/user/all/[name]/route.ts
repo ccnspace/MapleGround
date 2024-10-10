@@ -1,12 +1,11 @@
 import dayjs from "dayjs";
 import { NextRequest } from "next/server";
 
-export const dynamic = "force-dynamic";
-
-const commonHeader = {
+const commonHeader: RequestInit = {
   headers: {
     "x-nxopen-api-key": process.env.API_KEY || "",
   },
+  next: { revalidate: 0 },
 };
 
 const makeRequestUrls = (urlParams: string) => {
@@ -33,6 +32,7 @@ const makeRequestUrls = (urlParams: string) => {
   return urls.map((url) => `${url}?${urlParams}`);
 };
 
+export const dynamic = "force-dynamic";
 export async function GET(
   request: NextRequest,
   { params }: { params: { name: string } }

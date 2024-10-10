@@ -26,17 +26,25 @@ export type CharacterInfo = {
 
 /** 현재 검색한 캐릭터의 정보를 반환하는 hook */
 export const useCharacterInfo = () => {
-  const { basic, normalEquip, cashEquip, symbolEquip, androidEquip, stat } =
-    useCharacterStore(
-      useShallow((state) => ({
-        basic: state.characterAttributes?.basic,
-        normalEquip: state.characterAttributes?.normalEquip,
-        cashEquip: state.characterAttributes?.cashEquip,
-        symbolEquip: state.characterAttributes?.symbolEquip,
-        androidEquip: state.characterAttributes?.androidEquip,
-        stat: state.characterAttributes?.stat,
-      }))
-    );
+  const {
+    characterAttributes,
+    basic,
+    normalEquip,
+    cashEquip,
+    symbolEquip,
+    androidEquip,
+    stat,
+  } = useCharacterStore(
+    useShallow((state) => ({
+      characterAttributes: state.characterAttributes,
+      basic: state.characterAttributes?.basic,
+      normalEquip: state.characterAttributes?.normalEquip,
+      cashEquip: state.characterAttributes?.cashEquip,
+      symbolEquip: state.characterAttributes?.symbolEquip,
+      androidEquip: state.characterAttributes?.androidEquip,
+      stat: state.characterAttributes?.stat,
+    }))
+  );
 
   /** 아이템 분류가 key값이 되는 객체로 변환 (인벤토리 UI에 쉽게 넣기 위함) */
   const convertToEquipmentObjects = ({
@@ -98,8 +106,9 @@ export const useCharacterInfo = () => {
     [normalEquip, cashEquip, symbolEquip]
   );
 
-  const characterInfo: CharacterInfo = useMemo(
-    () => ({
+  const characterInfo: CharacterInfo | null = useMemo(() => {
+    if (!characterAttributes) return null;
+    return {
       basic,
       equipments: {
         normal: normalEquipObject,
@@ -109,17 +118,17 @@ export const useCharacterInfo = () => {
         android: androidEquip,
       },
       stat,
-    }),
-    [
-      normalEquipObject,
-      cashEquipObject,
-      arcaneSymbolObject,
-      authenticSymbolObject,
-      androidEquip,
-      stat,
-      basic,
-    ]
-  );
+    };
+  }, [
+    characterAttributes,
+    normalEquipObject,
+    cashEquipObject,
+    arcaneSymbolObject,
+    authenticSymbolObject,
+    androidEquip,
+    stat,
+    basic,
+  ]);
 
   return { characterInfo };
 };

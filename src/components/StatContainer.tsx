@@ -3,7 +3,7 @@
 import { useCharacterInfo } from "@/hooks/useCharacterInfo";
 
 export const StatContainer = () => {
-  const { characterData } = useCharacterInfo();
+  const { characterInfo } = useCharacterInfo();
 
   return (
     <div

@@ -12,7 +12,9 @@ export type SymbolOption = {
   symbol_drop_rate: string;
   symbol_meso_rate: string;
   symbol_exp_rate: string;
+  /** 현재 보유 성장치 */
   symbol_growth_count: number;
+  /** 성장 시 필요한 성장치 */
   symbol_require_growth_count: number;
 };
 

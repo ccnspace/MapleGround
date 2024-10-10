@@ -25,7 +25,7 @@ export type CharacterInfo = {
 };
 
 /** 현재 검색한 캐릭터의 정보를 반환하는 hook */
-export const useCharacterInfo = () => {
+export const useCharacterInfo = (preset?: number) => {
   const {
     characterAttributes,
     basic,
@@ -51,20 +51,32 @@ export const useCharacterInfo = () => {
     normalEquip,
     cashEquip,
     symbolEquip,
+    preset,
   }: {
     normalEquip: EquipmentInfo | undefined;
     cashEquip: CashEquipmentInfo | undefined;
     symbolEquip: SymbolEquipmentInfo | undefined;
+    preset?: number;
   }) => {
     const normalObject: Record<string, ItemEquipment> = {};
     const cashObject: Record<string, CashItemEquipment> = {};
     const arcaneObject: Record<string, SymbolOption> = {};
     const authenticObject: Record<string, SymbolOption> = {};
 
-    const normalEquipObject = normalEquip?.item_equipment.reduce((acc, cur) => {
-      acc[cur.item_equipment_slot] = cur;
-      return acc;
-    }, normalObject);
+    const getNormalEquipSource = (preset?: number) => {
+      if (preset === 1) return normalEquip?.item_equipment_preset_1;
+      if (preset === 2) return normalEquip?.item_equipment_preset_2;
+      if (preset === 3) return normalEquip?.item_equipment_preset_3;
+      return normalEquip?.item_equipment;
+    };
+
+    const normalEquipObject = getNormalEquipSource(preset)?.reduce(
+      (acc, cur) => {
+        acc[cur.item_equipment_slot] = cur;
+        return acc;
+      },
+      normalObject
+    );
 
     const cashEquipObject = cashEquip?.cash_item_equipment_base.reduce(
       (acc, cur) => {
@@ -102,8 +114,14 @@ export const useCharacterInfo = () => {
     arcaneSymbolObject,
     authenticSymbolObject,
   } = useMemo(
-    () => convertToEquipmentObjects({ normalEquip, cashEquip, symbolEquip }),
-    [normalEquip, cashEquip, symbolEquip]
+    () =>
+      convertToEquipmentObjects({
+        normalEquip,
+        cashEquip,
+        symbolEquip,
+        preset,
+      }),
+    [normalEquip, cashEquip, symbolEquip, preset]
   );
 
   const characterInfo: CharacterInfo | null = useMemo(() => {

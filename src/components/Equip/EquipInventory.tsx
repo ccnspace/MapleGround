@@ -128,7 +128,7 @@ const SymbolEquipment = ({
       id={symbol?.symbol_name}
       className={`flex flex-col justify-center items-center gap-1 w-[50px] cursor-pointer
       px-2 pt-1 pb-1 rounded-md bg-slate-300 dark:bg-[#4f515a] ${
-        isMaxLevel ? "border border-purple-300" : ""
+        isMaxLevel ? "border-2 border-purple-300" : ""
       }`}
     >
       {!!symbol?.symbol_icon && (
@@ -153,7 +153,7 @@ const SymbolEquipment = ({
 };
 
 type Props = {
-  equipments: CharacterEquipments;
+  equipments?: CharacterEquipments;
   setSelectedEquipName: (name: string) => void;
 };
 export const EquipInventory = memo((props: Props) => {
@@ -163,7 +163,11 @@ export const EquipInventory = memo((props: Props) => {
     android,
     arcaneSymbol = {},
     authenticSymbol = {},
-  } = equipments;
+  } = equipments || {};
+
+  const arcaneSymbolList = Object.values(arcaneSymbol);
+  const authenticSymbolList = Object.values(authenticSymbol);
+  const hasSymbol = !!arcaneSymbolList.length || !!authenticSymbolList.length;
 
   const handleClickIcon = (e: MouseEvent) => {
     const target = e.target as Element;
@@ -214,6 +218,16 @@ export const EquipInventory = memo((props: Props) => {
         <AndroidEquipment equipData={android} />
         <Equipment name="기계 심장" equipData={normal} />
       </div>
+      {hasSymbol && (
+        <div className="flex mr-auto">
+          <p
+            className="flex font-bold text-sm px-2 pb-1 pt-1
+         border-l-4 border-l-purple-300"
+          >
+            심볼 아이템
+          </p>
+        </div>
+      )}
       <div
         onClick={handleClickIcon}
         className="flex flex-col mt-3 items-start gap-2"

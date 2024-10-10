@@ -61,7 +61,7 @@ export const EquipDetailItem = (props: EquipDetailItemProps) => {
   if (totalOption[name] === "0") return null;
 
   return (
-    <p className="flex whitespace-pre text-white">
+    <p className="flex whitespace-pre text-white font-medium">
       <span
         className={`${isAddedOptions ? "text-cyan-400" : "text-white"}`}
       >{`${alias} : ${sign}${totalOption[name]}${percent}`}</span>

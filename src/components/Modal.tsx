@@ -61,7 +61,7 @@ export const Modal = () => {
     <>
       <div
         className="flex shrink-0 w-[350px] z-50 absolute left-[45%] top-1/3 flex-col
-         bg-white dark:bg-[#121212] shadow rounded-lg gap-2 text-center
+         bg-white dark:bg-[#2c2e38] shadow rounded-lg gap-2 text-center
       px-3 pt-6 pb-6"
       >
         <p className="flex whitespace-pre-wrap text-[18px] pt-2 pb-2 justify-center font-medium">

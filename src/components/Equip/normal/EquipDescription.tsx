@@ -22,7 +22,6 @@ export const EquipDescription = ({ item_icon, item_name }: Props) => {
             src={item_icon}
             unoptimized
             style={{
-              imageRendering: "pixelated",
               height: "42px",
               width: "auto",
             }}

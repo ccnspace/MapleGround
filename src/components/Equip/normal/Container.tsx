@@ -40,7 +40,7 @@ export const NormalContainer = ({ item }: Props) => {
       )}
       <EquipDescription item_icon={item_icon} item_name={item_name} />
       <Divider />
-      <div className="flex text-xs font-light flex-col gap-[2px]">
+      <div className="flex text-xs flex-col gap-[2px]">
         <p className="text-white">
           장비분류: <span>{item_equipment_part}</span>
         </p>

@@ -49,6 +49,7 @@ export async function GET(
   }
 
   const ocidData = (await ocidResponse.json()) as { ocid: string };
+
   const searchParams = request.nextUrl.searchParams;
   const date = searchParams.get("date") ?? "";
   const isToday = dayjs(Date.now()).format("YYYY-MM-DD") === date;
@@ -58,6 +59,23 @@ export async function GET(
   if (date && !isToday) urlParams.append("date", date);
 
   const requestUrls = makeRequestUrls(urlParams.toString());
+
+  const urlFetcher = async (url: string) => {
+    const response = await fetch(url, commonHeader);
+    const json = await response.json();
+    const requestUrl = new URL(url);
+    requestUrl.searchParams.delete("ocid");
+
+    if (response.ok) return json;
+    throw Error(
+      JSON.stringify({
+        name: json.error.name,
+        message: json.error.message,
+        requestUrl: requestUrl.toString(),
+      })
+    );
+  };
+
   try {
     const [
       basic,
@@ -68,9 +86,7 @@ export async function GET(
       cashEquip,
       petEquip,
       androidEquip,
-    ] = await Promise.all(
-      requestUrls.map(async (url) => (await fetch(url, commonHeader)).json())
-    );
+    ] = await Promise.all(requestUrls.map(urlFetcher));
 
     return Response.json({
       basic,
@@ -83,6 +99,10 @@ export async function GET(
       androidEquip,
     });
   } catch (e) {
-    return Response.json({ error: e }, { status: 400 });
+    if (e instanceof Error) {
+      const parsed = JSON.parse(e.message);
+      return Response.json(parsed, { status: 400 });
+    }
+    return Response.json({ message: "Fetch Failed" }, { status: 400 });
   }
 }

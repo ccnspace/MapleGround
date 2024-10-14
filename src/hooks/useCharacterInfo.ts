@@ -148,5 +148,5 @@ export const useCharacterInfo = (preset?: number) => {
     basic,
   ]);
 
-  return { characterInfo };
+  return { characterInfo, stat };
 };

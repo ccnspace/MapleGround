@@ -64,7 +64,7 @@ const StarForceBadge = ({ item }: { item: ItemEquipment }) => {
 };
 
 const potentialStyle: Record<string, string> = {
-  레전드리: "border-2 border-lime-400",
+  레전드리: "border-2 border-green-500",
   유니크: "border-2 border-yellow-400",
   에픽: "border-2 border-purple-500",
   레어: "border-2 border-sky-400",

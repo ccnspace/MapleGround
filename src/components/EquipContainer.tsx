@@ -28,14 +28,14 @@ export const EquipContainer = () => {
 
   return (
     <div
-      className="flex shrink-0 flex-row bg-slate-100 dark:bg-[#1f2024] px-5 pt-5 pb-5 border
-   border-slate-300 dark:border-[#1f2024] rounded-lg gap-6"
+      className="flex shrink-0 flex-row bg-slate-100 dark:bg-[#1f2024] px-5 pt-5 pb-5
+      border-2 border-slate-200 dark:border-[#1f2024] rounded-lg gap-6"
     >
       <div className="flex flex-col justify-center">
         {!!characterInfo?.equipments && (
-          <div className="flex justify-between mb-2">
+          <div className="flex justify-between mb-4">
             <p
-              className="flex font-extrabold text-sm mb-2 px-2 pb-0.5 pt-0.5 
+              className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
               border-l-4 border-l-lime-400
              "
             >
@@ -83,6 +83,11 @@ export const EquipContainer = () => {
             equipData={characterInfo.equipments}
             equipName={selectedEquipName}
           />
+        )}
+        {!!characterInfo?.equipments && !selectedEquipName && (
+          <p className="font-bold text-sm text-slate-950/50 dark:text-white/60">
+            왼쪽 인벤토리에서 아이템을 클릭하면 정보가 표시됩니다.
+          </p>
         )}
       </div>
     </div>

@@ -7,10 +7,10 @@ const commonHeader = {
 };
 
 export async function GET(_request: Request) {
-  const noticeResponse = await fetch(
-    `${process.env.NEXON_API_DOMAIN}/notice`,
-    commonHeader
-  );
+  const noticeResponse = await fetch(`${process.env.NEXON_API_DOMAIN}/notice`, {
+    ...commonHeader,
+    next: { revalidate: 0 },
+  });
 
   if (!noticeResponse.ok) {
     const response = await noticeResponse.json();

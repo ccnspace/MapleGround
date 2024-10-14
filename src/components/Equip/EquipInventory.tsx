@@ -64,14 +64,14 @@ const StarForceBadge = ({ item }: { item: ItemEquipment }) => {
 };
 
 const potentialStyle: Record<string, string> = {
-  레전드리: "border-2 border-lime-400",
+  레전드리: "border-2 border-green-500",
   유니크: "border-2 border-yellow-400",
   에픽: "border-2 border-purple-500",
   레어: "border-2 border-sky-400",
 };
 
-const commonEquipStyle =
-  "flex relative justify-center items-center bg-slate-300 dark:bg-[#4f515a] w-16 h-16 rounded-md cursor-pointer";
+const commonEquipStyle = `equip_wrapper flex hover:bg-slate-400/60 dark:hover:bg-white/40 relative justify-center
+  items-center bg-slate-300 dark:bg-[#4f515a] w-16 h-16 rounded-md cursor-pointer`;
 
 type EquipItemProps = {
   name: string;
@@ -81,7 +81,9 @@ type EquipItemProps = {
 const Equipment = ({ name, equipData, customClass }: EquipItemProps) => {
   const getPotentialStyle = (name: string) => {
     const potentialTitle = equipData?.[name]?.potential_option_grade;
-    return equipData && potentialTitle && potentialStyle[potentialTitle];
+    return !!(equipData && potentialTitle)
+      ? potentialStyle[potentialTitle]
+      : "";
   };
   return (
     <div
@@ -112,12 +114,23 @@ const AndroidEquipment = ({
   );
 };
 
+const MaxBadge = () => {
+  return (
+    <div
+      className={`absolute flex shadow top-0 left-0 font-bold text-white rounded-sm text-[10px] px-0.5 pt-0.25 pb-0.25 bg-purple-400/80`}
+    >
+      {"MAX"}
+    </div>
+  );
+};
 const SymbolEquipment = ({
   symbol,
   type,
+  onClick,
 }: {
   symbol: SymbolOption | undefined;
   type: "arcane" | "authentic";
+  onClick: (e: MouseEvent) => void;
 }) => {
   const symbolLevel = symbol?.symbol_level ?? 0;
   const isMaxLevel =
@@ -126,13 +139,15 @@ const SymbolEquipment = ({
   return (
     <div
       id={symbol?.symbol_name}
-      className={`flex flex-col justify-center items-center gap-1 w-[50px] cursor-pointer
-      px-2 pt-1 pb-1 rounded-md bg-slate-300 dark:bg-[#4f515a] ${
-        isMaxLevel ? "border border-purple-300" : ""
-      }`}
+      className={`symbol_wrapper flex hover:bg-slate-400/60 dark:hover:bg-white/40 relative
+       justify-center items-center gap-1 w-[54px] h-[60px] cursor-pointer
+       bg-slate-300 dark:bg-[#4f515a] px-2 pt-1 pb-1 rounded-md
+      ${isMaxLevel ? "border-2 border-purple-300/50" : ""}`}
+      onClick={onClick}
     >
       {!!symbol?.symbol_icon && (
-        <>
+        <div className="flex flex-col items-center">
+          {isMaxLevel && <MaxBadge />}
           <Image
             src={symbol.symbol_icon}
             unoptimized
@@ -146,14 +161,14 @@ const SymbolEquipment = ({
           >
             {`LV.${symbol?.symbol_level}`}
           </p>
-        </>
+        </div>
       )}
     </div>
   );
 };
 
 type Props = {
-  equipments: CharacterEquipments;
+  equipments?: CharacterEquipments;
   setSelectedEquipName: (name: string) => void;
 };
 export const EquipInventory = memo((props: Props) => {
@@ -163,11 +178,18 @@ export const EquipInventory = memo((props: Props) => {
     android,
     arcaneSymbol = {},
     authenticSymbol = {},
-  } = equipments;
+  } = equipments || {};
+
+  const arcaneSymbolList = Object.values(arcaneSymbol);
+  const authenticSymbolList = Object.values(authenticSymbol);
+  const hasSymbol = !!arcaneSymbolList.length || !!authenticSymbolList.length;
 
   const handleClickIcon = (e: MouseEvent) => {
     const target = e.target as Element;
-    const id = target.id || target.parentElement?.id;
+    const id =
+      target.closest(".equip_wrapper")?.id ||
+      target.closest(".symbol_wrapper")?.id;
+
     if (!id) return;
     setSelectedEquipName(id);
   };
@@ -214,25 +236,34 @@ export const EquipInventory = memo((props: Props) => {
         <AndroidEquipment equipData={android} />
         <Equipment name="기계 심장" equipData={normal} />
       </div>
-      <div
-        onClick={handleClickIcon}
-        className="flex flex-col mt-3 items-start gap-2"
-      >
-        <div className="flex flex-row gap-1.5">
+      {hasSymbol && (
+        <div className="flex mr-auto mt-3">
+          <p
+            className="flex font-bold text-sm px-2 pb-1 pt-1
+         border-l-4 border-l-purple-300"
+          >
+            심볼 아이템
+          </p>
+        </div>
+      )}
+      <div className="flex flex-col mt-3 items-start gap-2">
+        <div className="grid grid-cols-6 grid-flow-row gap-1.5">
           {Object.values(arcaneSymbol)?.map((item) => (
             <SymbolEquipment
               key={item.symbol_name}
               symbol={item}
               type="arcane"
+              onClick={handleClickIcon}
             />
           ))}
         </div>
-        <div className="flex flex-row gap-1.5">
+        <div className="grid grid-cols-6 grid-flow-row gap-1.5">
           {Object.values(authenticSymbol)?.map((item) => (
             <SymbolEquipment
               key={item.symbol_name}
               symbol={item}
               type="authentic"
+              onClick={handleClickIcon}
             />
           ))}
         </div>

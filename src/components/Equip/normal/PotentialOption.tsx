@@ -23,7 +23,7 @@ export const PotentialOption = (props: Props) => {
   return (
     <>
       <Divider />
-      <div className="flex flex-col text-xs font-light text-white whitespace-pre-wrap gap-[1px]">
+      <div className="flex flex-col text-xs font-medium text-white whitespace-pre-wrap gap-[1px]">
         <p className={`${potentialStyle[grade]} text-xs`}>{title}</p>
         {options.map((item, i) => (
           <p key={i}>{item}</p>

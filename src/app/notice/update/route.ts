@@ -1,9 +1,10 @@
 export const dynamic = "force-dynamic";
 
-const commonHeader = {
+const commonHeader: RequestInit = {
   headers: {
     "x-nxopen-api-key": process.env.API_KEY || "",
   },
+  next: { revalidate: 0 },
 };
 
 export async function GET(_request: Request) {

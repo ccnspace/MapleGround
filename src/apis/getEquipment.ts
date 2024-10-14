@@ -1,4 +1,4 @@
-import type { AllEquipmentsInfo, EquipmentInfo } from "@/types/Equipment";
+import type { EquipmentInfo } from "@/types/Equipment";
 import { apiFetcher } from "./apiFetcher";
 import type { SymbolEquipmentInfo } from "@/types/SymbolEquipment";
 import type { CashEquipmentInfo } from "@/types/CashEquipment";
@@ -21,14 +21,6 @@ export const getCashEquipmentInfo = async (nickname: string, date = "") => {
 export const getSymbolEquipmentInfo = async (nickname: string, date = "") => {
   const response = await apiFetcher<SymbolEquipmentInfo>(
     `/equip/symbol/${nickname}?date=${date}`
-  );
-  return response;
-};
-
-/** 일반 장비, 캐시 장비, 심볼 정보를 한번에 반환하는 함수 */
-export const getAllEquipmentsInfo = async (nickname: string, date = "") => {
-  const response = await apiFetcher<AllEquipmentsInfo>(
-    `/equip/all/${nickname}?date=${date}`
   );
   return response;
 };

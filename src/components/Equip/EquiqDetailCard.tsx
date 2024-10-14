@@ -11,12 +11,12 @@ type DetailCardProps = { equipName: string; equipData: CharacterEquipments };
 const DetailCardComponent = ({ equipName, equipData }: DetailCardProps) => {
   if (equipName.includes("아케인심볼")) {
     const item = equipData["arcaneSymbol"]?.[equipName] as SymbolOption;
-    return <SymbolContainer item={item} />;
+    return <SymbolContainer type="arcane" item={item} />;
   }
 
   if (equipName.includes("어센틱심볼")) {
     const item = equipData["authenticSymbol"]?.[equipName] as SymbolOption;
-    return <SymbolContainer item={item} />;
+    return <SymbolContainer type="authentic" item={item} />;
   }
 
   if (equipName.includes("안드로이드")) {

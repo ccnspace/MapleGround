@@ -186,12 +186,12 @@ export const EquipInventory = memo((props: Props) => {
 
   const handleClickIcon = (e: MouseEvent) => {
     const target = e.target as Element;
-    const id =
-      target.closest(".equip_wrapper")?.id ||
-      target.closest(".symbol_wrapper")?.id;
+    const parent =
+      target.closest(".equip_wrapper") || target.closest(".symbol_wrapper");
 
-    if (!id) return;
-    setSelectedEquipName(id);
+    if (!parent) return;
+    if (parent.childElementCount === 0) return;
+    setSelectedEquipName(parent.id);
   };
 
   return (

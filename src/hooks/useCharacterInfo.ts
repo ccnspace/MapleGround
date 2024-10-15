@@ -22,6 +22,7 @@ export type CharacterInfo = {
   basic?: CharacterAttributes["basic"];
   equipments?: CharacterEquipments;
   stat?: CharacterAttributes["stat"];
+  ability?: CharacterAttributes["ability"];
 };
 
 /** 현재 검색한 캐릭터의 정보를 반환하는 hook */
@@ -34,6 +35,7 @@ export const useCharacterInfo = (preset?: number) => {
     symbolEquip,
     androidEquip,
     stat,
+    ability,
   } = useCharacterStore(
     useShallow((state) => ({
       characterAttributes: state.characterAttributes,
@@ -43,6 +45,7 @@ export const useCharacterInfo = (preset?: number) => {
       symbolEquip: state.characterAttributes?.symbolEquip,
       androidEquip: state.characterAttributes?.androidEquip,
       stat: state.characterAttributes?.stat,
+      ability: state.characterAttributes?.ability,
     }))
   );
 
@@ -136,6 +139,7 @@ export const useCharacterInfo = (preset?: number) => {
         android: androidEquip,
       },
       stat,
+      ability,
     };
   }, [
     characterAttributes,
@@ -146,7 +150,8 @@ export const useCharacterInfo = (preset?: number) => {
     androidEquip,
     stat,
     basic,
+    ability,
   ]);
 
-  return { characterInfo, stat };
+  return { characterInfo, stat, ability };
 };

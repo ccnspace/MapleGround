@@ -45,7 +45,7 @@ export type StatName =
 
 type Stat = {
   stat_name: StatName;
-  stat_value: string;
+  stat_value: string | null;
 };
 
 export type CharacterStat = {

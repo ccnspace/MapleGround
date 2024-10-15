@@ -1,7 +1,7 @@
 "use client";
 
 import { useCharacterInfo } from "@/hooks/useCharacterInfo";
-import { useMemo } from "react";
+import { type PropsWithChildren, useMemo } from "react";
 import { formatKoreanNumber } from "@/utils/formatKoreanNum";
 import { StatName } from "@/types/CharacterStat";
 
@@ -68,18 +68,112 @@ const getUnit = (statName: string) => {
 };
 
 // TODO: 직업별로 강조할 스탯 배경색 지정
-const getStatItemBgColor = () => {};
+const importantStats: Record<string, string[]> = {
+  STR: [
+    "히어로",
+    "팔라딘",
+    "다크나이트",
+    "소울마스터",
+    "미하일",
+    "블래스터",
+    "데몬 슬레이어",
+    "아란",
+    "카이저",
+    "아델",
+    "제로",
+    "바이퍼",
+    "캐논슈터",
+    "스트라이커",
+    "은월",
+    "아크",
+    "제논",
+  ],
+  DEX: [
+    "보우마스터",
+    "신궁",
+    "메카닉",
+    "패스파인더",
+    "윈드브레이커",
+    "와일드헌터",
+    "카인",
+    "메르세데스",
+    "캡틴",
+    "제논",
+    "엔젤릭버스터",
+  ],
+  INT: [
+    "아크메이지(불,독)",
+    "아크메이지(썬,콜)",
+    "비숍",
+    "플레임위자드",
+    "배틀메이지",
+    "루미너스",
+    "에반",
+    "일리움",
+    "라라",
+    "키네시스",
+  ],
+  LUK: [
+    "나이트로드",
+    "섀도어",
+    "듀얼블레이드",
+    "나이트워커",
+    "제논",
+    "팬텀",
+    "카데나",
+    "칼리",
+    "호영",
+  ],
+  "버프 지속시간": [
+    "아크메이지(썬,콜)",
+    "비숍",
+    "아크메이지(불,독)",
+    "카이저",
+    "루미너스",
+  ],
+  HP: ["데몬어벤져"],
+};
+const getStatItemStyle = (jobName: string, valueName: string) => {
+  if (importantStats[valueName]?.includes(jobName)) {
+    return "font-bold bg-slate-500/70 text-white dark:bg-black/30";
+  }
+  return "font-bold";
+};
+
+type StatItemProps = {
+  statName: StatName;
+  jobName: string;
+  statObject: Record<StatName, string>;
+  className?: string;
+};
+const StatItem = ({
+  statName,
+  jobName,
+  statObject,
+  className,
+  children,
+}: PropsWithChildren<StatItemProps>) => (
+  <div
+    className={`${getStatItemStyle(jobName, statName)} 
+              flex items-center bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5 ${className}`}
+  >
+    <span className="font-bold">{statName}</span>
+    <span className="font-medium px-1 ml-auto">{statObject[statName]}</span>
+    {children}
+  </div>
+);
 
 export const StatContainer = () => {
-  const { stat } = useCharacterInfo();
-  const { final_stat = [] } = stat || {};
+  const { characterInfo } = useCharacterInfo();
+  const { final_stat = [] } = characterInfo?.stat || {};
+  const jobName = characterInfo?.basic?.character_class || "";
 
   const statObject = useMemo(() => {
     const object = {} as Record<StatName, string>;
     return final_stat.reduce((acc, cur) => {
       const { stat_name, stat_value } = cur;
       const unit = getUnit(stat_name);
-      const statValueNum = parseInt(stat_value);
+      const statValueNum = stat_value !== null ? parseInt(stat_value) : 0;
       const formattedValue =
         stat_name !== "전투력" ? statValueNum.toLocaleString() : statValueNum;
       acc[stat_name] = `${formattedValue}${unit}`;
@@ -97,7 +191,7 @@ export const StatContainer = () => {
       className="flex shrink-0 min-w-96 flex-col bg-slate-100 dark:bg-[#1f2024] px-3 pt-3 pb-3
       border-2 border-slate-200 dark:border-[#1f2024] rounded-lg gap-1"
     >
-      {stat ? (
+      {characterInfo?.stat ? (
         <div className="flex flex-col gap-3">
           <p
             className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
@@ -131,160 +225,134 @@ export const StatContainer = () => {
                 {`${statObject["최소 스탯공격력"]} ~ ${statObject["최대 스탯공격력"]}`}
               </span>
             </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">STR</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["STR"]}
+            <StatItem
+              statName="STR"
+              statObject={statObject}
+              jobName={jobName}
+            />
+            <StatItem
+              statName="DEX"
+              statObject={statObject}
+              jobName={jobName}
+            />
+            <StatItem
+              statName="INT"
+              statObject={statObject}
+              jobName={jobName}
+            />
+            <StatItem
+              statName="LUK"
+              statObject={statObject}
+              jobName={jobName}
+            />
+            <StatItem statName="HP" statObject={statObject} jobName={jobName} />
+            <StatItem statName="MP" statObject={statObject} jobName={jobName} />
+            <StatItem
+              statName="최종 데미지"
+              statObject={statObject}
+              jobName={jobName}
+              className="col-span-2"
+            />
+            <StatItem
+              statName="데미지"
+              statObject={statObject}
+              jobName={jobName}
+              className="col-span-2"
+            />
+            <StatItem
+              statName="보스 몬스터 데미지"
+              statObject={statObject}
+              jobName={jobName}
+              className="col-span-2"
+            />
+            <StatItem
+              statName="방어율 무시"
+              statObject={statObject}
+              jobName={jobName}
+              className="col-span-2"
+            />
+            <StatItem
+              statName="버프 지속시간"
+              statObject={statObject}
+              jobName={jobName}
+              className="col-span-2"
+            />
+            <StatItem
+              statName="공격력"
+              statObject={statObject}
+              jobName={jobName}
+            />
+            <StatItem
+              statName="마력"
+              statObject={statObject}
+              jobName={jobName}
+            />
+            <StatItem
+              statName="크리티컬 데미지"
+              statObject={statObject}
+              jobName={jobName}
+            />
+            <StatItem
+              statName="크리티컬 확률"
+              statObject={statObject}
+              jobName={jobName}
+            />
+            <StatItem
+              statName="아케인포스"
+              statObject={statObject}
+              jobName={jobName}
+            />
+            <StatItem
+              statName="어센틱포스"
+              statObject={statObject}
+              jobName={jobName}
+            />
+            <StatItem
+              statName="공격 속도"
+              statObject={statObject}
+              jobName={jobName}
+            >
+              <span className="text-xs font-bold text-black/50 dark:text-white/50">
+                {"(최대 8)"}
               </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">DEX</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["DEX"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">INT</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["INT"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">LUK</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["LUK"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">HP</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["HP"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">MP</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["MP"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5 col-span-2">
-              <span className="font-bold">최종 데미지</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["최종 데미지"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5 col-span-2">
-              <span className="font-bold">데미지</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["데미지"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5 col-span-2">
-              <span className="font-bold">보스 몬스터 데미지</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["보스 몬스터 데미지"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5 col-span-2">
-              <span className="font-bold">방어율 무시</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["방어율 무시"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5 col-span-2">
-              <span className="font-bold">버프 지속시간</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["버프 지속시간"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">공격력</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["공격력"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">마력</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["마력"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">크리티컬 데미지</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["크리티컬 데미지"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">크리티컬 확률</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["크리티컬 확률"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">아케인포스</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["아케인포스"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">어센틱포스</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["어센틱포스"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="flex font-bold">공격 속도</span>
-              <span className="flex font-medium px-1 ml-auto items-center gap-0.5">
-                {statObject["공격 속도"]}
-                <span className="text-xs font-bold text-black/50 dark:text-white/50">
-                  {"(최대 8)"}
-                </span>
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">상태이상 내성</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["상태이상 내성"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">스탠스</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["스탠스"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">방어력</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["방어력"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">이동속도</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["이동속도"]}
-              </span>
-            </div>
-            <div className="flex bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">점프력</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["점프력"]}
-              </span>
-            </div>
-
-            <div className="flex bg-lime-400/30 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">아이템 드롭률</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["아이템 드롭률"]}
-              </span>
-            </div>
-            <div className="flex bg-yellow-400/30 rounded-md px-1.5 pt-1.5 pb-1.5">
-              <span className="font-bold">메소 획득량</span>
-              <span className="font-medium px-1 ml-auto">
-                {statObject["메소 획득량"]}
-              </span>
-            </div>
+            </StatItem>
+            <StatItem
+              statName="상태이상 내성"
+              statObject={statObject}
+              jobName={jobName}
+            />
+            <StatItem
+              statName="스탠스"
+              statObject={statObject}
+              jobName={jobName}
+            />
+            <StatItem
+              statName="방어력"
+              statObject={statObject}
+              jobName={jobName}
+            />
+            <StatItem
+              statName="이동속도"
+              statObject={statObject}
+              jobName={jobName}
+            />
+            <StatItem
+              statName="점프력"
+              statObject={statObject}
+              jobName={jobName}
+            />
+            <StatItem
+              statName="아이템 드롭률"
+              statObject={statObject}
+              jobName={jobName}
+              className="bg-lime-400/40"
+            />
+            <StatItem
+              statName="메소 획득량"
+              statObject={statObject}
+              jobName={jobName}
+              className="bg-yellow-400/30"
+            />
           </div>
         </div>
       ) : (

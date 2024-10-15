@@ -24,8 +24,8 @@ const DetailCardComponent = ({ equipName, equipData }: DetailCardProps) => {
     return <AndroidContainer item={item} />;
   }
 
-  const item = equipData["normal"]?.[equipName] as ItemEquipment;
-  return <NormalContainer item={item} />;
+  const item = equipData["normal"]?.[equipName];
+  return !!item && <NormalContainer item={item} />;
 };
 
 export const EquipDetailCard = ({ equipName, equipData }: DetailCardProps) => {

@@ -20,6 +20,10 @@ export const EquipContainer = () => {
   };
 
   useEffect(() => {
+    setSelectedEquipName("");
+  }, [preset]);
+
+  useEffect(() => {
     if (!characterInfo) {
       setSelectedEquipName("");
       setPreset(0);

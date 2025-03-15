@@ -1,9 +1,6 @@
 import type { CharacterAttributes } from "@/apis/getCharacterAttributes";
 import type { AndroidEquipment } from "@/types/AndroidEquipment";
-import type {
-  CashEquipmentInfo,
-  CashItemEquipment,
-} from "@/types/CashEquipment";
+import type { CashEquipmentInfo, CashItemEquipment } from "@/types/CashEquipment";
 import type { EquipmentInfo, ItemEquipment } from "@/types/Equipment";
 import { SymbolEquipmentInfo, SymbolOption } from "@/types/SymbolEquipment";
 import { useCharacterStore } from "@/stores/character";
@@ -27,16 +24,7 @@ export type CharacterInfo = {
 
 /** 현재 검색한 캐릭터의 정보를 반환하는 hook */
 export const useCharacterInfo = (preset?: number) => {
-  const {
-    characterAttributes,
-    basic,
-    normalEquip,
-    cashEquip,
-    symbolEquip,
-    androidEquip,
-    stat,
-    ability,
-  } = useCharacterStore(
+  const { characterAttributes, basic, normalEquip, cashEquip, symbolEquip, androidEquip, stat, ability } = useCharacterStore(
     useShallow((state) => ({
       characterAttributes: state.characterAttributes,
       basic: state.characterAttributes?.basic,
@@ -73,21 +61,15 @@ export const useCharacterInfo = (preset?: number) => {
       return normalEquip?.item_equipment;
     };
 
-    const normalEquipObject = getNormalEquipSource(preset)?.reduce(
-      (acc, cur) => {
-        acc[cur.item_equipment_slot] = cur;
-        return acc;
-      },
-      normalObject
-    );
+    const normalEquipObject = getNormalEquipSource(preset)?.reduce((acc, cur) => {
+      acc[cur.item_equipment_slot] = cur;
+      return acc;
+    }, normalObject);
 
-    const cashEquipObject = cashEquip?.cash_item_equipment_base.reduce(
-      (acc, cur) => {
-        acc[cur.cash_item_equipment_slot] = cur;
-        return acc;
-      },
-      cashObject
-    );
+    const cashEquipObject = cashEquip?.cash_item_equipment_base.reduce((acc, cur) => {
+      acc[cur.cash_item_equipment_slot] = cur;
+      return acc;
+    }, cashObject);
 
     const arcaneSymbolObject = symbolEquip?.symbol
       .filter((item) => item.symbol_name.includes("아케인"))
@@ -111,12 +93,7 @@ export const useCharacterInfo = (preset?: number) => {
     };
   };
 
-  const {
-    normalEquipObject,
-    cashEquipObject,
-    arcaneSymbolObject,
-    authenticSymbolObject,
-  } = useMemo(
+  const { normalEquipObject, cashEquipObject, arcaneSymbolObject, authenticSymbolObject } = useMemo(
     () =>
       convertToEquipmentObjects({
         normalEquip,

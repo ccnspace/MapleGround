@@ -93,10 +93,54 @@ const importantStats: Record<string, string[]> = {
   LUK: ["나이트로드", "섀도어", "듀얼블레이더", "나이트워커", "제논", "팬텀", "카데나", "칼리", "호영"],
   "버프 지속시간": ["아크메이지(썬,콜)", "비숍", "아크메이지(불,독)", "카이저", "루미너스"],
   HP: ["데몬어벤져"],
+  공격력: [
+    "히어로",
+    "팔라딘",
+    "다크나이트",
+    "소울마스터",
+    "미하일",
+    "블래스터",
+    "데몬 슬레이어",
+    "아란",
+    "카이저",
+    "아델",
+    "제로",
+    "바이퍼",
+    "캐논슈터",
+    "스트라이커",
+    "은월",
+    "아크",
+    "제논",
+    "보우마스터",
+    "신궁",
+    "메카닉",
+    "패스파인더",
+    "윈드브레이커",
+    "와일드헌터",
+    "카인",
+    "메르세데스",
+    "캡틴",
+    "제논",
+    "엔젤릭버스터",
+    "나이트로드",
+    "섀도어",
+    "듀얼블레이더",
+    "나이트워커",
+    "제논",
+    "팬텀",
+    "카데나",
+    "칼리",
+    "호영",
+  ],
+  마력: ["아크메이지(불,독)", "아크메이지(썬,콜)", "비숍", "플레임위자드", "배틀메이지", "루미너스", "에반", "일리움", "라라", "키네시스"],
 };
+const mainStats = ["최종 데미지", "데미지", "크리티컬 데미지", "아이템 드롭률", "메소 획득량", "보스 몬스터 데미지", "방어율 무시"];
 const getStatItemStyle = (jobName: string, valueName: string) => {
   if (importantStats[valueName]?.includes(jobName)) {
-    return "font-bold bg-slate-500/70 text-white dark:bg-black/30";
+    return "font-bold bg-yellow-100 border-2 border-yellow-200 dark:bg-black/30 dark:border-yellow-200/50";
+  }
+  if (mainStats.includes(valueName)) {
+    return "font-bold bg-slate-400/20 border-2 border-slate-100/5 dark:border-lime-400/40";
   }
   return "font-bold";
 };
@@ -108,10 +152,7 @@ type StatItemProps = {
   className?: string;
 };
 const StatItem = ({ statName, jobName, statObject, className, children }: PropsWithChildren<StatItemProps>) => (
-  <div
-    className={`${getStatItemStyle(jobName, statName)} 
-              flex items-center bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5 ${className}`}
-  >
+  <div className={`${getStatItemStyle(jobName, statName)} flex items-center rounded-md px-1.5 pt-1.5 pb-1.5 ${className}`}>
     <span className="font-bold">{statName}</span>
     <span className="font-medium px-1 ml-auto">{statObject[statName]}</span>
     {children}
@@ -142,8 +183,8 @@ export const StatContainer = () => {
 
   return (
     <div
-      className="flex shrink-0 min-w-96 flex-col bg-slate-100 dark:bg-[#1f2024] px-3 pt-3 pb-3
-      border-2 border-slate-200 dark:border-[#1f2024] rounded-lg gap-1"
+      className="flex shrink-0 min-w-96 bg-slate-100 flex-col dark:bg-[#1f2024] px-3 pt-3 pb-3
+      rounded-lg gap-1"
     >
       {characterInfo?.stat ? (
         <div className="flex flex-col gap-3">
@@ -166,8 +207,8 @@ export const StatContainer = () => {
             {!!combatDescription && <p className="flex justify-center pt-1 font-bold text-sm text-gray-600">{combatDescription}</p>}
           </div>
 
-          <div className="grid grid-cols-2 bg-slate-400/20 rounded-md px-2 pt-2 pb-3 gap-2 text-sm">
-            <div className="flex items-center rounded-md px-1 pt-1 pb-1 col-span-2">
+          <div className="grid grid-cols-2 rounded-md px-2 pt-2 pb-3 gap-2 text-sm">
+            <div className="flex items-center rounded-md px-1.5 pt-1 pb-1 col-span-2 font-bold bg-slate-400/20 border-2 border-slate-100/5 dark:border-lime-400/40">
               <span className="font-extrabold">스탯 공격력</span>
               <span className="font-medium px-1 pt-1 pb-1 ml-auto">
                 {`${statObject["최소 스탯공격력"]} ~ ${statObject["최대 스탯공격력"]}`}
@@ -198,8 +239,8 @@ export const StatContainer = () => {
             <StatItem statName="방어력" statObject={statObject} jobName={jobName} />
             <StatItem statName="이동속도" statObject={statObject} jobName={jobName} />
             <StatItem statName="점프력" statObject={statObject} jobName={jobName} />
-            <StatItem statName="아이템 드롭률" statObject={statObject} jobName={jobName} className="bg-lime-400/40" />
-            <StatItem statName="메소 획득량" statObject={statObject} jobName={jobName} className="bg-yellow-400/30" />
+            <StatItem statName="아이템 드롭률" statObject={statObject} jobName={jobName} />
+            <StatItem statName="메소 획득량" statObject={statObject} jobName={jobName} />
           </div>
         </div>
       ) : (

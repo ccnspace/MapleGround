@@ -25,11 +25,12 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system">
           <Header />
           <Modal />
-          <div className="flex flex-row h-full gap-4">
+          <div className="flex flex-row h-full gap-4 justify-center">
             <SideBar />
             {children}
             {/* <NoticeSideBar /> */}
           </div>
+          <div className="flex mt-auto pb-3">Footer</div>
         </ThemeProvider>
       </body>
     </html>

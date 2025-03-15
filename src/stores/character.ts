@@ -1,6 +1,6 @@
 import { getCharacterAttributes, type CharacterAttributes } from "@/apis/getCharacterAttributes";
 import { create } from "zustand";
-import { devtools } from "zustand/middleware";
+import { devtools, persist } from "zustand/middleware";
 
 type CharacterState = {
   fetchStatus: "success" | "error" | "idle" | "loading";
@@ -20,28 +20,33 @@ const initialState: CharacterState = {
 };
 
 export const useCharacterStore = create<CharacterState & CharacterAction>()(
-  devtools((set, get) => ({
-    ...initialState,
-    setCharacterAttributes: (characterAttributes) => {
-      set({ characterAttributes });
-    },
-    setFetchStatus: (fetchStatus) => {
-      set({ fetchStatus });
-    },
-    resetCharacterData: () => {
-      set({ ...initialState });
-    },
-    fetchCharacterAttributes: async (nickname: string) => {
-      const { setFetchStatus, setCharacterAttributes, resetCharacterData } = get();
-      try {
-        setFetchStatus("loading");
-        const response = await getCharacterAttributes(nickname);
-        setCharacterAttributes(response);
-        setFetchStatus("success");
-      } catch {
-        resetCharacterData();
-        setFetchStatus("error");
-      }
-    },
-  }))
+  devtools(
+    persist(
+      (set, get) => ({
+        ...initialState,
+        setCharacterAttributes: (characterAttributes) => {
+          set({ characterAttributes });
+        },
+        setFetchStatus: (fetchStatus) => {
+          set({ fetchStatus });
+        },
+        resetCharacterData: () => {
+          set({ ...initialState });
+        },
+        fetchCharacterAttributes: async (nickname: string) => {
+          const { setFetchStatus, setCharacterAttributes, resetCharacterData } = get();
+          try {
+            setFetchStatus("loading");
+            const response = await getCharacterAttributes(nickname);
+            setCharacterAttributes(response);
+            setFetchStatus("success");
+          } catch {
+            resetCharacterData();
+            setFetchStatus("error");
+          }
+        },
+      }),
+      { name: "character" }
+    )
+  )
 );

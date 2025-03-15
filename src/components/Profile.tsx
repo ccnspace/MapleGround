@@ -131,7 +131,7 @@ export const ProfileWrapper = () => {
   const hasProfile = characterAttributes && fetchStatus === "success";
   const isSearchError = fetchStatus === "error";
 
-  const bgColor = !hasProfile ? "bg-slate-800" : "bg-slate-900 border-2 border-slate-600";
+  const bgColor = !hasProfile ? "bg-slate-800" : "bg-slate-800 border-2 border-slate-600";
 
   const resetProfile = () => {
     if (!characterAttributes) {

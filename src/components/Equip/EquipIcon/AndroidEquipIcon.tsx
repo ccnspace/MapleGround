@@ -1,0 +1,38 @@
+import { AndroidEquipment } from "@/types/AndroidEquipment";
+import { CSSProperties, memo, useContext, useRef } from "react";
+import { EquipActionContext, EquipContext } from "../../EquipContainer";
+import { useClickOutside } from "@/hooks/useClickOutside";
+import { useCharacterInfo } from "@/hooks/useCharacterInfo";
+import Image from "next/image";
+import { EquipDetailCard } from "../EquiqDetailCard";
+
+const commonEquipStyle = `equip_wrapper flex hover:bg-slate-400/60 dark:hover:bg-white/40 relative justify-center
+  items-center bg-slate-300 dark:bg-[#4f515a] w-16 h-16 rounded-md cursor-pointer`;
+
+// TODO: EquipDetailCard에 공통화
+const commonDetailStyle = { position: "absolute", zIndex: 1000, top: 10, left: 10 } as CSSProperties;
+
+const AndroidImage = ({ icon }: { icon: AndroidEquipment["android_icon"] }) => (
+  <Image src={icon as string} alt={"안드로이드"} unoptimized width={52} height={60} style={{ width: "auto", height: "auto" }} />
+);
+
+export const AndroidEquipIcon = memo(({ equipData, isSelected }: { equipData: AndroidEquipment | undefined; isSelected: boolean }) => {
+  const setSelectedEquipName = useContext(EquipActionContext);
+  const equipDetailRef = useRef<HTMLDivElement>(null);
+  useClickOutside(equipDetailRef, () => setSelectedEquipName(""));
+
+  if (!equipData) return null;
+
+  return (
+    <div id={"안드로이드"} className={`${commonEquipStyle}`}>
+      {equipData?.android_icon && <AndroidImage icon={equipData.android_icon} />}
+      {isSelected && (
+        <div ref={equipDetailRef} style={commonDetailStyle}>
+          <EquipDetailCard equipName={"안드로이드"} />
+        </div>
+      )}
+    </div>
+  );
+});
+
+AndroidEquipIcon.displayName = "AndroidEquipIcon";

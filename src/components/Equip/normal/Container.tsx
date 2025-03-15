@@ -28,6 +28,7 @@ export const NormalContainer = ({ item }: Props) => {
     additional_potential_option_1,
     additional_potential_option_2,
     additional_potential_option_3,
+    item_base_option: { base_equipment_level },
   } = item;
   const isAmazingForce = item.starforce_scroll_flag === "사용";
   const showStarforceBadge = !!item.starforce && item.starforce !== "0";
@@ -35,45 +36,27 @@ export const NormalContainer = ({ item }: Props) => {
 
   return (
     <>
-      {showStarforceBadge && (
-        <StarforceBadge isAmazingForce={isAmazingForce} starforce={starforce} />
-      )}
-      <EquipDescription item_icon={item_icon} item_name={item_name} />
+      {showStarforceBadge && <StarforceBadge isAmazingForce={isAmazingForce} starforce={starforce} />}
+      <EquipDescription item_icon={item_icon} item_name={item_name} baseLevel={base_equipment_level} />
       <Divider />
       <div className="flex text-xs flex-col gap-[2px]">
         <p className="text-white">
           장비분류: <span>{item_equipment_part}</span>
         </p>
         {equipOptionList.map((option) => (
-          <EquipDetailItem
-            key={option.name}
-            name={option.name}
-            alias={option.alias}
-            equipData={item}
-            isPercent={option.isPercent}
-          />
+          <EquipDetailItem key={option.name} name={option.name} alias={option.alias} equipData={item} isPercent={option.isPercent} />
         ))}
         <p className="text-white">
           업그레이드 가능 횟수: {scroll_upgradeable_count}
-          <span className="text-yellow-500">
-            {` (복구 가능 횟수 : ${scroll_resilience_count})`}
-          </span>
+          <span className="text-yellow-500">{` (복구 가능 횟수 : ${scroll_resilience_count})`}</span>
         </p>
-        {golden_hammer_flag === "적용" && (
-          <p className="text-white">황금망치 제련 적용</p>
-        )}
-        {canCuttableItem && (
-          <p className="text-yellow-500">
-            {`가위 사용 가능 횟수 : ${cuttable_count}회`}
-          </p>
-        )}
+        {golden_hammer_flag === "적용" && <p className="text-white">황금망치 제련 적용</p>}
+        {canCuttableItem && <p className="text-yellow-500">{`가위 사용 가능 횟수 : ${cuttable_count}회`}</p>}
       </div>
       {item_description && (
         <>
           <Divider />
-          <p className="text-xs text-white whitespace-pre-wrap">
-            {item_description}
-          </p>
+          <p className="text-xs text-white whitespace-pre-wrap">{item_description}</p>
         </>
       )}
       {potential_option_grade && (
@@ -87,11 +70,7 @@ export const NormalContainer = ({ item }: Props) => {
         <PotentialOption
           type="additional"
           grade={additional_potential_option_grade}
-          options={[
-            additional_potential_option_1,
-            additional_potential_option_2,
-            additional_potential_option_3,
-          ]}
+          options={[additional_potential_option_1, additional_potential_option_2, additional_potential_option_3]}
         />
       )}
     </>

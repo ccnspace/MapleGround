@@ -12,7 +12,7 @@ export const MainContainer = () => {
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
 
   return (
-    <div className="main_container flex flex-col gap-5 px-5 pt-8 pb-8 overflow-y-auto">
+    <div className="main_container flex flex-col w-[1280px] gap-5 px-5 pt-8 pb-8">
       <div className="flex gap-5 h-auto">
         <StatContainer />
         <EquipContainer />
@@ -22,7 +22,7 @@ export const MainContainer = () => {
         </div>
       </div>
       <div className="flex gap-5">
-        <ChartContainer />
+        {/* <ChartContainer /> */}
         {/* <ExpContainer /> */}
       </div>
       {fetchStatus === "loading" && <DimmedLayer spinner />}

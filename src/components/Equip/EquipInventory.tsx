@@ -18,14 +18,7 @@ const ItemIcon = ({ item }: { item: ItemEquipment }) => (
 );
 
 const AndroidIcon = ({ icon }: { icon: AndroidEquipment["android_icon"] }) => (
-  <Image
-    src={icon as string}
-    alt={"안드로이드"}
-    unoptimized
-    width={52}
-    height={60}
-    style={{ width: "auto", height: "auto" }}
-  />
+  <Image src={icon as string} alt={"안드로이드"} unoptimized width={52} height={60} style={{ width: "auto", height: "auto" }} />
 );
 
 const StarForceBadge = ({ item }: { item: ItemEquipment }) => {
@@ -81,17 +74,10 @@ type EquipItemProps = {
 const Equipment = ({ name, equipData, customClass }: EquipItemProps) => {
   const getPotentialStyle = (name: string) => {
     const potentialTitle = equipData?.[name]?.potential_option_grade;
-    return !!(equipData && potentialTitle)
-      ? potentialStyle[potentialTitle]
-      : "";
+    return !!(equipData && potentialTitle) ? potentialStyle[potentialTitle] : "";
   };
   return (
-    <div
-      id={name}
-      className={`${getPotentialStyle(
-        name
-      )} ${commonEquipStyle} ${customClass}`}
-    >
+    <div id={name} className={`${getPotentialStyle(name)} ${commonEquipStyle} ${customClass}`}>
       {equipData?.[name] && (
         <>
           <StarForceBadge item={equipData[name]} />
@@ -102,11 +88,7 @@ const Equipment = ({ name, equipData, customClass }: EquipItemProps) => {
   );
 };
 
-const AndroidEquipment = ({
-  equipData,
-}: {
-  equipData: AndroidEquipment | undefined;
-}) => {
+const AndroidEquipment = ({ equipData }: { equipData: AndroidEquipment | undefined }) => {
   return (
     <div id={"안드로이드"} className={`${commonEquipStyle}`}>
       {equipData?.android_icon && <AndroidIcon icon={equipData.android_icon} />}
@@ -133,8 +115,7 @@ const SymbolEquipment = ({
   onClick: (e: MouseEvent) => void;
 }) => {
   const symbolLevel = symbol?.symbol_level ?? 0;
-  const isMaxLevel =
-    type === "arcane" ? symbolLevel === 20 : symbolLevel === 11;
+  const isMaxLevel = type === "arcane" ? symbolLevel === 20 : symbolLevel === 11;
 
   return (
     <div
@@ -148,13 +129,7 @@ const SymbolEquipment = ({
       {!!symbol?.symbol_icon && (
         <div className="flex flex-col items-center">
           {isMaxLevel && <MaxBadge />}
-          <Image
-            src={symbol.symbol_icon}
-            unoptimized
-            width={30}
-            height={30}
-            alt={symbol?.symbol_name ?? ""}
-          />
+          <Image src={symbol.symbol_icon} unoptimized width={30} height={30} alt={symbol?.symbol_name ?? ""} />
           <p
             className={`rounded-sm font-bold px-0.5 pt-0.25 pb-0.25
             text-xs text-slate-800 dark:text-white `}
@@ -173,12 +148,7 @@ type Props = {
 };
 export const EquipInventory = memo((props: Props) => {
   const { equipments, setSelectedEquipName } = props;
-  const {
-    normal,
-    android,
-    arcaneSymbol = {},
-    authenticSymbol = {},
-  } = equipments || {};
+  const { normal, android, arcaneSymbol = {}, authenticSymbol = {} } = equipments || {};
 
   const arcaneSymbolList = Object.values(arcaneSymbol);
   const authenticSymbolList = Object.values(authenticSymbol);
@@ -186,8 +156,7 @@ export const EquipInventory = memo((props: Props) => {
 
   const handleClickIcon = (e: MouseEvent) => {
     const target = e.target as Element;
-    const parent =
-      target.closest(".equip_wrapper") || target.closest(".symbol_wrapper");
+    const parent = target.closest(".equip_wrapper") || target.closest(".symbol_wrapper");
 
     if (!parent) return;
     if (parent.childElementCount === 0) return;
@@ -195,25 +164,14 @@ export const EquipInventory = memo((props: Props) => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center">
-      <div
-        onClick={handleClickIcon}
-        className="grid grid-cols-5 grid-flow-row gap-2"
-      >
+    <div className="flex flex-col justify-center items-center min-h-[640px]">
+      <div onClick={handleClickIcon} className="grid grid-cols-5 grid-flow-row gap-2">
         <Equipment name="반지4" equipData={normal} />
-        <Equipment
-          name="모자"
-          equipData={normal}
-          customClass="col-start-3 col-end-5"
-        />
+        <Equipment name="모자" equipData={normal} customClass="col-start-3 col-end-5" />
         <Equipment name="엠블렘" equipData={normal} />
         <Equipment name="반지3" equipData={normal} />
         <Equipment name="펜던트2" equipData={normal} />
-        <Equipment
-          name="얼굴장식"
-          equipData={normal}
-          customClass="col-start-3 col-end-5"
-        />
+        <Equipment name="얼굴장식" equipData={normal} customClass="col-start-3 col-end-5" />
         <Equipment name="뱃지" equipData={normal} />
         <Equipment name="반지2" equipData={normal} />
         <Equipment name="펜던트" equipData={normal} />
@@ -249,22 +207,12 @@ export const EquipInventory = memo((props: Props) => {
       <div className="flex flex-col mt-3 items-start gap-2">
         <div className="grid grid-cols-6 grid-flow-row gap-1.5">
           {Object.values(arcaneSymbol)?.map((item) => (
-            <SymbolEquipment
-              key={item.symbol_name}
-              symbol={item}
-              type="arcane"
-              onClick={handleClickIcon}
-            />
+            <SymbolEquipment key={item.symbol_name} symbol={item} type="arcane" onClick={handleClickIcon} />
           ))}
         </div>
         <div className="grid grid-cols-6 grid-flow-row gap-1.5">
           {Object.values(authenticSymbol)?.map((item) => (
-            <SymbolEquipment
-              key={item.symbol_name}
-              symbol={item}
-              type="authentic"
-              onClick={handleClickIcon}
-            />
+            <SymbolEquipment key={item.symbol_name} symbol={item} type="authentic" onClick={handleClickIcon} />
           ))}
         </div>
       </div>

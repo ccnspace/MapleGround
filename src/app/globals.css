@@ -50,3 +50,18 @@ body {
 abbr:where([title]) {
   text-decoration: none;
 }
+
+.main_container::-webkit-scrollbar {
+  width: 10px;
+}
+.main_container::-webkit-scrollbar-thumb {
+  background-color: rgba(122, 122, 122, 0.5);
+  border-radius: 10px;
+  background-clip: padding-box;
+  border: 1px solid transparent;
+}
+.main_container::-webkit-scrollbar-track {
+  background-color: rgba(122, 122, 122, 0.2);
+  border-radius: 10px;
+  padding: 3px;
+}

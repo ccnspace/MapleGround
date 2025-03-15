@@ -9,15 +9,9 @@ const commonHeader = {
   },
 };
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { name: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { name: string } }) {
   const username = params.name;
-  const ocidResponse = await fetch(
-    `${process.env.NEXON_API_DOMAIN}/id?character_name=${username}`,
-    commonHeader
-  );
+  const ocidResponse = await fetch(`${process.env.NEXON_API_DOMAIN}/id?character_name=${username}`, commonHeader);
 
   if (!ocidResponse.ok) {
     const response = await ocidResponse.json();

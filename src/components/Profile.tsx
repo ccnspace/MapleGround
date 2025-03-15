@@ -9,9 +9,8 @@ import { BackIcon } from "./svg/BackIcon";
 import CharacterImg from "@/images/0.png";
 import { useCharacterStore } from "@/stores/character";
 import { useShallow } from "zustand/shallow";
-import { CharacterAttributes, getCharacterAttributes } from "@/apis/getCharacterAttributes";
+import { CharacterAttributes } from "@/apis/getCharacterAttributes";
 import { useModalStore } from "@/stores/modal";
-import { useLoadingStore } from "@/stores/loading";
 
 const EmptyAltText = () => {
   return (
@@ -28,39 +27,13 @@ const EmptyAltText = () => {
   );
 };
 
-// FIXME: setter를 useState 대신 상태관리 라이브러리 혹은 context 활용
-type EmptyProfileProps = {
-  setLoading: (loading: boolean) => void;
-};
-const ProfileSearch = ({ setLoading }: EmptyProfileProps) => {
-  const [inputValue, setValue] = useState("");
-  const { setCharacterAttributes, setFetchStatus, resetCharacterData } = useCharacterStore(
-    useShallow((state) => ({
-      setCharacterAttributes: state.setCharacterAttributes,
-      setFetchStatus: state.setFetchStatus,
-      resetCharacterData: state.resetCharacterData,
-    }))
-  );
-
-  const requestCharacterInfo = async (nickname: string) => {
-    try {
-      useLoadingStore.getState().setLoading(true);
-      const response = await getCharacterAttributes(nickname);
-      setCharacterAttributes(response);
-      setFetchStatus("success");
-    } catch (e) {
-      resetCharacterData();
-      setFetchStatus("error");
-    } finally {
-      setLoading(false);
-      useLoadingStore.getState().setLoading(false);
-    }
-  };
+const ProfileSearch = () => {
+  const [nickname, setNickname] = useState("");
+  const fetchCharacterAttributes = useCharacterStore((state) => state.fetchCharacterAttributes);
 
   const handleSubmit = (e: FormEvent) => {
-    setLoading(true);
     e.preventDefault();
-    requestCharacterInfo(inputValue);
+    fetchCharacterAttributes(nickname);
   };
 
   return (
@@ -71,8 +44,8 @@ const ProfileSearch = ({ setLoading }: EmptyProfileProps) => {
       <div className="flex items-center rounded w-3/4 text-white bg-slate-700 px-2 pt-1 pb-1">
         <input
           className="font-normal bg-transparent outline-none w-full"
-          value={inputValue}
-          onChange={(e) => setValue(e.target.value)}
+          value={nickname}
+          onChange={(e) => setNickname(e.target.value)}
         ></input>
         <EnterIcon />
       </div>
@@ -145,7 +118,6 @@ const Profile = ({ characterAttributes }: ProfileProps) => {
 };
 
 export const ProfileWrapper = () => {
-  const [isLoading, setLoading] = useState(false);
   const { fetchStatus, characterAttributes, resetCharacterData } = useCharacterStore(
     useShallow((state) => ({
       fetchStatus: state.fetchStatus,
@@ -155,8 +127,8 @@ export const ProfileWrapper = () => {
     }))
   );
 
-  const isEmptyProfile = !characterAttributes && fetchStatus === "idle" && !isLoading;
-  const hasProfile = fetchStatus && characterAttributes && !isLoading;
+  const isEmptyProfile = !characterAttributes && fetchStatus === "idle";
+  const hasProfile = characterAttributes && fetchStatus === "success";
   const isSearchError = fetchStatus === "error";
 
   const bgColor = !hasProfile ? "bg-slate-800" : "bg-slate-900 border-2 border-slate-600";
@@ -182,10 +154,10 @@ export const ProfileWrapper = () => {
       mx-5 mt-6 mb-4 px-3 pt-2 pb-2 h-56 
      ${bgColor}`}
     >
-      {isLoading && <Spinner />}
+      {fetchStatus === "loading" && <Spinner />}
       {isEmptyProfile && (
         <>
-          <ProfileSearch setLoading={setLoading} />
+          <ProfileSearch />
           <Image src={CharacterImg} alt="" width={110} className="absolute opacity-5 -z-0" />
         </>
       )}

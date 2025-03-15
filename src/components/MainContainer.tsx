@@ -5,12 +5,11 @@ import { AbilityContainer } from "@/components/AbilityContainer";
 import { StatContainer } from "@/components/StatContainer";
 import { PetEquipContainer } from "@/components/PetEquipContainer";
 import { ChartContainer } from "@/components/ChartContainer";
-import { ExpContainer } from "./ExpContainer";
 import { DimmedLayer } from "./DimmedLayer";
-import { useLoadingStore } from "@/stores/loading";
+import { useCharacterStore } from "@/stores/character";
 
 export const MainContainer = () => {
-  const isLoading = useLoadingStore((state) => state.isLoading);
+  const fetchStatus = useCharacterStore((state) => state.fetchStatus);
 
   return (
     <div className="main_container flex flex-col gap-5 px-5 pt-8 pb-8 overflow-y-auto">
@@ -26,7 +25,7 @@ export const MainContainer = () => {
         <ChartContainer />
         {/* <ExpContainer /> */}
       </div>
-      {isLoading && <DimmedLayer spinner />}
+      {fetchStatus === "loading" && <DimmedLayer spinner />}
     </div>
   );
 };

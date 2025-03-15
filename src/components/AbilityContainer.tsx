@@ -58,8 +58,8 @@ export const AbilityContainer = () => {
 
   return (
     <div
-      className="flex shrink-0 min-w-96 flex-col bg-slate-100 dark:bg-[#1f2024] px-3 pt-3 pb-3
-    border-2 border-slate-200 dark:border-[#1f2024] rounded-lg gap-1 min-h-48"
+      className="flex shrink-0 flex-col bg-slate-100 dark:bg-[#1f2024] px-3 pt-3 pb-3
+   rounded-lg gap-1 min-h-48"
     >
       {!!currentAbility ? (
         <div className="flex flex-col justify-center">
@@ -79,9 +79,7 @@ export const AbilityContainer = () => {
                 onClick={() => {
                   setPreset(1);
                 }}
-                className={`flex text-xs px-1 pt-0.5 pb-0.5 ${getActivePresetStyle(
-                  1
-                )}`}
+                className={`flex text-xs px-1 pt-0.5 pb-0.5 ${getActivePresetStyle(1)}`}
               >
                 1번 프리셋
               </button>
@@ -89,9 +87,7 @@ export const AbilityContainer = () => {
                 onClick={() => {
                   setPreset(2);
                 }}
-                className={`flex rounded-md text-xs px-1 pt-0.5 pb-0.5 ${getActivePresetStyle(
-                  2
-                )}`}
+                className={`flex rounded-md text-xs px-1 pt-0.5 pb-0.5 ${getActivePresetStyle(2)}`}
               >
                 2번 프리셋
               </button>
@@ -99,9 +95,7 @@ export const AbilityContainer = () => {
                 onClick={() => {
                   setPreset(3);
                 }}
-                className={`flex rounded-md text-xs px-1 pt-0.5 pb-0.5 text-slate-500 ${getActivePresetStyle(
-                  3
-                )}`}
+                className={`flex rounded-md text-xs px-1 pt-0.5 pb-0.5 text-slate-500 ${getActivePresetStyle(3)}`}
               >
                 3번 프리셋
               </button>
@@ -113,9 +107,7 @@ export const AbilityContainer = () => {
           <div className="flex flex-col pt-2 pb-2 gap-2">
             {currentAbility.info.map((item) => (
               <p
-                className={`flex text-sm font-medium px-2 pt-1.5 pb-1.5 rounded-md ${getGradeBgColor(
-                  item.ability_grade
-                )}`}
+                className={`flex text-sm font-medium px-2 pt-1.5 pb-1.5 rounded-md ${getGradeBgColor(item.ability_grade)}`}
                 key={item.ability_no}
               >
                 {item.ability_value}
@@ -125,9 +117,7 @@ export const AbilityContainer = () => {
         </div>
       ) : (
         <div className="flex items-center justify-center h-full">
-          <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60">
-            여기에 어빌리티 정보가 표시됩니다.
-          </p>
+          <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60">여기에 어빌리티 정보가 표시됩니다.</p>
         </div>
       )}
     </div>

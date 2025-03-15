@@ -98,8 +98,8 @@ export const ExpContainer = () => {
 
   return (
     <div
-      className="flex shrink-0 min-w-[640px] min-h-[400px] flex-col bg-slate-100 dark:bg-[#1f2024] px-3 pt-3 pb-3
-        border-2 border-slate-200 dark:border-[#1f2024] rounded-lg gap-0.5 justify-center"
+      className="flex shrink-0 min-h-[400px] flex-col bg-slate-100 dark:bg-[#1f2024] px-3 pt-3 pb-3
+        rounded-lg gap-0.5 justify-center"
     >
       <div className="flex flex-col h-32 justify-center">
         <div className="flex items-center justify-center">

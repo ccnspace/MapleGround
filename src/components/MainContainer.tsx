@@ -5,28 +5,27 @@ import { AbilityContainer } from "@/components/AbilityContainer";
 import { StatContainer } from "@/components/StatContainer";
 import { PetEquipContainer } from "@/components/PetEquipContainer";
 import { ChartContainer } from "@/components/ChartContainer";
-import { ExpContainer } from "./ExpContainer";
 import { DimmedLayer } from "./DimmedLayer";
-import { useLoadingStore } from "@/stores/loading";
+import { useCharacterStore } from "@/stores/character";
+import { ExpContainer } from "./ExpContainer";
 
 export const MainContainer = () => {
-  const isLoading = useLoadingStore((state) => state.isLoading);
+  const fetchStatus = useCharacterStore((state) => state.fetchStatus);
 
   return (
-    <div className="main_container flex flex-col gap-5 px-5 pt-8 pb-8 overflow-y-auto">
-      <div className="flex gap-5 h-auto">
-        <StatContainer />
-        <EquipContainer />
-        <div className="flex flex-col gap-5">
-          <AbilityContainer />
-          <PetEquipContainer />
-        </div>
+    <div className="main_container w-[1280px] gap-4">
+      <StatContainer />
+      <EquipContainer />
+      <div className="grid gap-4">
+        <AbilityContainer />
+        <PetEquipContainer />
+        <PetEquipContainer />
       </div>
-      <div className="flex gap-5">
+      <div className="col-span-2">
         <ChartContainer />
-        {/* <ExpContainer /> */}
       </div>
-      {isLoading && <DimmedLayer spinner />}
+      <ExpContainer />
+      {fetchStatus === "loading" && <DimmedLayer spinner />}
     </div>
   );
 };

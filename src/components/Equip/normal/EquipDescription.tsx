@@ -3,15 +3,14 @@ import Image from "next/image";
 type Props = {
   item_icon: string;
   item_name: string;
+  baseLevel?: number;
 };
 
 // TODO: 추옵 정보/주흔 작 등 다양한 정보를 간략화하여 제공
-export const EquipDescription = ({ item_icon, item_name }: Props) => {
+export const EquipDescription = ({ item_icon, item_name, baseLevel }: Props) => {
   return (
     <>
-      <p className="flex justify-center text-white text-base font-medium">
-        {item_name}
-      </p>
+      <p className="flex justify-center text-white text-base font-medium">{item_name}</p>
       <div className="flex flex-row items-center gap-2">
         <div
           className="flex items-center justify-center rounded-lg
@@ -30,6 +29,7 @@ export const EquipDescription = ({ item_icon, item_name }: Props) => {
             alt={item_name}
           />
         </div>
+        {!!baseLevel && <div className="flex items-start text-xs text-white">· reqLevel: {baseLevel}</div>}
       </div>
     </>
   );

@@ -1,3 +1,4 @@
+import { fetchOcid } from "@/utils/fetchOcid";
 import { NextRequest } from "next/server";
 
 const API_KEY = process.env.API_KEY;
@@ -34,15 +35,6 @@ const makeRequestUrls = (ocid: string) => {
 // 개발 모드이면 초당 최대 5회까지의 호출 제한이 있어 부득이하게 wait를 걸어준다.
 const wait = () => new Promise((resolve) => setTimeout(resolve, 500));
 
-const fetchOcid = async (username: string) => {
-  const response = await fetch(`${NEXON_API_DOMAIN}/id?character_name=${username}`, commonHeader);
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(JSON.stringify({ errorCode: error.error.name }));
-  }
-  return (await response.json()).ocid;
-};
-
 const fetchAllInfo = async (url: string) => {
   console.log("Fetching: ", url);
   await wait();
@@ -66,7 +58,7 @@ const fetchAllInfo = async (url: string) => {
 export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest, { params }: { params: { name: string } }) {
   try {
-    const ocid = await fetchOcid(params.name);
+    const ocid = await fetchOcid({ username: params.name, apiDomain: NEXON_API_DOMAIN || "", commonHeader });
     const requestUrls = makeRequestUrls(ocid);
 
     const responses = [] as { name: string; data: unknown }[];

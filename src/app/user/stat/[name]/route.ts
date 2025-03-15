@@ -1,3 +1,5 @@
+import { shiftDateByMonth } from "@/utils/shiftDateByMonths";
+import dayjs from "dayjs";
 import { NextRequest } from "next/server";
 
 const API_KEY = process.env.API_KEY;
@@ -8,27 +10,25 @@ if (!API_KEY || !NEXON_API_DOMAIN) {
 }
 
 const commonHeader: RequestInit = {
-  headers: { "x-nxopen-api-key": API_KEY },
+  headers: {
+    "x-nxopen-api-key": API_KEY,
+  },
   next: { revalidate: 0 },
 };
 
-const endpoints = [
-  "basic",
-  "stat",
-  "ability",
-  "item-equipment",
-  "symbol-equipment",
-  "cashitem-equipment",
-  "pet-equipment",
-  "android-equipment",
-] as const;
+const requestDates = [-12, -8, -5, -4, -3, -2, -1].map(shiftDateByMonth);
 
 const makeRequestUrls = (ocid: string) => {
-  return endpoints.map((endpoint) => {
-    const url = new URL(`${NEXON_API_DOMAIN}/character/${endpoint}`);
-    url.searchParams.append("ocid", ocid);
-    return url.toString();
-  });
+  const baseUrl = new URL(`${NEXON_API_DOMAIN}/character/stat`);
+  baseUrl.searchParams.append("ocid", ocid);
+
+  return requestDates
+    .map((date) => {
+      const url = new URL(baseUrl.toString());
+      url.searchParams.append("date", date);
+      return url.toString();
+    })
+    .concat(baseUrl.toString());
 };
 
 // 개발 모드이면 초당 최대 5회까지의 호출 제한이 있어 부득이하게 wait를 걸어준다.
@@ -43,7 +43,7 @@ const fetchOcid = async (username: string) => {
   return (await response.json()).ocid;
 };
 
-const fetchAllInfo = async (url: string) => {
+const fetchCharacterStats = async (url: string) => {
   console.log("Fetching: ", url);
   await wait();
   const response = await fetch(url, commonHeader);
@@ -69,31 +69,25 @@ export async function GET(request: NextRequest, { params }: { params: { name: st
     const ocid = await fetchOcid(params.name);
     const requestUrls = makeRequestUrls(ocid);
 
-    const responses = [] as { name: string; data: unknown }[];
-    for (let i = 0; i < requestUrls.length; i++) {
-      const data = await fetchAllInfo(requestUrls[i]);
-      responses.push({ name: endpoints[i], data });
+    const responses = [] as unknown[];
+    for (const url of requestUrls) {
+      try {
+        const data = await fetchCharacterStats(url);
+        responses.push(data);
+      } catch (e) {
+        console.error("Error fetching: ", e);
+        responses.push(null); // 실패한 요청은 null 처리
+      }
     }
 
-    const basic = responses.find((res) => res.name === "basic")?.data;
-    const stat = responses.find((res) => res.name === "stat")?.data;
-    const ability = responses.find((res) => res.name === "ability")?.data;
-    const normalEquip = responses.find((res) => res.name === "item-equipment")?.data;
-    const symbolEquip = responses.find((res) => res.name === "symbol-equipment")?.data;
-    const cashEquip = responses.find((res) => res.name === "cashitem-equipment")?.data;
-    const petEquip = responses.find((res) => res.name === "pet-equipment")?.data;
-    const androidEquip = responses.find((res) => res.name === "android-equipment")?.data;
+    // TODO: 날짜 관련 리팩토링
+    const today = dayjs(new Date()).format("YYYY-MM-DD");
+    const jsonResponse = [...requestDates, today].reduce((acc, date, index) => {
+      acc[date] = responses[index];
+      return acc;
+    }, {} as Record<string, unknown>);
 
-    return Response.json({
-      basic,
-      stat,
-      ability,
-      normalEquip,
-      symbolEquip,
-      cashEquip,
-      petEquip,
-      androidEquip,
-    });
+    return Response.json(jsonResponse);
   } catch (e) {
     if (e instanceof Error) {
       const parsed = JSON.parse(e.message);

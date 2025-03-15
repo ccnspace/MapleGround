@@ -7,6 +7,7 @@ import { NoticeSideBar } from "@/components/NoticeSideBar";
 import { pretendard } from "./fonts/pretendard";
 import { Modal } from "@/components/Modal";
 import { ThemeProvider } from "next-themes";
+import { DimmedLayer } from "@/components/DimmedLayer";
 
 export const metadata: Metadata = {
   title: "MapleDot: 메닷",
@@ -20,16 +21,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${pretendard.variable} font-pretendard bg-white dark:bg-[#131313]`}
-      >
+      <body className={`${pretendard.variable} font-pretendard bg-white dark:bg-[#131313]`}>
         <ThemeProvider attribute="class" defaultTheme="system">
           <Header />
           <Modal />
           <div className="flex flex-row h-full gap-4">
             <SideBar />
             {children}
-            <NoticeSideBar />
+            {/* <NoticeSideBar /> */}
           </div>
         </ThemeProvider>
       </body>

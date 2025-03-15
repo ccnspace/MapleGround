@@ -88,49 +88,10 @@ const importantStats: Record<string, string[]> = {
     "아크",
     "제논",
   ],
-  DEX: [
-    "보우마스터",
-    "신궁",
-    "메카닉",
-    "패스파인더",
-    "윈드브레이커",
-    "와일드헌터",
-    "카인",
-    "메르세데스",
-    "캡틴",
-    "제논",
-    "엔젤릭버스터",
-  ],
-  INT: [
-    "아크메이지(불,독)",
-    "아크메이지(썬,콜)",
-    "비숍",
-    "플레임위자드",
-    "배틀메이지",
-    "루미너스",
-    "에반",
-    "일리움",
-    "라라",
-    "키네시스",
-  ],
-  LUK: [
-    "나이트로드",
-    "섀도어",
-    "듀얼블레이드",
-    "나이트워커",
-    "제논",
-    "팬텀",
-    "카데나",
-    "칼리",
-    "호영",
-  ],
-  "버프 지속시간": [
-    "아크메이지(썬,콜)",
-    "비숍",
-    "아크메이지(불,독)",
-    "카이저",
-    "루미너스",
-  ],
+  DEX: ["보우마스터", "신궁", "메카닉", "패스파인더", "윈드브레이커", "와일드헌터", "카인", "메르세데스", "캡틴", "제논", "엔젤릭버스터"],
+  INT: ["아크메이지(불,독)", "아크메이지(썬,콜)", "비숍", "플레임위자드", "배틀메이지", "루미너스", "에반", "일리움", "라라", "키네시스"],
+  LUK: ["나이트로드", "섀도어", "듀얼블레이더", "나이트워커", "제논", "팬텀", "카데나", "칼리", "호영"],
+  "버프 지속시간": ["아크메이지(썬,콜)", "비숍", "아크메이지(불,독)", "카이저", "루미너스"],
   HP: ["데몬어벤져"],
 };
 const getStatItemStyle = (jobName: string, valueName: string) => {
@@ -146,13 +107,7 @@ type StatItemProps = {
   statObject: Record<StatName, string>;
   className?: string;
 };
-const StatItem = ({
-  statName,
-  jobName,
-  statObject,
-  className,
-  children,
-}: PropsWithChildren<StatItemProps>) => (
+const StatItem = ({ statName, jobName, statObject, className, children }: PropsWithChildren<StatItemProps>) => (
   <div
     className={`${getStatItemStyle(jobName, statName)} 
               flex items-center bg-slate-400/25 rounded-md px-1.5 pt-1.5 pb-1.5 ${className}`}
@@ -174,8 +129,7 @@ export const StatContainer = () => {
       const { stat_name, stat_value } = cur;
       const unit = getUnit(stat_name);
       const statValueNum = stat_value !== null ? parseInt(stat_value) : 0;
-      const formattedValue =
-        stat_name !== "전투력" ? statValueNum.toLocaleString() : statValueNum;
+      const formattedValue = stat_name !== "전투력" ? statValueNum.toLocaleString() : statValueNum;
       acc[stat_name] = `${formattedValue}${unit}`;
       return acc;
     }, object);
@@ -207,15 +161,9 @@ export const StatContainer = () => {
         px-3 pt-2 pb-2 rounded-lg`}
             >
               <p className="font-bold text-lg text-white">전투력</p>
-              <p className="font-extrabold text-3xl text-white [text-shadow:_1px_2px_4px_rgb(0_0_0/_0.4)]">
-                {formattedCombatPower}
-              </p>
+              <p className="font-extrabold text-3xl text-white [text-shadow:_1px_2px_4px_rgb(0_0_0/_0.4)]">{formattedCombatPower}</p>
             </div>
-            {!!combatDescription && (
-              <p className="flex justify-center pt-1 font-bold text-sm text-gray-600">
-                {combatDescription}
-              </p>
-            )}
+            {!!combatDescription && <p className="flex justify-center pt-1 font-bold text-sm text-gray-600">{combatDescription}</p>}
           </div>
 
           <div className="grid grid-cols-2 bg-slate-400/20 rounded-md px-2 pt-2 pb-3 gap-2 text-sm">
@@ -225,141 +173,38 @@ export const StatContainer = () => {
                 {`${statObject["최소 스탯공격력"]} ~ ${statObject["최대 스탯공격력"]}`}
               </span>
             </div>
-            <StatItem
-              statName="STR"
-              statObject={statObject}
-              jobName={jobName}
-            />
-            <StatItem
-              statName="DEX"
-              statObject={statObject}
-              jobName={jobName}
-            />
-            <StatItem
-              statName="INT"
-              statObject={statObject}
-              jobName={jobName}
-            />
-            <StatItem
-              statName="LUK"
-              statObject={statObject}
-              jobName={jobName}
-            />
+            <StatItem statName="STR" statObject={statObject} jobName={jobName} />
+            <StatItem statName="DEX" statObject={statObject} jobName={jobName} />
+            <StatItem statName="INT" statObject={statObject} jobName={jobName} />
+            <StatItem statName="LUK" statObject={statObject} jobName={jobName} />
             <StatItem statName="HP" statObject={statObject} jobName={jobName} />
             <StatItem statName="MP" statObject={statObject} jobName={jobName} />
-            <StatItem
-              statName="최종 데미지"
-              statObject={statObject}
-              jobName={jobName}
-              className="col-span-2"
-            />
-            <StatItem
-              statName="데미지"
-              statObject={statObject}
-              jobName={jobName}
-              className="col-span-2"
-            />
-            <StatItem
-              statName="보스 몬스터 데미지"
-              statObject={statObject}
-              jobName={jobName}
-              className="col-span-2"
-            />
-            <StatItem
-              statName="방어율 무시"
-              statObject={statObject}
-              jobName={jobName}
-              className="col-span-2"
-            />
-            <StatItem
-              statName="버프 지속시간"
-              statObject={statObject}
-              jobName={jobName}
-              className="col-span-2"
-            />
-            <StatItem
-              statName="공격력"
-              statObject={statObject}
-              jobName={jobName}
-            />
-            <StatItem
-              statName="마력"
-              statObject={statObject}
-              jobName={jobName}
-            />
-            <StatItem
-              statName="크리티컬 데미지"
-              statObject={statObject}
-              jobName={jobName}
-            />
-            <StatItem
-              statName="크리티컬 확률"
-              statObject={statObject}
-              jobName={jobName}
-            />
-            <StatItem
-              statName="아케인포스"
-              statObject={statObject}
-              jobName={jobName}
-            />
-            <StatItem
-              statName="어센틱포스"
-              statObject={statObject}
-              jobName={jobName}
-            />
-            <StatItem
-              statName="공격 속도"
-              statObject={statObject}
-              jobName={jobName}
-            >
-              <span className="text-xs font-bold text-black/50 dark:text-white/50">
-                {"(최대 8)"}
-              </span>
+            <StatItem statName="최종 데미지" statObject={statObject} jobName={jobName} className="col-span-2" />
+            <StatItem statName="데미지" statObject={statObject} jobName={jobName} className="col-span-2" />
+            <StatItem statName="보스 몬스터 데미지" statObject={statObject} jobName={jobName} className="col-span-2" />
+            <StatItem statName="방어율 무시" statObject={statObject} jobName={jobName} className="col-span-2" />
+            <StatItem statName="버프 지속시간" statObject={statObject} jobName={jobName} className="col-span-2" />
+            <StatItem statName="공격력" statObject={statObject} jobName={jobName} />
+            <StatItem statName="마력" statObject={statObject} jobName={jobName} />
+            <StatItem statName="크리티컬 데미지" statObject={statObject} jobName={jobName} />
+            <StatItem statName="크리티컬 확률" statObject={statObject} jobName={jobName} />
+            <StatItem statName="아케인포스" statObject={statObject} jobName={jobName} />
+            <StatItem statName="어센틱포스" statObject={statObject} jobName={jobName} />
+            <StatItem statName="공격 속도" statObject={statObject} jobName={jobName}>
+              <span className="text-xs font-bold text-black/50 dark:text-white/50">{"(최대 8)"}</span>
             </StatItem>
-            <StatItem
-              statName="상태이상 내성"
-              statObject={statObject}
-              jobName={jobName}
-            />
-            <StatItem
-              statName="스탠스"
-              statObject={statObject}
-              jobName={jobName}
-            />
-            <StatItem
-              statName="방어력"
-              statObject={statObject}
-              jobName={jobName}
-            />
-            <StatItem
-              statName="이동속도"
-              statObject={statObject}
-              jobName={jobName}
-            />
-            <StatItem
-              statName="점프력"
-              statObject={statObject}
-              jobName={jobName}
-            />
-            <StatItem
-              statName="아이템 드롭률"
-              statObject={statObject}
-              jobName={jobName}
-              className="bg-lime-400/40"
-            />
-            <StatItem
-              statName="메소 획득량"
-              statObject={statObject}
-              jobName={jobName}
-              className="bg-yellow-400/30"
-            />
+            <StatItem statName="상태이상 내성" statObject={statObject} jobName={jobName} />
+            <StatItem statName="스탠스" statObject={statObject} jobName={jobName} />
+            <StatItem statName="방어력" statObject={statObject} jobName={jobName} />
+            <StatItem statName="이동속도" statObject={statObject} jobName={jobName} />
+            <StatItem statName="점프력" statObject={statObject} jobName={jobName} />
+            <StatItem statName="아이템 드롭률" statObject={statObject} jobName={jobName} className="bg-lime-400/40" />
+            <StatItem statName="메소 획득량" statObject={statObject} jobName={jobName} className="bg-yellow-400/30" />
           </div>
         </div>
       ) : (
         <div className="flex items-center justify-center h-full">
-          <p className="font-bold text-sm text-slate-950/50 dark:text-white/60">
-            여기에 캐릭터의 전투 정보가 표시됩니다.
-          </p>
+          <p className="font-bold text-sm text-slate-950/50 dark:text-white/60">여기에 캐릭터의 전투 정보가 표시됩니다.</p>
         </div>
       )}
     </div>

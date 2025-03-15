@@ -25,7 +25,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system">
           <Header />
           <Modal />
-          <div className="flex flex-row h-full gap-4 justify-center">
+          <div className="flex flex-row gap-4 justify-center">
             <SideBar />
             {children}
             {/* <NoticeSideBar /> */}

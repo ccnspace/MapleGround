@@ -7,24 +7,24 @@ import { PetEquipContainer } from "@/components/PetEquipContainer";
 import { ChartContainer } from "@/components/ChartContainer";
 import { DimmedLayer } from "./DimmedLayer";
 import { useCharacterStore } from "@/stores/character";
+import { ExpContainer } from "./ExpContainer";
 
 export const MainContainer = () => {
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
 
   return (
-    <div className="main_container flex flex-col w-[1280px] gap-5 px-5 pt-8 pb-8">
-      <div className="flex gap-5 h-auto">
-        <StatContainer />
-        <EquipContainer />
-        <div className="flex flex-col gap-5">
-          <AbilityContainer />
-          <PetEquipContainer />
-        </div>
+    <div className="main_container w-[1280px] gap-4">
+      <StatContainer />
+      <EquipContainer />
+      <div className="grid gap-4">
+        <AbilityContainer />
+        <PetEquipContainer />
+        <PetEquipContainer />
       </div>
-      <div className="flex gap-5">
-        {/* <ChartContainer /> */}
-        {/* <ExpContainer /> */}
+      <div className="col-span-2">
+        <ChartContainer />
       </div>
+      <ExpContainer />
       {fetchStatus === "loading" && <DimmedLayer spinner />}
     </div>
   );

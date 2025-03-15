@@ -10,7 +10,7 @@ export const Badge = ({ text, bgColor }: { text: string; bgColor: string }) => {
   return (
     <span
       className={`${ColorSet[bgColor]} w-fit tracking-tighter mx-1 text-xs rounded-sm
-        text-black font-bold px-0.5 pt-0.5 pb-0.5`}
+        text-black font-bold px-1 pt-0.5 pb-0.5`}
     >
       {text}
     </span>

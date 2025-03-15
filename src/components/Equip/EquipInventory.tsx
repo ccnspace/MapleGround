@@ -13,13 +13,16 @@ export const EquipInventory = () => {
   const authenticSymbolList = Object.values(authenticSymbol);
   const hasSymbol = !!arcaneSymbolList.length || !!authenticSymbolList.length;
 
-  const handleClickIcon = useCallback((e: MouseEvent) => {
-    const target = e.target as Element;
-    const parent = target.closest(".equip_wrapper") || target.closest(".symbol_wrapper");
-    if (!parent || parent.childElementCount === 0) return;
+  const handleClickIcon = useCallback(
+    (e: MouseEvent) => {
+      const target = e.target as Element;
+      const parent = target.closest(".equip_wrapper") || target.closest(".symbol_wrapper");
+      if (!parent || parent.childElementCount === 0) return;
 
-    setSelectedEquipName(parent.id);
-  }, []);
+      setSelectedEquipName(parent.id);
+    },
+    [setSelectedEquipName]
+  );
 
   if (!normal) return null;
 

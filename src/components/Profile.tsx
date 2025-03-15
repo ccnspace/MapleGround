@@ -11,6 +11,7 @@ import { useCharacterStore } from "@/stores/character";
 import { useShallow } from "zustand/shallow";
 import { CharacterAttributes } from "@/apis/getCharacterAttributes";
 import { useModalStore } from "@/stores/modal";
+import { useCharacterPowerStore } from "@/stores/characterPower";
 
 const EmptyAltText = () => {
   return (
@@ -127,6 +128,8 @@ export const ProfileWrapper = () => {
     }))
   );
 
+  const resetCharacterPower = useCharacterPowerStore((state) => state.resetCharacterPower);
+
   const isEmptyProfile = !characterAttributes && fetchStatus === "idle";
   const hasProfile = characterAttributes && fetchStatus === "success";
   const isSearchError = fetchStatus === "error";
@@ -143,6 +146,7 @@ export const ProfileWrapper = () => {
       message: "설정된 캐릭터를 초기화 하시겠어요?",
       confirmCallback: () => {
         resetCharacterData();
+        resetCharacterPower();
       },
     });
   };

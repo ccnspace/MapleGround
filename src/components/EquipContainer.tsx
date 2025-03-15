@@ -52,11 +52,11 @@ export const EquipContainer = () => {
 
   return (
     <div
-      className="flex shrink-0 flex-row bg-slate-100 dark:bg-[#1f2024] px-5 pt-5 pb-5
-     rounded-lg gap-6"
+      className="flex shrink-0 min-w-96 justify-center bg-slate-100 flex-col dark:bg-[#1f2024] px-3 pt-3 pb-3
+      rounded-lg gap-1"
     >
       <div className="flex flex-col justify-center">
-        {!!characterInfo?.equipments && (
+        {!!characterInfo?.equipments ? (
           <div className="flex justify-between mb-4">
             <p
               className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
@@ -81,6 +81,12 @@ export const EquipContainer = () => {
               >
                 3번 프리셋
               </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col  min-w-96 h-32 justify-center">
+            <div className="flex items-center justify-center">
+              <p className="font-bold text-sm text-slate-950/50 dark:text-white/60">여기에 캐릭터의 아이템이 표시됩니다.</p>
             </div>
           </div>
         )}

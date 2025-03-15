@@ -1,20 +1,27 @@
 "use client";
 
 import Chart, { type Props } from "react-apexcharts";
-import { getCharacterCombatPower } from "@/apis/getCharacterCombatPower";
 import { useCharacterStore } from "@/stores/character";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { InfoIcon } from "./svg/InfoIcon";
+import { useCharacterPowerStore } from "@/stores/characterPower";
+import { useShallow } from "zustand/shallow";
+import { Spinner } from "./svg/Spinner";
 
 export const ChartContainer = () => {
   const nickname = useCharacterStore((state) => state.characterAttributes?.basic.character_name);
+  const { fetchStatus, characterPower, fetchCharacterPower } = useCharacterPowerStore(
+    useShallow((state) => ({
+      fetchStatus: state.fetchStatus,
+      characterPower: state.characterPower,
+      fetchCharacterPower: state.fetchCharacterPower,
+    }))
+  );
+
   const [categories, setCategories] = useState<string[]>([]);
   const [seriesData, setSeriesData] = useState<number[]>([]);
-
   const { theme } = useTheme();
-
-  const canShowChart = nickname && categories.length && seriesData.length;
+  const canShowChart = !!nickname && !!categories.length && !!seriesData.length;
 
   // 초기화
   useEffect(() => {
@@ -25,15 +32,17 @@ export const ChartContainer = () => {
   }, [nickname, categories, seriesData]);
 
   useEffect(() => {
-    if (!nickname) return;
+    if (!nickname || characterPower) return;
 
-    const fetchCharacterInfo = async () => {
-      const power = await getCharacterCombatPower(nickname);
-      setCategories((prev) => [...prev, ...Object.keys(power)]);
-      setSeriesData((prev) => [...prev, ...Object.values(power)]);
-    };
-    fetchCharacterInfo();
-  }, [nickname]);
+    fetchCharacterPower(nickname);
+  }, [nickname, characterPower]);
+
+  useEffect(() => {
+    if (!characterPower) return;
+
+    setCategories((prev) => [...prev, ...Object.keys(characterPower)]);
+    setSeriesData((prev) => [...prev, ...Object.values(characterPower)]);
+  }, [characterPower]);
 
   const chartOptions: Props["options"] = {
     chart: {
@@ -98,11 +107,11 @@ export const ChartContainer = () => {
 
   return (
     <div
-      className="flex shrink-0 min-w-[640px] min-h-[400px] flex-col bg-slate-100 dark:bg-[#1f2024] px-3 pt-3 pb-3
-        border-2 border-slate-200 dark:border-[#1f2024] rounded-lg gap-0.5 justify-center"
+      className="flex shrink-0 w-full min-h-[400px] flex-col bg-slate-100 dark:bg-[#1f2024] px-3 pt-3 pb-3
+        rounded-lg gap-0.5 justify-center"
     >
       <div className="flex flex-col h-32 justify-center">
-        {canShowChart ? (
+        {canShowChart && (
           <>
             <p
               className="flex font-extrabold text-base mb-auto px-2 pt-0.5
@@ -111,11 +120,17 @@ export const ChartContainer = () => {
             >
               전투력 추이
             </p>
-            <Chart options={chartOptions} series={series} type="line" width="600" height="310" />
+            <Chart options={chartOptions} series={series} type="line" height="310" />
           </>
-        ) : (
+        )}
+        {fetchStatus === "idle" && (
           <div className="flex items-center justify-center">
-            <p className="font-bold text-sm text-slate-950/50 dark:text-white/60">여기에 캐릭터의 전투력 차트가 표시됩니다.</p>
+            <p className="font-bold text-sm text-slate-950/50 dark:text-white/60">여기에 캐릭터의 전투력 추이가 표시됩니다.</p>
+          </div>
+        )}
+        {fetchStatus === "loading" && (
+          <div className="flex items-center justify-center">
+            <Spinner width="3em" height="3em" />
           </div>
         )}
       </div>

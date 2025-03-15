@@ -51,6 +51,14 @@ abbr:where([title]) {
   text-decoration: none;
 }
 
+.main_container {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(400px, 1fr));
+  grid-auto-flow: row;
+  padding-top: 16px;
+  height: fit-content;
+}
+
 .main_container::-webkit-scrollbar {
   width: 10px;
 }

@@ -58,7 +58,7 @@ export const AbilityContainer = () => {
 
   return (
     <div
-      className="flex shrink-0 min-w-96 flex-col bg-slate-100 dark:bg-[#1f2024] px-3 pt-3 pb-3
+      className="flex shrink-0 flex-col bg-slate-100 dark:bg-[#1f2024] px-3 pt-3 pb-3
    rounded-lg gap-1 min-h-48"
     >
       {!!currentAbility ? (

@@ -1,5 +1,3 @@
-import { fail } from "assert";
-
 type ItemGrade = "레어" | "에픽" | "유니크" | "레전드리";
 
 type Constructor = {

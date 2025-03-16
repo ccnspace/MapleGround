@@ -65,6 +65,8 @@ type ItemEtcOption = {
 };
 type StarforceOption = ItemEtcOption;
 
+export type ItemPotentialGrade = "레어" | "에픽" | "유니크" | "레전드리";
+
 export type ItemEquipment = {
   item_equipment_part: string;
   item_equipment_slot: string;
@@ -76,8 +78,8 @@ export type ItemEquipment = {
   item_gender: string | null;
   item_total_option: TotalItemOption;
   item_base_option: BaseItemOption;
-  potential_option_grade: string;
-  additional_potential_option_grade: string;
+  potential_option_grade: ItemPotentialGrade | null;
+  additional_potential_option_grade: ItemPotentialGrade | null;
   /** 잠재능력 봉인 여부 */
   potential_option_flag: string;
   potential_option_1: string;

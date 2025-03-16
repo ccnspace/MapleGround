@@ -5,6 +5,7 @@ import { ItemEquipment } from "@/types/Equipment";
 import { StarIcon } from "../../svg/StarIcon";
 import { ItemIcon } from "./ItemIcon";
 import { EquipDetailCard } from "../EquiqDetailCard";
+import { CubeSimulator } from "@/utils/CubeSimulator";
 
 const StarForceBadge = ({ item }: { item: ItemEquipment }) => {
   const starforce = parseInt(item?.starforce);

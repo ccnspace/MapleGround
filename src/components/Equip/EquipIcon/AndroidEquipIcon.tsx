@@ -1,8 +1,7 @@
 import { AndroidEquipment } from "@/types/AndroidEquipment";
 import { CSSProperties, memo, useContext, useRef } from "react";
-import { EquipActionContext, EquipContext } from "../../EquipContainer";
+import { EquipActionContext } from "@/components/Container/EquipContainer";
 import { useClickOutside } from "@/hooks/useClickOutside";
-import { useCharacterInfo } from "@/hooks/useCharacterInfo";
 import Image from "next/image";
 import { EquipDetailCard } from "../EquiqDetailCard";
 

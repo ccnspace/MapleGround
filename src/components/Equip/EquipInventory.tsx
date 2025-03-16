@@ -1,5 +1,5 @@
 import { MouseEvent, useCallback, useContext } from "react";
-import { EquipActionContext, EquipContext } from "../EquipContainer";
+import { EquipActionContext, EquipContext } from "../Container/EquipContainer";
 import { NormalEquipIcon } from "./EquipIcon/NormalEquipIcon";
 import { AndroidEquipIcon } from "./EquipIcon/AndroidEquipIcon";
 import { SymbolEquipIcon } from "./EquipIcon/SymbolEquipIcon";

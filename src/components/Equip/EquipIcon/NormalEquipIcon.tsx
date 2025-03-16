@@ -1,9 +1,8 @@
 import { useClickOutside } from "@/hooks/useClickOutside";
-import { CSSProperties, memo, useContext, useEffect, useRef } from "react";
-import { EquipActionContext, EquipContext } from "../../EquipContainer";
+import { CSSProperties, memo, useContext, useRef } from "react";
+import { EquipActionContext } from "@/components/Container/EquipContainer";
 import { ItemEquipment } from "@/types/Equipment";
 import { StarIcon } from "../../svg/StarIcon";
-import { useCharacterInfo } from "@/hooks/useCharacterInfo";
 import { ItemIcon } from "./ItemIcon";
 import { EquipDetailCard } from "../EquiqDetailCard";
 

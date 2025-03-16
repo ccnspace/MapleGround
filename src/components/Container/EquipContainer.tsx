@@ -1,8 +1,8 @@
 "use client";
 
 import { CharacterEquipments, useCharacterInfo } from "@/hooks/useCharacterInfo";
-import { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
-import { EquipInventory } from "./Equip/EquipInventory";
+import { createContext, useEffect, useMemo, useState } from "react";
+import { EquipInventory } from "../Equip/EquipInventory";
 
 type EquipContextType = {
   characterEquipments: CharacterEquipments | undefined;

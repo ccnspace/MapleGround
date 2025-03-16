@@ -1,9 +1,8 @@
 import Image from "next/image";
-import { useCharacterInfo } from "@/hooks/useCharacterInfo";
 import { SymbolOption } from "@/types/SymbolEquipment";
 import { CSSProperties, memo, type MouseEvent, useContext, useRef } from "react";
 import { useClickOutside } from "@/hooks/useClickOutside";
-import { EquipActionContext, EquipContext } from "../../EquipContainer";
+import { EquipActionContext } from "@/components/Container/EquipContainer";
 import { EquipDetailCard } from "../EquiqDetailCard";
 
 const MaxBadge = () => (

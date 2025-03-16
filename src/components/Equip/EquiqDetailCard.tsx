@@ -6,7 +6,7 @@ import { AndroidContainer } from "./android/Container";
 import { SymbolContainer } from "./symbol/Container";
 import { CharacterEquipments } from "@/hooks/useCharacterInfo";
 
-import { EquipContext } from "../EquipContainer";
+import { EquipContext } from "../Container/EquipContainer";
 
 type DetailCardProps = { equipName: string; characterEquipments: CharacterEquipments };
 

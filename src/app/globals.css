@@ -75,16 +75,7 @@ abbr:where([title]) {
 }
 
 .fade-in {
-  animation: fadein 0.5s;
-}
-
-@keyframes fadein {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  animation: fadein 0.36s;
 }
 
 .cube-glow {
@@ -99,5 +90,14 @@ abbr:where([title]) {
   }
   100% {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0);
+  }
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

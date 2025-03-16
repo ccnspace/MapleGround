@@ -11,7 +11,7 @@ export class CubeSimulator {
   private grades: ItemGrade[];
   private gradeUpInfo: { chance: number; guarantee: number }[];
   private gradeIndex = 0;
-  private failedAttempts = [0, 0, 0];
+  private failedAttempts = [0, 0, 0, 0];
 
   private currentAttempt = 0;
   private currentGuarantee = 0;
@@ -42,7 +42,7 @@ export class CubeSimulator {
     this.reset(this.initialItemGrade, this.initialItemOptions);
   }
 
-  convertItemLevelToString(itemLevel: number) {
+  private convertItemLevelToString(itemLevel: number) {
     if (itemLevel < 30) return "30";
     if (itemLevel < 70) return "70";
     if (itemLevel < 119) return "100";
@@ -50,34 +50,15 @@ export class CubeSimulator {
     return "250";
   }
 
-  reset(itemGrade: ItemGrade, itemOptions: string[]) {
+  private reset(itemGrade: ItemGrade, itemOptions: string[]) {
     this.gradeIndex = this.grades.indexOf(itemGrade);
-    this.failedAttempts = [0, 0, 0]; // 각 등급별 실패 횟수
+    this.failedAttempts = [0, 0, 0, 0]; // 각 등급별 시도도 횟수
     this.prevOptions = itemOptions ?? ["", "", ""]; // 옵션 초기화
     this.currentOptions = itemOptions ?? ["", "", ""]; // 옵션 초기화
     this.currentGuarantee = this.gradeUpInfo[this.gradeIndex]?.guarantee ?? 0;
   }
 
-  rollCube() {
-    this.prevGrade = this.grades[this.gradeIndex];
-    if (this.gradeIndex < this.grades.length - 1) {
-      const gradeUpInfo = this.gradeUpInfo[this.gradeIndex];
-      const roll = Math.random();
-
-      if (roll < gradeUpInfo.chance || this.failedAttempts[this.gradeIndex] >= gradeUpInfo.guarantee) {
-        this.gradeIndex++;
-        this.failedAttempts[this.gradeIndex - 1] = 0; // 보장된 승급 시 초기화
-      } else {
-        this.failedAttempts[this.gradeIndex]++;
-      }
-    }
-    this.currentGrade = this.grades[this.gradeIndex];
-    this.currentAttempt = this.failedAttempts[this.gradeIndex] ?? 0;
-    this.currentGuarantee = this.gradeUpInfo[this.gradeIndex]?.guarantee ?? 0;
-    this.assignOptions();
-  }
-
-  assignOptions() {
+  private assignOptions() {
     this.prevOptions = this.currentOptions;
 
     const optionPool = this.getOptionPool();
@@ -88,11 +69,11 @@ export class CubeSimulator {
     ];
   }
 
-  getOptionPool() {
+  private getOptionPool() {
     return getItemOptionPool(this.itemType, this.grades[this.gradeIndex], this.itemLevel);
   }
 
-  getRandomOption(optionPool: Option[]) {
+  private getRandomOption(optionPool: Option[]) {
     const roll = Math.random();
     let cumulativeProbability = 0;
 
@@ -105,6 +86,29 @@ export class CubeSimulator {
     return "";
   }
 
+  rollCube() {
+    this.prevGrade = this.grades[this.gradeIndex];
+    const roll = Math.random();
+
+    if (this.gradeIndex < this.grades.length - 1) {
+      const gradeUpInfo = this.gradeUpInfo[this.gradeIndex];
+
+      if (roll < gradeUpInfo.chance || this.failedAttempts[this.gradeIndex] >= gradeUpInfo.guarantee) {
+        this.gradeIndex++;
+        this.failedAttempts[this.gradeIndex - 1] = 0; // 보장된 승급 시 초기화
+      } else {
+        this.failedAttempts[this.gradeIndex]++;
+      }
+    } else {
+      this.failedAttempts[this.gradeIndex]++;
+    }
+
+    this.currentGrade = this.grades[this.gradeIndex];
+    this.currentAttempt = this.failedAttempts[this.gradeIndex];
+    this.currentGuarantee = this.gradeUpInfo[this.gradeIndex]?.guarantee ?? 0;
+    this.assignOptions();
+  }
+
   getItemState() {
     return {
       prevGrade: this.prevGrade,
@@ -115,6 +119,22 @@ export class CubeSimulator {
       currentAttempt: this.currentAttempt,
       currentGuarantee: this.currentGuarantee,
     };
+  }
+
+  setMiracleTime(isSet: boolean) {
+    if (isSet) {
+      this.gradeUpInfo = [
+        { chance: 0.3, guarantee: 10 }, // 레어 -> 에픽
+        { chance: 0.07, guarantee: 42 }, // 에픽 -> 유니크
+        { chance: 0.028, guarantee: 107 }, // 유니크 -> 레전드리
+      ];
+    } else {
+      this.gradeUpInfo = [
+        { chance: 0.150000001275, guarantee: 10 }, // 레어 -> 에픽
+        { chance: 0.035, guarantee: 42 }, // 에픽 -> 유니크
+        { chance: 0.014, guarantee: 107 }, // 유니크 -> 레전드리
+      ];
+    }
   }
 }
 

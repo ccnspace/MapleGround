@@ -29,7 +29,7 @@ export const EquipDescription = ({ item_icon, item_name, baseLevel }: Props) => 
             alt={item_name}
           />
         </div>
-        {!!baseLevel && <div className="flex items-start text-xs text-white">· reqLevel: {baseLevel}</div>}
+        {!!baseLevel && <div className="flex items-start text-xs text-white">· REQ LEVEL: {baseLevel}</div>}
       </div>
     </>
   );

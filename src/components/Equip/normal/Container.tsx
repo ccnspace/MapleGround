@@ -106,7 +106,7 @@ export const NormalContainer = ({ item }: Props) => {
           <div className="flex flex-row gap-2 justify-center">
             <button
               onClick={handleRollCubeClick}
-              className="tracking-tighter text-white text-sm font-bold pt-1 pb-1 px-2 mt-1 [text-shadow:_2px_1px_2px_rgb(0_0_0_/_80%)]
+              className="tracking-tighter text-white text-sm font-bold pt-1 pb-1 px-2 mt-1 [text-shadow:_2px_1px_3px_rgb(0_0_0_/_50%)]
               rounded-md bg-gradient-to-r from-purple-400/90 to-sky-500/90 hover:bg-gradient-to-r hover:from-purple-500/90 hover:to-sky-600/90"
             >
               🪄 잠재능력 재설정
@@ -115,7 +115,7 @@ export const NormalContainer = ({ item }: Props) => {
               onClick={() => {
                 alert("Coming Soon!");
               }}
-              className="tracking-tighter text-white whitespace-pre-wrap text-sm font-bold pt-1 pb-1 px-2 mt-1 [text-shadow:_2px_1px_2px_rgb(0_0_0_/_80%)] 
+              className="tracking-tighter text-white whitespace-pre-wrap text-sm font-bold pt-1 pb-1 px-2 mt-1 [text-shadow:_2px_1px_3px_rgb(0_0_0_/_50%)] 
               rounded-md bg-gradient-to-r from-lime-400/90 to-teal-600/90 hover:bg-gradient-to-r hover:from-lime-500/90 hover:to-teal-700/90"
             >
               {`🪄 에디셔널 재설정`}

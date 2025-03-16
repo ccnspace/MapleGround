@@ -9,6 +9,19 @@ import completeSound from "@/app/sound/AchievmentComplete.mp3";
 import CheckBox from "../CheckBox";
 import potentialImg from "@/images/potentialBg.png";
 
+const getGradeBackground = (grade: ItemPotentialGrade) => {
+  if (grade === "레어") {
+    return `bg-sky-500`;
+  }
+  if (grade === "에픽") {
+    return "bg-purple-600";
+  }
+  if (grade === "유니크") {
+    return "bg-yellow-500";
+  }
+  return "bg-lime-500";
+};
+
 export const CubeContainer = () => {
   const targetItem = useCubeStore((state) => state.targetItem);
   const resetCube = useCubeStore((state) => state.resetCube);
@@ -16,7 +29,7 @@ export const CubeContainer = () => {
   const [prevOptions, setPrevOptions] = useState<string[]>([]);
   const [newOptions, setNewOptions] = useState<string[]>([]);
   const [prevGrade, setPrevGrade] = useState<ItemPotentialGrade>();
-  const [newGrade, setNewGrade] = useState<ItemPotentialGrade>();
+  const [afterGrade, setAfterGrade] = useState<ItemPotentialGrade>();
   const [currentAttempt, setCurrentAttempt] = useState<number>(0);
   const [currentGuarantee, setCurrentGuarantee] = useState<number>(0);
   const [fadeIn, setFadeIn] = useState(false);
@@ -66,21 +79,35 @@ export const CubeContainer = () => {
 
     playRollCubeAudio();
 
-    const { prevOptions, currentOptions, prevGrade, currentGrade, currentAttempt, currentGuarantee } = cubeSimulator.getItemState();
+    const {
+      prevOptions,
+      currentOptions,
+      prevGrade: simulatorPrevGrade,
+      currentGrade: simulatorCurrentGrade,
+      currentAttempt,
+      currentGuarantee,
+    } = cubeSimulator.getItemState();
 
     setPrevOptions(prevOptions);
     setNewOptions(currentOptions);
 
-    setPrevGrade(prevGrade);
-    setNewGrade(currentGrade);
+    setPrevGrade(simulatorPrevGrade);
+    setAfterGrade(simulatorCurrentGrade);
 
     setCurrentAttempt(currentAttempt);
     setCurrentGuarantee(currentGuarantee);
 
-    if (prevGrade !== currentGrade) {
+    if (simulatorPrevGrade !== simulatorCurrentGrade) {
       playGradeUpAudio();
     }
   }, 500);
+
+  const showAfterButton = prevGrade === afterGrade;
+  const handleAfterButtonClick = () => {
+    const { currentOptions } = cubeSimulator.getItemState();
+    cubeSimulator.setPrevOptions(currentOptions);
+    setPrevOptions(currentOptions);
+  };
 
   useEffect(() => {
     setFadeIn(true);
@@ -96,14 +123,14 @@ export const CubeContainer = () => {
   }, [newOptions]);
 
   useEffect(() => {
-    if (!newGrade) return;
-    if (prevGrade === newGrade) return;
+    if (!afterGrade) return;
+    if (prevGrade === afterGrade) return;
 
     setGlow(true);
     setTimeout(() => {
       setGlow(false);
     }, 1000);
-  }, [prevGrade, newGrade]);
+  }, [prevGrade, afterGrade]);
 
   useEffect(() => {
     if (!currentPotentialOptions) return;
@@ -138,7 +165,7 @@ export const CubeContainer = () => {
       <div
         style={{ zIndex: 1002 }}
         className={`fixed top-[30%] left-[50%] text-white flex rounded-lg
-             bg-black/80 border ${isMiracleChecked ? "border-lime-300/60" : "border-white/30"} p-2 align-center 
+             bg-black/70 border ${isMiracleChecked ? "border-lime-300/60" : "border-white/30"} p-2 align-center 
              justify-center w-[312px] ${glow ? "cube-glow" : ""}`}
       >
         <div className="flex p-1 flex-col items-center gap-2">
@@ -175,21 +202,42 @@ export const CubeContainer = () => {
             </div>
             <div className="flex flex-col w-[280px] rounded-md bg-sky-500">
               <p className="text-sm px-1 pt-1 pb-0.5 font-bold [text-shadow:_1px_2px_4px_rgb(0_0_0/_0.4)]">BEFORE</p>
-              <div className="flex flex-col bg-slate-900 m-1 p-1 text-sm rounded-md min-h-[88px]">
-                <p className="flex justify-center text-yellow-300 font-light">{prevGrade}</p>
+              <div className="flex flex-col gap-0.5 bg-slate-900 m-1 text-sm rounded-md min-h-[96px]">
+                {prevGrade && (
+                  <p className={`flex justify-center mb-1 font-medium rounded-tl-md rounded-tr-md ${getGradeBackground(prevGrade)}`}>
+                    {prevGrade}
+                  </p>
+                )}
                 {prevOptions?.map((option, idx) => (
-                  <p key={idx} className={`font-medium text-sm ${fadeIn ? "fade-in" : ""}`}>
+                  <p key={idx} className="font-medium px-2 text-sm">
                     {option}
                   </p>
                 ))}
               </div>
             </div>
             <div className="flex flex-col w-[280px] rounded-md bg-sky-500">
-              <p className="text-sm px-1 pt-1 pb-0.5 font-bold [text-shadow:_1px_2px_4px_rgb(0_0_0/_0.4)]">AFTER</p>
-              <div className="flex flex-col bg-slate-900 m-1 p-1 text-sm rounded-md min-h-[88px]">
-                <p className="flex justify-center text-yellow-300 font-light">{newGrade}</p>
+              <div className="flex flex-row items-center justify-between">
+                <p className="text-sm px-1 pt-1 pb-0.5 font-bold [text-shadow:_1px_2px_4px_rgb(0_0_0/_0.4)]">AFTER</p>
+                {showAfterButton && (
+                  <button
+                    onClick={handleAfterButtonClick}
+                    className="text-sm px-2.5 mr-2 rounded-md font-bold text-black cursor-pointer
+                bg-gradient-to-b from-yellow-300 to-yellow-400
+                hover:from-yellow-400 hover:to-yellow-500
+                "
+                  >
+                    선택
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-col gap-0.5 bg-slate-900 m-1 text-sm rounded-md min-h-[96px]">
+                {afterGrade && (
+                  <p className={`flex justify-center mb-1 font-medium rounded-tl-md rounded-tr-md ${getGradeBackground(afterGrade)}`}>
+                    {afterGrade}
+                  </p>
+                )}
                 {newOptions?.map((option, idx) => (
-                  <p key={idx} className={`font-medium text-sm ${fadeIn ? "fade-in" : ""}`}>
+                  <p key={idx} className={`font-medium px-2 text-sm ${fadeIn ? "fade-in" : ""}`}>
                     {option}
                   </p>
                 ))}

@@ -59,8 +59,6 @@ export class CubeSimulator {
   }
 
   private assignOptions() {
-    this.prevOptions = this.currentOptions;
-
     const optionPool = this.getOptionPool();
     this.currentOptions = [
       this.getRandomOption(optionPool.firstLine),
@@ -87,6 +85,9 @@ export class CubeSimulator {
   }
 
   rollCube() {
+    if (this.prevGrade !== this.currentGrade) {
+      this.prevOptions = this.currentOptions;
+    }
     this.prevGrade = this.grades[this.gradeIndex];
     const roll = Math.random();
 
@@ -106,6 +107,7 @@ export class CubeSimulator {
     this.currentGrade = this.grades[this.gradeIndex];
     this.currentAttempt = this.failedAttempts[this.gradeIndex];
     this.currentGuarantee = this.gradeUpInfo[this.gradeIndex]?.guarantee ?? 0;
+
     this.assignOptions();
   }
 
@@ -135,6 +137,10 @@ export class CubeSimulator {
         { chance: 0.014, guarantee: 107 }, // 유니크 -> 레전드리
       ];
     }
+  }
+
+  setPrevOptions(options: string[]) {
+    this.prevOptions = options;
   }
 }
 

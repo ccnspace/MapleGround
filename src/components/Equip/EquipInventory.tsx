@@ -24,7 +24,7 @@ export const EquipInventory = () => {
     [setSelectedEquipName]
   );
 
-  if (!normal) return null;
+  if (!characterEquipments) return null;
 
   return (
     <div className="flex flex-col justify-center items-center min-h-[640px]">
@@ -63,39 +63,41 @@ export const EquipInventory = () => {
         <NormalEquipIcon name="기계 심장" equipData={normal} isSelected={selectedEquipName === "기계 심장"} />
       </div>
       {hasSymbol && (
-        <div className="flex mr-auto mt-3">
-          <p
-            className="flex font-bold text-sm px-2 pb-1 pt-1
+        <>
+          <div className="flex mr-auto mt-3">
+            <p
+              className="flex font-bold text-sm px-2 pb-1 pt-1
          border-l-4 border-l-purple-300"
-          >
-            심볼 아이템
-          </p>
-        </div>
+            >
+              심볼 아이템
+            </p>
+          </div>
+          <div className="flex flex-col mt-3 items-start gap-2">
+            <div className="grid grid-cols-6 grid-flow-row gap-1.5">
+              {Object.values(arcaneSymbol)?.map((item) => (
+                <SymbolEquipIcon
+                  key={item.symbol_name}
+                  symbol={item}
+                  type="arcane"
+                  onClick={handleClickIcon}
+                  isSelected={selectedEquipName === item.symbol_name}
+                />
+              ))}
+            </div>
+            <div className="grid grid-cols-6 grid-flow-row gap-1.5">
+              {Object.values(authenticSymbol)?.map((item) => (
+                <SymbolEquipIcon
+                  key={item.symbol_name}
+                  symbol={item}
+                  type="authentic"
+                  onClick={handleClickIcon}
+                  isSelected={selectedEquipName === item.symbol_name}
+                />
+              ))}
+            </div>
+          </div>
+        </>
       )}
-      <div className="flex flex-col mt-3 items-start gap-2">
-        <div className="grid grid-cols-6 grid-flow-row gap-1.5">
-          {Object.values(arcaneSymbol)?.map((item) => (
-            <SymbolEquipIcon
-              key={item.symbol_name}
-              symbol={item}
-              type="arcane"
-              onClick={handleClickIcon}
-              isSelected={selectedEquipName === item.symbol_name}
-            />
-          ))}
-        </div>
-        <div className="grid grid-cols-6 grid-flow-row gap-1.5">
-          {Object.values(authenticSymbol)?.map((item) => (
-            <SymbolEquipIcon
-              key={item.symbol_name}
-              symbol={item}
-              type="authentic"
-              onClick={handleClickIcon}
-              isSelected={selectedEquipName === item.symbol_name}
-            />
-          ))}
-        </div>
-      </div>
     </div>
   );
 };

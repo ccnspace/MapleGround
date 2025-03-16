@@ -71,7 +71,7 @@ const PetDetailBox = ({ petInfo, setSelectedPetIndex }: { petInfo: PetInfo; setS
         <p className="font-medium text-sm">펫장비 옵션</p>
         <p className="font-light text-xs">{petInfo.equipment.name}</p>
         {petInfo.equipment.options?.map((option, index) => (
-          <p key={index} className="font-medium text-xs text-yellow-400">
+          <p key={index} className="font-medium text-xs text-yellow-500">
             {`· ${option.option_type}: +${option.option_value}`}
           </p>
         ))}

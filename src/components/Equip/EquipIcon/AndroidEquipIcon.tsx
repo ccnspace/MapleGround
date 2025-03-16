@@ -20,8 +20,6 @@ export const AndroidEquipIcon = memo(({ equipData, isSelected }: { equipData: An
   const equipDetailRef = useRef<HTMLDivElement>(null);
   useClickOutside(equipDetailRef, () => setSelectedEquipName(""));
 
-  if (!equipData) return null;
-
   return (
     <div id={"안드로이드"} className={`${commonEquipStyle}`}>
       {equipData?.android_icon && <AndroidImage icon={equipData.android_icon} />}

@@ -9,12 +9,16 @@ import { DimmedLayer } from "../DimmedLayer";
 import { useCharacterStore } from "@/stores/character";
 import { ExpContainer } from "./ExpContainer";
 import { EquipSetContainer } from "./EquipSetContainer";
+import { useCubeStore } from "@/stores/cube";
+import { CubeContainer } from "./CubeContainer";
 
 export const MainContainer = () => {
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
+  const cubeTargetItem = useCubeStore((state) => state.targetItem);
 
   return (
     <div className="main_container w-[1280px] gap-4">
+      {cubeTargetItem && <CubeContainer />}
       <StatContainer />
       <EquipContainer />
       <div className="grid gap-4">

@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 import type { SymbolOption } from "@/types/SymbolEquipment";
 import type { AndroidEquipment } from "@/types/AndroidEquipment";
 import { NormalContainer } from "./normal/Container";
@@ -7,6 +7,7 @@ import { SymbolContainer } from "./symbol/Container";
 import { CharacterEquipments } from "@/hooks/useCharacterInfo";
 
 import { EquipContext } from "../Container/EquipContainer";
+import { CubeSimulator } from "@/utils/CubeSimulator";
 
 type DetailCardProps = { equipName: string; characterEquipments: CharacterEquipments };
 

@@ -5,6 +5,9 @@ import { EquipDetailItem } from "./EquipDetailItem";
 import { equipOptionList } from "@/consts/EquipOptionList";
 import { StarforceBadge } from "../StarforceBadge";
 import { EquipDescription } from "./EquipDescription";
+import { MouseEvent, useContext, useRef } from "react";
+import { useCubeStore } from "@/stores/cube";
+import { EquipActionContext, EquipContext } from "@/components/Container/EquipContainer";
 
 type Props = {
   item: ItemEquipment;
@@ -14,6 +17,7 @@ export const NormalContainer = ({ item }: Props) => {
     starforce,
     item_icon,
     item_name,
+    item_equipment_slot,
     item_equipment_part,
     scroll_upgradeable_count,
     scroll_resilience_count,
@@ -33,6 +37,24 @@ export const NormalContainer = ({ item }: Props) => {
   const isAmazingForce = item.starforce_scroll_flag === "사용";
   const showStarforceBadge = !!item.starforce && item.starforce !== "0";
   const canCuttableItem = item.cuttable_count !== "255";
+
+  const setSelectedEquipName = useContext(EquipActionContext);
+  const setCubeTargetItem = useCubeStore((state) => state.setCubeTargetItem);
+  const handleRollCubeClick = (e: MouseEvent) => {
+    if (!potential_option_grade) return;
+    e.stopPropagation();
+    setSelectedEquipName("");
+    setCubeTargetItem({
+      targetItem: {
+        itemName: item_name,
+        itemIcon: item_icon,
+        itemLevel: base_equipment_level,
+        itemPotentialGrade: potential_option_grade,
+        itemType: item_equipment_slot,
+        currentPotentialOptions: [potential_option_1, potential_option_2, potential_option_3],
+      },
+    });
+  };
 
   return (
     <>
@@ -72,6 +94,14 @@ export const NormalContainer = ({ item }: Props) => {
           grade={additional_potential_option_grade}
           options={[additional_potential_option_1, additional_potential_option_2, additional_potential_option_3]}
         />
+      )}
+      {potential_option_grade && (
+        <button
+          onClick={handleRollCubeClick}
+          className="text-white text-sm font-bold p-1 mt-1 rounded-md bg-gradient-to-r from-purple-400/90 to-sky-500/90 hover:bg-gradient-to-r hover:from-purple-500/90 hover:to-sky-600/90"
+        >
+          🧊 잠재능력 재설정
+        </button>
       )}
     </>
   );

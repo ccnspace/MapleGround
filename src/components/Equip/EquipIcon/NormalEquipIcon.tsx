@@ -71,7 +71,7 @@ export const NormalEquipIcon = memo(({ name, equipData, customClass, isSelected 
     return !!(equipData && potentialTitle) ? potentialStyle[potentialTitle] : "";
   };
 
-  if (!equipData?.[name]) return null;
+  if (!equipData?.[name]) return <div className={`${getPotentialStyle(name)} ${commonEquipStyle} ${customClass}`}></div>;
 
   return (
     <div id={name} className={`${getPotentialStyle(name)} ${commonEquipStyle} ${customClass}`}>

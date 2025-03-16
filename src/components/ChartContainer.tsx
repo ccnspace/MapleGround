@@ -77,7 +77,6 @@ export const ChartContainer = () => {
     },
     stroke: {
       lineCap: "round",
-      curve: "smooth",
     },
     grid: {
       show: true,

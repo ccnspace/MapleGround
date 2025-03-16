@@ -17,10 +17,6 @@ export const EquipContainer = () => {
   const [preset, setPreset] = useState(0);
   const { characterInfo } = useCharacterInfo(preset);
 
-  useEffect(() => {
-    console.log(characterInfo);
-  }, [characterInfo]);
-
   const getActivePresetStyle = (_preset: number) => {
     if (preset === _preset)
       return `text-black dark:text-white underline decoration-2 underline-offset-4 decoration-black/60 dark:decoration-white/80

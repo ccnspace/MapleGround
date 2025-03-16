@@ -5,7 +5,7 @@ import { getCharacterCombatPower } from "@/apis/getCharacterCombatPower";
 import { useCharacterStore } from "@/stores/character";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { InfoIcon } from "./svg/InfoIcon";
+import { InfoIcon } from "../svg/InfoIcon";
 
 export const ExpContainer = () => {
   const nickname = useCharacterStore((state) => state.characterAttributes?.basic.character_name);

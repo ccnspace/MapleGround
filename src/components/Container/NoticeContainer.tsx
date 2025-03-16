@@ -4,7 +4,7 @@ import { getAllNotices } from "@/apis/getAllNotices";
 import { useNoticeStore } from "@/stores/notice";
 import { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
-import { NoticeItem } from "./NoticeItem";
+import { NoticeItem } from "../NoticeItem";
 
 const Skeleton = () => (
   <>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { NoticeContainer } from "./NoticeContainer";
+import { NoticeContainer } from "./Container/NoticeContainer";
 import { RightIcon } from "./svg/RightIcon";
 import { LeftIcon } from "./svg/LeftIcon";
 

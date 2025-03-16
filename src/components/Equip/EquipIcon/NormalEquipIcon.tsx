@@ -1,9 +1,8 @@
 import { useClickOutside } from "@/hooks/useClickOutside";
-import { CSSProperties, memo, useContext, useEffect, useRef } from "react";
-import { EquipActionContext, EquipContext } from "../../EquipContainer";
+import { CSSProperties, memo, useContext, useRef } from "react";
+import { EquipActionContext } from "@/components/Container/EquipContainer";
 import { ItemEquipment } from "@/types/Equipment";
 import { StarIcon } from "../../svg/StarIcon";
-import { useCharacterInfo } from "@/hooks/useCharacterInfo";
 import { ItemIcon } from "./ItemIcon";
 import { EquipDetailCard } from "../EquiqDetailCard";
 
@@ -72,11 +71,9 @@ export const NormalEquipIcon = memo(({ name, equipData, customClass, isSelected 
     return !!(equipData && potentialTitle) ? potentialStyle[potentialTitle] : "";
   };
 
-  if (!equipData?.[name]) return null;
-
   return (
     <div id={name} className={`${getPotentialStyle(name)} ${commonEquipStyle} ${customClass}`}>
-      {equipData[name] && (
+      {equipData?.[name] && (
         <>
           <StarForceBadge item={equipData[name]} />
           <ItemIcon item={equipData[name]} />

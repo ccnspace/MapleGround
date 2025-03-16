@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { useCharacterPowerStore } from "@/stores/characterPower";
 import { useShallow } from "zustand/shallow";
-import { Spinner } from "./svg/Spinner";
+import { Spinner } from "../svg/Spinner";
 
 export const ChartContainer = () => {
   const nickname = useCharacterStore((state) => state.characterAttributes?.basic.character_name);
@@ -77,7 +77,6 @@ export const ChartContainer = () => {
     },
     stroke: {
       lineCap: "round",
-      curve: "smooth",
     },
     grid: {
       show: true,

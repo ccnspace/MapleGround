@@ -1,13 +1,14 @@
 "use client";
 
-import { EquipContainer } from "@/components/EquipContainer";
-import { AbilityContainer } from "@/components/AbilityContainer";
+import { EquipContainer } from "@/components/Container/EquipContainer";
+import { AbilityContainer } from "@/components/Container/AbilityContainer";
 import { StatContainer } from "@/components/StatContainer";
-import { PetEquipContainer } from "@/components/PetEquipContainer";
-import { ChartContainer } from "@/components/ChartContainer";
-import { DimmedLayer } from "./DimmedLayer";
+import { PetEquipContainer } from "@/components/Container/PetEquipContainer";
+import { ChartContainer } from "@/components/Container/ChartContainer";
+import { DimmedLayer } from "../DimmedLayer";
 import { useCharacterStore } from "@/stores/character";
 import { ExpContainer } from "./ExpContainer";
+import { EquipSetContainer } from "./EquipSetContainer";
 
 export const MainContainer = () => {
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
@@ -19,7 +20,7 @@ export const MainContainer = () => {
       <div className="grid gap-4">
         <AbilityContainer />
         <PetEquipContainer />
-        <PetEquipContainer />
+        <EquipSetContainer />
       </div>
       <div className="col-span-2">
         <ChartContainer />

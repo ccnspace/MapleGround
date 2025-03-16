@@ -18,35 +18,20 @@ type PetSkill = {
   skill_2_icon: string | null;
 };
 
+type PetEquipInfo = {
+  [key: `pet_${number}_name`]: string | null;
+  [key: `pet_${number}_icon`]: string | null;
+  [key: `pet_${number}_nickname`]: string | null;
+  [key: `pet_${number}_appearance`]: string | null;
+  [key: `pet_${number}_appearance_icon`]: string | null;
+  [key: `pet_${number}_description`]: string | null;
+  [key: `pet_${number}_equipment`]: PetItem | null;
+  [key: `pet_${number}_auto_skill`]: PetSkill | null;
+  [key: `pet_${number}_pet_type`]: string | null;
+  [key: `pet_${number}_skill`]: string[];
+  [key: `pet_${number}_date_expire`]: string | null;
+};
+
 export type PetEquipment = {
   date: string | null;
-  pet_1_icon: string | null;
-  pet_1_description: string | null;
-  pet_1_equipment: PetItem | null;
-  pet_1_auto_skill: PetSkill | null;
-  pet_1_pet_type: string | null;
-  pet_1_skill: string[];
-  pet_1_date_expire: string | null;
-  pet_1_appearance: string | null;
-  pet_1_appearance_icon: string | null;
-
-  pet_2_icon: string | null;
-  pet_2_description: string | null;
-  pet_2_equipment: PetItem | null;
-  pet_2_auto_skill: PetSkill | null;
-  pet_2_pet_type: string | null;
-  pet_2_skill: string[];
-  pet_2_date_expire: string | null;
-  pet_2_appearance: string | null;
-  pet_2_appearance_icon: string | null;
-
-  pet_3_icon: string | null;
-  pet_3_description: string | null;
-  pet_3_equipment: PetItem | null;
-  pet_3_auto_skill: PetSkill | null;
-  pet_3_pet_type: string | null;
-  pet_3_skill: string[];
-  pet_3_date_expire: string | null;
-  pet_3_appearance: string | null;
-  pet_3_appearance_icon: string | null;
-};
+} & PetEquipInfo;

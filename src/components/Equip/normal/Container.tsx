@@ -8,6 +8,7 @@ import { EquipDescription } from "./EquipDescription";
 import { type MouseEvent, useContext } from "react";
 import { useCubeStore } from "@/stores/cube";
 import { EquipActionContext } from "@/components/Container/EquipContainer";
+import { CubeType } from "@/utils/CubeSimulator";
 
 type Props = {
   item: ItemEquipment;
@@ -42,21 +43,27 @@ export const NormalContainer = ({ item }: Props) => {
   const canCuttableItem = item.cuttable_count !== "255";
 
   const setSelectedEquipName = useContext(EquipActionContext);
-  const setCubeTargetItem = useCubeStore((state) => state.setCubeTargetItem);
+  const setCubeTargetState = useCubeStore((state) => state.setCubeTargetState);
 
-  const canRollCube = !!potential_option_grade && rollableItem.includes(item_equipment_slot);
-  const handleRollCubeClick = (e: MouseEvent) => {
-    if (!potential_option_grade) return;
+  const canRollPotential = !!potential_option_grade && rollableItem.includes(item_equipment_slot);
+  const canRollAdditional = !!additional_potential_option_grade && rollableItem.includes(item_equipment_slot);
+  const canRollCube = canRollPotential || canRollAdditional;
+
+  const handleRollCubeClick = (e: MouseEvent, cubeType: CubeType) => {
+    if (!potential_option_grade && !additional_potential_option_grade) return;
     e.stopPropagation();
     setSelectedEquipName("");
-    setCubeTargetItem({
+    setCubeTargetState({
+      cubeType,
       targetItem: {
         itemName: item_name,
         itemIcon: item_icon,
         itemLevel: base_equipment_level,
-        itemPotentialGrade: potential_option_grade,
         itemType: item_equipment_slot,
+        itemPotentialGrade: potential_option_grade,
+        additionalPotentialGrade: additional_potential_option_grade,
         currentPotentialOptions: [potential_option_1, potential_option_2, potential_option_3],
+        currentAdditionalOptions: [additional_potential_option_1, additional_potential_option_2, additional_potential_option_3],
       },
     });
   };
@@ -104,22 +111,24 @@ export const NormalContainer = ({ item }: Props) => {
         <>
           <Divider />
           <div className="flex flex-row gap-2 justify-center">
-            <button
-              onClick={handleRollCubeClick}
-              className="tracking-tighter text-white text-sm font-bold pt-1 pb-1 px-2 mt-1 [text-shadow:_2px_1px_3px_rgb(0_0_0_/_50%)]
+            {canRollPotential && (
+              <button
+                onClick={(e) => handleRollCubeClick(e, "potential")}
+                className="tracking-tighter text-white text-sm font-bold pt-1 pb-1 px-2 mt-1 [text-shadow:_2px_1px_3px_rgb(0_0_0_/_50%)]
               rounded-md bg-gradient-to-r from-purple-400/90 to-sky-500/90 hover:bg-gradient-to-r hover:from-purple-500/90 hover:to-sky-600/90"
-            >
-              🪄 잠재능력 재설정
-            </button>
-            <button
-              onClick={() => {
-                alert("Coming Soon!");
-              }}
-              className="tracking-tighter text-white whitespace-pre-wrap text-sm font-bold pt-1 pb-1 px-2 mt-1 [text-shadow:_2px_1px_3px_rgb(0_0_0_/_50%)] 
+              >
+                🪄 잠재능력 재설정
+              </button>
+            )}
+            {canRollAdditional && (
+              <button
+                onClick={(e) => handleRollCubeClick(e, "additional")}
+                className="tracking-tighter text-white whitespace-pre-wrap text-sm font-bold pt-1 pb-1 px-2 mt-1 [text-shadow:_2px_1px_3px_rgb(0_0_0_/_50%)] 
               rounded-md bg-gradient-to-r from-lime-400/90 to-teal-600/90 hover:bg-gradient-to-r hover:from-lime-500/90 hover:to-teal-700/90"
-            >
-              {`🪄 에디셔널 재설정`}
-            </button>
+              >
+                {`🪄 에디셔널 재설정`}
+              </button>
+            )}
           </div>
         </>
       )}

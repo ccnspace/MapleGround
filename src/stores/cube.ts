@@ -1,27 +1,32 @@
 import type { ItemPotentialGrade } from "@/types/Equipment";
+import { CubeType } from "@/utils/CubeSimulator";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 interface CubeState {
   targetItem: {
-    itemPotentialGrade: ItemPotentialGrade;
+    itemPotentialGrade: ItemPotentialGrade | null;
+    additionalPotentialGrade: ItemPotentialGrade | null;
+    currentPotentialOptions: string[];
+    currentAdditionalOptions: string[];
     itemLevel: number;
     itemType: string;
     itemIcon: string;
     itemName: string;
-    currentPotentialOptions?: string[];
   } | null;
+  cubeType: CubeType;
 }
 
 interface CubeAction {
-  setCubeTargetItem: (item: CubeState) => void;
+  setCubeTargetState: (item: CubeState) => void;
   resetCube: () => void;
 }
 
 export const useCubeStore = create<CubeState & CubeAction>()(
   devtools((set) => ({
     targetItem: null,
-    setCubeTargetItem: (item) => set(item),
+    cubeType: "potential",
+    setCubeTargetState: (item) => set(item),
     resetCube: () => set({ targetItem: null }),
   }))
 );

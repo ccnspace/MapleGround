@@ -14,7 +14,7 @@ const CheckBox: React.FC<CheckBoxProps> = ({ checked, defaultChecked, onChange, 
   };
 
   return (
-    <label className={`flex items-center space-x-2 cursor-pointer ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}>
+    <label className={`flex space-x-2 cursor-pointer ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}>
       <input
         type="checkbox"
         checked={checked}
@@ -23,7 +23,7 @@ const CheckBox: React.FC<CheckBoxProps> = ({ checked, defaultChecked, onChange, 
         disabled={disabled}
         className="w-4 h-4 accent-blue-500 cursor-pointer"
       />
-      {label && <span className="text-sm text-gray-700">{label}</span>}
+      {label && <span className="text-xs">{label}</span>}
     </label>
   );
 };

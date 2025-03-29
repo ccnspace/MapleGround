@@ -79,12 +79,12 @@ abbr:where([title]) {
 }
 
 .cube-glow {
-  animation: glowFadeout 1s ease-out;
+  animation: glowFadeout 0.8s ease-in-out;
 }
 
 @keyframes glowFadeout {
   0% {
-    background-color: rgb(255, 255, 255, 0.3);
+    background-color: rgb(255, 255, 255, 0.6);
     border: 2px solid rgb(65, 217, 255, 0.9);
     box-shadow: 0 0 50px rgb(223, 245, 255);
   }

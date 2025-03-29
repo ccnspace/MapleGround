@@ -28,6 +28,12 @@ const { firstLine, secondLine, thirdLine } = getItemOptionPool("무기", "레전
 const firstOptions = firstLine.map((option) => option.name);
 const secondOptions = secondLine.map((option) => option.name);
 const thirdOptions = thirdLine.map((option) => option.name);
+const MAX_SPEED_STEP = 5;
+
+const rollCubeAudio = new Audio(rollCubeSound);
+const gradeUpAudio = new Audio(completeSound);
+rollCubeAudio.volume = 0.35;
+gradeUpAudio.volume = 0.15;
 
 export const CubeContainer = () => {
   const targetItem = useCubeStore((state) => state.targetItem);
@@ -66,11 +72,6 @@ export const CubeContainer = () => {
   /** 기록실 */
   const [records, setRecords] = useState<string[]>([]);
 
-  const rollCubeAudio = useRef(new Audio(rollCubeSound));
-  const gradeUpAudio = useRef(new Audio(completeSound));
-  rollCubeAudio.current.volume = 0.5;
-  gradeUpAudio.current.volume = 0.3;
-
   const remainGradeUpRatio = (() => {
     if (currentGuarantee === 0) return 0;
     return currentAttempt / currentGuarantee;
@@ -92,15 +93,15 @@ export const CubeContainer = () => {
 
   const playRollCubeAudio = useCallback(() => {
     if (isSoundChecked) {
-      rollCubeAudio.current.pause();
-      rollCubeAudio.current.currentTime = 0;
-      rollCubeAudio.current.play();
+      rollCubeAudio.pause();
+      rollCubeAudio.currentTime = 0;
+      rollCubeAudio.play();
     }
   }, [isSoundChecked]);
 
   const playGradeUpAudio = useCallback(() => {
     if (isSoundChecked) {
-      gradeUpAudio.current.play();
+      gradeUpAudio.play();
     }
   }, [isSoundChecked]);
 
@@ -235,21 +236,39 @@ export const CubeContainer = () => {
   /** 스피드 옵션 */
   const [isSpeedMode, setSpeedMode] = useState(false);
   const timer = useRef<NodeJS.Timeout>();
+  const [speedStep, setSpeedStep] = useState(1);
+  const speedLabel = speedStep === MAX_SPEED_STEP ? "속도 - 5단계(MAX)" : `속도 - ${speedStep}단계`;
+
+  const handleUpSpeed = () => {
+    if (speedStep === MAX_SPEED_STEP) return;
+    setSpeedStep((prev) => prev + 1);
+  };
+
+  const handleDownSpeed = () => {
+    if (speedStep === 1) return;
+    setSpeedStep((prev) => prev - 1);
+  };
+
   useEffect(() => {
     if (isSpeedMode) {
       setIsSoundChecked(false);
+      const delay = Math.floor(500 / (speedStep * 5));
       timer.current = setInterval(() => {
         startRollCube();
-      }, 50);
+      }, delay);
     } else {
       clearTimeout(timer.current);
     }
     return () => {
       clearTimeout(timer.current);
     };
-  }, [isSpeedMode, startRollCube]);
+  }, [isSpeedMode, speedStep, startRollCube]);
 
-  const speedOptions = [firstSpeedOption, secondSpeedOption, thirdSpeedOption];
+  const speedOptions = useMemo(
+    () => [firstSpeedOption, secondSpeedOption, thirdSpeedOption],
+    [firstSpeedOption, secondSpeedOption, thirdSpeedOption]
+  );
+
   useEffect(() => {
     if (!isSpeedMode || !newOptions.length) return;
 
@@ -347,8 +366,12 @@ export const CubeContainer = () => {
               </div>
             </div>
             <button
+              disabled={isSpeedMode}
               onClick={handleRollCubeClick}
-              className="flex justify-center border-2 border-white/50 bg-gradient-to-r from-lime-300 to-lime-400 hover:from-lime-400 hover:to-lime-500 text-sm font-bold text-black rounded-md p-1"
+              className="flex justify-center border-2 border-white/50
+               disabled:gray-200 disabled:text-gray-400
+               enabled:bg-gradient-to-r from-lime-300 to-lime-400 hover:from-lime-400 hover:to-lime-500
+               text-sm font-bold text-black rounded-md p-1"
             >
               <p className="flex">한 번 더 재설정하기(혹은 [D]키 입력)</p>
             </button>
@@ -363,26 +386,63 @@ export const CubeContainer = () => {
             <p className="text-sm font-bold mb-1 bg-white/20 p-1 rounded-md">⚙️ 기본 설정</p>
             <div className="flex gap-2 justify-center ">
               <CheckBox label={"큐브 사운드 재생"} checked={isSoundChecked} onChange={setIsSoundChecked} disabled={isSpeedMode} />
-              <CheckBox label={"미라클 타임"} checked={isMiracleChecked} onChange={setIsMiracleChecked} />
+              <CheckBox label={"미라클 타임"} checked={isMiracleChecked} onChange={setIsMiracleChecked} disabled={isSpeedMode} />
             </div>
             <Divider />
             <div className="flex items-center justify-center flex-col gap-0.5 text-black dark:text-white">
-              <p className="text-sm w-full font-bold mb-1 bg-white/20 p-1 rounded-md text-white">⚡초스피드 모드</p>
+              <p
+                className="flex flex-row justify-between items-center text-sm w-full font-bold mb-1
+               bg-white/20 p-1 rounded-md text-white"
+              >
+                ⚡자동 재설정 모드
+                <p
+                  className="flex justify-center text-xs px-1.5 pt-0.5 pb-0.5
+                  text-yellow-300 font-bold"
+                >
+                  🏃{speedLabel}
+                </p>
+              </p>
               <p style={{ fontSize: "12px" }} className="flex mb-1 font-light text-white/90">
                 순서 관계없이 선택한 3가지 옵션이 나올 때까지 재설정
               </p>
-              <SelectBox options={firstOptions} onSelect={setFirstSpeedOption}></SelectBox>
-              <SelectBox options={secondOptions} onSelect={setSecondSpeedOption}></SelectBox>
-              <SelectBox options={thirdOptions} onSelect={setThirdSpeedOption}></SelectBox>
-              <button
-                className="text-white font-bold w-[50%] text-xs p-1 mt-1.5 rounded-md flex
+              <SelectBox disabled={isSpeedMode} options={firstOptions} onSelect={setFirstSpeedOption}></SelectBox>
+              <SelectBox disabled={isSpeedMode} options={secondOptions} onSelect={setSecondSpeedOption}></SelectBox>
+              <SelectBox disabled={isSpeedMode} options={thirdOptions} onSelect={setThirdSpeedOption}></SelectBox>
+              <div className="flex flex-row w-[100%] gap-1.5 justify-center items-center">
+                <button
+                  className="text-white font-bold w-[70%] text-xs p-1 mt-1.5 rounded-md flex
                 justify-center bg-gradient-to-tr from-sky-600 to-blue-700
                 hover:bg-gradient-to-tr hover:from-sky-800 hover:to-blue-900
                 "
-                onClick={() => setSpeedMode((prev) => !prev)}
-              >
-                <p>{isSpeedMode ? "OFF" : "🔥START🔥"}</p>
-              </button>
+                  onClick={() => setSpeedMode((prev) => !prev)}
+                >
+                  <p>{isSpeedMode ? "OFF" : "⚡START"}</p>
+                </button>
+                <button
+                  disabled={!isSpeedMode || speedStep === MAX_SPEED_STEP}
+                  className="relative text-white font-bold w-[10%] text-xs p-0.5 mt-1.5 rounded-md flex
+                justify-center items-center
+                disabled:bg-gray-800 disabled:text-white/50
+                enabled:bg-gradient-to-tr from-yellow-400 to-yellow-600
+                enabled:hover:bg-gradient-to-tr hover:from-yellow-600 hover:to-yellow-700
+                "
+                  onClick={handleUpSpeed}
+                >
+                  <p>{"▲"}</p>
+                </button>
+                <button
+                  disabled={!isSpeedMode || speedStep === 1}
+                  className="relative text-white font-bold w-[10%] text-xs p-0.5 mt-1.5 rounded-md flex
+                justify-center items-center
+                disabled:bg-gray-800 disabled:text-white/50
+                enabled:bg-gradient-to-tr from-yellow-400 to-yellow-600
+                enabled:hover:bg-gradient-to-tr hover:from-yellow-600 hover:to-yellow-700
+                "
+                  onClick={handleDownSpeed}
+                >
+                  <p>{"▼"}</p>
+                </button>
+              </div>
             </div>
             <Divider />
             <div className="flex flex-col">

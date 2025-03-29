@@ -7,13 +7,19 @@ import completeSound from "@/app/sound/AchievmentComplete.mp3";
 const AUDIO_CONFIG = {
   rollCube: {
     src: rollCubeSound,
-    volume: 0.35,
+    volume: 0.15,
   },
   gradeUp: {
     src: completeSound,
-    volume: 0.15,
+    volume: 0.1,
   },
 } as const;
+
+const rollAudio = new Audio(AUDIO_CONFIG.rollCube.src);
+rollAudio.volume = AUDIO_CONFIG.rollCube.volume;
+
+const gradeUpAudio = new Audio(AUDIO_CONFIG.gradeUp.src);
+gradeUpAudio.volume = AUDIO_CONFIG.gradeUp.volume;
 
 export const useCubeSimulation = (cubeSimulator: CubeSimulator) => {
   const [prevOptions, setPrevOptions] = useState<string[]>([]);
@@ -24,15 +30,13 @@ export const useCubeSimulation = (cubeSimulator: CubeSimulator) => {
   const [currentGuarantee, setCurrentGuarantee] = useState(0);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
-  const rollAudio = useRef(new Audio(AUDIO_CONFIG.rollCube.src));
-  const gradeUpAudio = useRef(new Audio(AUDIO_CONFIG.gradeUp.src));
   const prevAttempt = useRef<number>(0);
 
   const playSound = useCallback(
     (type: "roll" | "gradeUp") => {
       if (!isSoundEnabled) return;
 
-      const audio = type === "roll" ? rollAudio.current : gradeUpAudio.current;
+      const audio = type === "roll" ? rollAudio : gradeUpAudio;
       audio.pause();
       audio.currentTime = 0;
       audio.play();

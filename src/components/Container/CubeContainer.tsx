@@ -99,6 +99,7 @@ export const CubeContainer = () => {
     () => [firstSpeedOption, secondSpeedOption, thirdSpeedOption],
     [firstSpeedOption, secondSpeedOption, thirdSpeedOption]
   );
+  const isAllNotSelected = speedOptions.every((item) => item === NOT_SELECTED);
 
   /** 기록실 */
   const [records, setRecords] = useState<string[]>([]);
@@ -191,8 +192,6 @@ export const CubeContainer = () => {
     if (speedStep === 1) return;
     setSpeedStep((prev) => prev - 1);
   };
-
-  const isAllNotSelected = speedOptions.every((item) => item === NOT_SELECTED);
 
   useEffect(() => {
     if (isSpeedMode) {
@@ -289,7 +288,7 @@ export const CubeContainer = () => {
             </div>
             <Divider />
             <div className="flex items-center justify-center flex-col gap-0.5 text-black dark:text-white">
-              <p
+              <div
                 className="flex flex-row justify-between items-center text-sm w-full font-bold mb-1
                bg-white/20 p-1 rounded-md text-white"
               >
@@ -300,7 +299,7 @@ export const CubeContainer = () => {
                 >
                   🏃{speedLabel}
                 </p>
-              </p>
+              </div>
               <p style={{ fontSize: "12px" }} className="flex mb-1 font-light text-white/90">
                 순서 관계없이 선택한 옵션이 나올 때까지 재설정
               </p>
@@ -351,7 +350,7 @@ export const CubeContainer = () => {
             </div>
             <Divider />
             <div className="flex flex-col">
-              <p
+              <div
                 className="flex flex-row justify-between items-center text-sm w-full font-bold mb-1
                bg-white/20 p-1 rounded-md text-white"
               >
@@ -363,7 +362,7 @@ export const CubeContainer = () => {
                 >
                   ↻초기화
                 </button>
-              </p>
+              </div>
               <div className="flex break-words overflow-y-scroll h-[72px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white">
                 {records.map((item, idx) => (
                   <p key={idx}>·{item}</p>

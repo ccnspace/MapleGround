@@ -282,7 +282,7 @@ export const CubeContainer = () => {
   useEffect(() => {
     if (isSpeedMode) {
       setIsSoundChecked(false);
-      const delay = Math.floor(500 / (speedStep * 5));
+      const delay = speedStep < 5 ? Math.floor(500 / (speedStep * 5)) : 0;
       timer.current = setInterval(() => {
         startRollCube();
       }, delay);
@@ -299,6 +299,14 @@ export const CubeContainer = () => {
     [firstSpeedOption, secondSpeedOption, thirdSpeedOption]
   );
   const isAllNotSelected = speedOptions.every((item) => item === NOT_SELECTED);
+
+  // 자동 잠재능력 옵션 바꿀 때마다 시도횟수 초기화화
+  useEffect(() => {
+    if (!speedOptions.length) return;
+    cubeSimulator.setCurrentAttempt(0);
+    setCurrentAttempt(0);
+    prevAttempt.current = 0;
+  }, [speedOptions]);
 
   const prevAttempt = useRef<number>(0);
   useEffect(() => {

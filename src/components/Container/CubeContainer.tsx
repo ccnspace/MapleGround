@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useThrottle } from "@/hooks/useThrottle";
 import { useCubeStore } from "@/stores/cube";
 import { ItemPotentialGrade } from "@/types/Equipment";
-import { CubeSimulator, getItemOptionPool } from "@/utils/CubeSimulator";
+import { CubeSimulator, CubeType, getAdditionalOptionPool, getItemOptionPool } from "@/utils/CubeSimulator";
 import Image from "next/image";
 import rollCubeSound from "@/app/sound/ScrollSuccess.mp3";
 import completeSound from "@/app/sound/AchievmentComplete.mp3";
@@ -10,6 +10,7 @@ import CheckBox from "../CheckBox";
 import potentialImg from "@/images/potentialBg.png";
 import { Divider } from "../Equip/Divider";
 import { SelectBox } from "../SelectBox";
+import { convertItemLevel } from "@/utils/convertItemLevel";
 
 const getGradeBackground = (grade: ItemPotentialGrade) => {
   if (grade === "레어") {
@@ -24,16 +25,17 @@ const getGradeBackground = (grade: ItemPotentialGrade) => {
   return "bg-lime-500";
 };
 
-const { firstLine, secondLine, thirdLine } = getItemOptionPool("무기", "레전드리", "120");
-const firstOptions = firstLine.map((option) => option.name);
-const secondOptions = secondLine.map((option) => option.name);
-const thirdOptions = thirdLine.map((option) => option.name);
 const MAX_SPEED_STEP = 5;
-
 const rollCubeAudio = new Audio(rollCubeSound);
 const gradeUpAudio = new Audio(completeSound);
 rollCubeAudio.volume = 0.35;
 gradeUpAudio.volume = 0.15;
+
+const getItemOptionPoolByType = (type: CubeType, itemType: string, itemLevel: number | undefined) => {
+  const convertedItemLevel = convertItemLevel(itemLevel);
+  if (type === "potential") return getItemOptionPool(itemType, "레전드리", convertedItemLevel);
+  return getAdditionalOptionPool(itemType, "레전드리", convertedItemLevel);
+};
 
 export const CubeContainer = () => {
   const targetItem = useCubeStore((state) => state.targetItem);
@@ -49,6 +51,15 @@ export const CubeContainer = () => {
     currentPotentialOptions = [],
     currentAdditionalOptions = [],
   } = targetItem || {};
+
+  const { firstLine, secondLine, thirdLine } = useMemo(() => {
+    if (!cubeType || !itemType) return { firstLine: [], secondLine: [], thirdLine: [] };
+    return getItemOptionPoolByType(cubeType, itemType, itemLevel);
+  }, [cubeType, itemType, itemLevel]);
+
+  const firstOptions = useMemo(() => firstLine.map((option) => option.name), [firstLine]);
+  const secondOptions = useMemo(() => secondLine.map((option) => option.name), [secondLine]);
+  const thirdOptions = useMemo(() => thirdLine.map((option) => option.name), [thirdLine]);
 
   const [prevOptions, setPrevOptions] = useState<string[]>([]);
   const [newOptions, setNewOptions] = useState<string[]>([]);
@@ -322,7 +333,7 @@ export const CubeContainer = () => {
                 />
               </div>
             </div>
-            <div className="flex flex-col w-[280px] rounded-md bg-sky-500">
+            <div className="flex flex-col w-[280px] rounded-md bg-sky-400">
               <p className="text-sm px-1 pt-1 pb-0.5 font-bold [text-shadow:_1px_2px_4px_rgb(0_0_0/_0.4)]">BEFORE</p>
               <div className="flex flex-col gap-0.5 bg-gradient-to-br from-slate-800 to-slate-900 m-1 text-sm rounded-md min-h-[96px]">
                 {prevGrade && (
@@ -337,7 +348,7 @@ export const CubeContainer = () => {
                 ))}
               </div>
             </div>
-            <div className="flex flex-col w-[280px] rounded-md bg-sky-500">
+            <div className="flex flex-col w-[280px] rounded-md bg-sky-400">
               <div className="flex flex-row items-center justify-between">
                 <p className="text-sm px-1 pt-1 pb-0.5 font-bold [text-shadow:_1px_2px_4px_rgb(0_0_0/_0.4)]">AFTER</p>
                 {showAfterButton && (

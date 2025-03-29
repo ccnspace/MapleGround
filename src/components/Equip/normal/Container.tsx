@@ -14,7 +14,8 @@ type Props = {
   item: ItemEquipment;
 };
 
-const rollableItem = ["무기"];
+/** 잠재능력 재설정 가능 아이템 리스트트 */
+const rollableItem = ["무기", "상의"];
 
 export const NormalContainer = ({ item }: Props) => {
   const {

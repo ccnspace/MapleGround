@@ -116,7 +116,6 @@ export class CubeSimulator {
       }
 
       // 첫, 두 번째 옵션에서 피격 시 일정 확률로 데미지 % 무시, 일정 확률로 몇 초간 무적 나오면 세 번째 옵션에서는 나오지 않게 filter
-
       const excludeOptions = ["확률로 데미지의", "초간 무적"];
       for (const option of excludeOptions) {
         if (firstOption.includes(option) || secondOption.includes(option)) {
@@ -223,7 +222,7 @@ export class CubeSimulator {
   }
 
   setCurrentAttempt(attempt: number) {
-    this.currentAttempt = attempt;
+    this.failedAttempts[this.gradeIndex] = attempt;
   }
 
   getCurrentGradeUpInfo() {

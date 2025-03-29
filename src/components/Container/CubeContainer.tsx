@@ -31,6 +31,8 @@ const gradeUpAudio = new Audio(completeSound);
 rollCubeAudio.volume = 0.35;
 gradeUpAudio.volume = 0.15;
 
+const NOT_SELECTED = "선택 안 함";
+
 const getItemOptionPoolByType = (type: CubeType, itemType: string, itemLevel: number | undefined) => {
   const convertedItemLevel = convertItemLevel(itemLevel);
   if (type === "potential") return getItemOptionPool(itemType, "레전드리", convertedItemLevel);
@@ -57,9 +59,9 @@ export const CubeContainer = () => {
     return getItemOptionPoolByType(cubeType, itemType, itemLevel);
   }, [cubeType, itemType, itemLevel]);
 
-  const firstOptions = useMemo(() => firstLine.map((option) => option.name), [firstLine]);
-  const secondOptions = useMemo(() => secondLine.map((option) => option.name), [secondLine]);
-  const thirdOptions = useMemo(() => thirdLine.map((option) => option.name), [thirdLine]);
+  const firstOptions = useMemo(() => ["선택 안 함", ...firstLine.map((option) => option.name)], [firstLine]);
+  const secondOptions = useMemo(() => ["선택 안 함", ...secondLine.map((option) => option.name)], [secondLine]);
+  const thirdOptions = useMemo(() => ["선택 안 함", ...thirdLine.map((option) => option.name)], [thirdLine]);
 
   const [prevOptions, setPrevOptions] = useState<string[]>([]);
   const [newOptions, setNewOptions] = useState<string[]>([]);
@@ -279,16 +281,22 @@ export const CubeContainer = () => {
     () => [firstSpeedOption, secondSpeedOption, thirdSpeedOption],
     [firstSpeedOption, secondSpeedOption, thirdSpeedOption]
   );
+  const isAllNotSelected = speedOptions.every((item) => item === NOT_SELECTED);
 
+  const prevAttempt = useRef<number>(0);
   useEffect(() => {
     if (!isSpeedMode || !newOptions.length) return;
 
-    const sortedSpeedOptions = [...speedOptions].sort();
-    const sortedNewOptions = [...newOptions].sort();
-    const isAllMatched = sortedSpeedOptions.every((item, idx) => item === sortedNewOptions[idx]);
-    if (isAllMatched) {
+    const filteredOptions = [...speedOptions].filter((item) => item !== NOT_SELECTED);
+    if (!filteredOptions.length) return;
+
+    const isAllMatched = filteredOptions.every((item) => newOptions.includes(item));
+    if (isAllMatched && prevAttempt.current !== currentAttempt) {
       setSpeedMode(false);
       setRecords((prev) => [...prev, `${newOptions.join("/")} ${currentAttempt}번만에 획득`]);
+      cubeSimulator.setCurrentAttempt(0);
+      setCurrentAttempt(0);
+      prevAttempt.current = 0;
     }
   }, [isSpeedMode, speedOptions, newOptions, currentAttempt]);
 
@@ -414,7 +422,7 @@ export const CubeContainer = () => {
                 </p>
               </p>
               <p style={{ fontSize: "12px" }} className="flex mb-1 font-light text-white/90">
-                순서 관계없이 선택한 3가지 옵션이 나올 때까지 재설정
+                순서 관계없이 선택한 옵션이 나올 때까지 재설정
               </p>
               <SelectBox disabled={isSpeedMode} options={firstOptions} onSelect={setFirstSpeedOption}></SelectBox>
               <SelectBox disabled={isSpeedMode} options={secondOptions} onSelect={setSecondSpeedOption}></SelectBox>
@@ -425,7 +433,13 @@ export const CubeContainer = () => {
                 justify-center bg-gradient-to-tr from-sky-600 to-blue-700
                 hover:bg-gradient-to-tr hover:from-sky-800 hover:to-blue-900
                 "
-                  onClick={() => setSpeedMode((prev) => !prev)}
+                  onClick={() => {
+                    if (isAllNotSelected) {
+                      alert("적어도 한 개 이상 선택해야 합니다.");
+                      return;
+                    }
+                    setSpeedMode((prev) => !prev);
+                  }}
                 >
                   <p>{isSpeedMode ? "OFF" : "⚡START"}</p>
                 </button>
@@ -457,7 +471,19 @@ export const CubeContainer = () => {
             </div>
             <Divider />
             <div className="flex flex-col">
-              <p className="text-sm font-bold mb-1 bg-white/20 p-1 rounded-md text-white">⏱️ 기록실</p>
+              <p
+                className="flex flex-row justify-between items-center text-sm w-full font-bold mb-1
+               bg-white/20 p-1 rounded-md text-white"
+              >
+                ⏱️ 기록실
+                <button
+                  onClick={() => setRecords([])}
+                  className="flex justify-center text-xs px-1.5 pt-0.5 pb-0.5
+                  bg-slate-700 hover:bg-slate-900 rounded-md p-0.5 font-bold"
+                >
+                  ↻초기화
+                </button>
+              </p>
               <div className="flex break-words overflow-y-scroll h-[72px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white">
                 {records.map((item, idx) => (
                   <p key={idx}>·{item}</p>

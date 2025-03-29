@@ -39,6 +39,23 @@ const getItemOptionPoolByType = (type: CubeType, itemType: string, itemLevel: nu
   return getAdditionalOptionPool(itemType, "레전드리", convertedItemLevel);
 };
 
+function countElements<T>(arr: T[]): Record<string, number> {
+  return arr.reduce((acc: Record<string, number>, cur: T) => {
+    const key = String(cur);
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+}
+
+function isFullyContainedInArray<T>(array1: T[], array2: T[]): boolean {
+  const count1 = countElements(array1);
+  const count2 = countElements(array2);
+
+  return Object.entries(count1).every(([key, value]) => {
+    return (count2[key] || 0) >= value;
+  });
+}
+
 export const CubeContainer = () => {
   const targetItem = useCubeStore((state) => state.targetItem);
   const cubeType = useCubeStore((state) => state.cubeType);
@@ -290,8 +307,9 @@ export const CubeContainer = () => {
     const filteredOptions = [...speedOptions].filter((item) => item !== NOT_SELECTED);
     if (!filteredOptions.length) return;
 
-    const isAllMatched = filteredOptions.every((item) => newOptions.includes(item));
-    if (isAllMatched && prevAttempt.current !== currentAttempt) {
+    const isFullyMatched = isFullyContainedInArray(filteredOptions, newOptions);
+
+    if (isFullyMatched && prevAttempt.current !== currentAttempt) {
       setSpeedMode(false);
       setRecords((prev) => [...prev, `${newOptions.join("/")} ${currentAttempt}번만에 획득`]);
       cubeSimulator.setCurrentAttempt(0);

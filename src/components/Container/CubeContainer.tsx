@@ -216,9 +216,11 @@ export const CubeContainer = () => {
              justify-center w-[312px] ${glow ? "cube-glow" : ""}`}
         >
           {isMiracleChecked ? (
-            <p className="text-sm font-bold text-lime-400">✨✨ 지금은 미라클 타임!! ✨✨</p>
+            <p className="text-sm font-bold text-lime-400">{`✨ 지금은 미라클 타임!! (${cubeTitle})✨`}</p>
           ) : (
-            <p className="text-sm font-bold">{`아이템의 ${cubeTitle}을 재설정합니다.`}</p>
+            <p className="text-sm font-bold">
+              <span className="text-cyan-400">{cubeTitle}</span>을 재설정합니다.
+            </p>
           )}
           <div className="flex flex-col p-1 rounded-lg bg-gradient-to-b from-gray-200 to-gray-300 gap-2">
             <div className="relative flex flex-col gap-2 items-center justify-center w-[280px] h-[124px] rounded-md bg-slate-700">
@@ -246,9 +248,10 @@ export const CubeContainer = () => {
                 />
               </div>
             </div>
-            <CubeDisplay label="BEFORE" grade={prevGrade} options={prevOptions} />
+            <CubeDisplay label="BEFORE" cubeType={cubeType} grade={prevGrade} options={prevOptions} />
             <CubeDisplay
               label="AFTER"
+              cubeType={cubeType}
               grade={afterGrade}
               options={newOptions}
               showSelectButton={showAfterButton}

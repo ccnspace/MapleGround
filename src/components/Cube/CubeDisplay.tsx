@@ -1,7 +1,9 @@
 import type { ItemPotentialGrade } from "@/types/Equipment";
+import type { CubeType } from "@/utils/CubeSimulator";
 import { useEffect, useState } from "react";
 
 interface CubeDisplayProps {
+  cubeType: CubeType;
   grade?: ItemPotentialGrade;
   options: string[];
   label: string;
@@ -16,7 +18,7 @@ const GRADE_BACKGROUNDS = {
   레전드리: "bg-lime-500",
 } as const;
 
-export const CubeDisplay = ({ grade, options, label, showSelectButton, onSelect }: CubeDisplayProps) => {
+export const CubeDisplay = ({ cubeType, grade, options, label, showSelectButton, onSelect }: CubeDisplayProps) => {
   const [fadeIn, setFadeIn] = useState(false);
 
   /** 잠재능력 재설정 UI 효과 */
@@ -52,7 +54,7 @@ export const CubeDisplay = ({ grade, options, label, showSelectButton, onSelect 
         {grade && <p className={`flex justify-center mb-1 font-medium rounded-tl-md rounded-tr-md ${GRADE_BACKGROUNDS[grade]}`}>{grade}</p>}
         {options?.map((option, idx) => (
           <p key={idx} className={`font-medium px-2 text-sm ${fadeIn ? "fade-in" : ""}`}>
-            {option}
+            {cubeType === "additional" ? `+ ${option}` : option}
           </p>
         ))}
       </div>

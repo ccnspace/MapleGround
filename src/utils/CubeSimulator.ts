@@ -1,6 +1,6 @@
 import { convertItemLevel } from "./convertItemLevel";
 
-type ItemGrade = "레어" | "에픽" | "유니크" | "레전드리";
+export type ItemGrade = "레어" | "에픽" | "유니크" | "레전드리";
 export type CubeType = "additional" | "potential";
 
 type Constructor = {

@@ -1,26 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useThrottle } from "@/hooks/useThrottle";
 import { useCubeStore } from "@/stores/cube";
-import { CubeSimulator, CubeType, getAdditionalOptionPool, getItemOptionPool } from "@/utils/CubeSimulator";
+import { CubeSimulator } from "@/utils/CubeSimulator";
 import Image from "next/image";
 import CheckBox from "../CheckBox";
 import potentialImg from "@/images/potentialBg.png";
 import { Divider } from "../Equip/Divider";
 import { SelectBox } from "../SelectBox";
-import { convertItemLevel } from "@/utils/convertItemLevel";
 import { useShallow } from "zustand/react/shallow";
 import { useCubeSimulation } from "@/hooks/useCubeSimulation";
 import { CubeDisplay } from "../Cube/CubeDisplay";
 import { isFullyContainedInArray } from "@/utils/arrayUtils";
+import { usePotentialInfo } from "@/hooks/usePotentialInfo";
+import { NOT_SELECTED, POTENTIAL_CUBE, ADDITIONAL_POTENTIAL_CUBE } from "@/consts/Cube";
 
 const MAX_SPEED_STEP = 5;
-const NOT_SELECTED = "선택 안 함";
-
-const getItemOptionPoolByType = (type: CubeType, itemType: string, itemLevel: number | undefined) => {
-  const convertedItemLevel = convertItemLevel(itemLevel);
-  if (type === "potential") return getItemOptionPool(itemType, "레전드리", convertedItemLevel);
-  return getAdditionalOptionPool(itemType, "레전드리", convertedItemLevel);
-};
 
 export const CubeContainer = () => {
   const { targetItem, cubeType, resetCube } = useCubeStore(
@@ -30,6 +24,8 @@ export const CubeContainer = () => {
       resetCube: state.resetCube,
     }))
   );
+
+  const cubeTitle = cubeType === "potential" ? POTENTIAL_CUBE : ADDITIONAL_POTENTIAL_CUBE;
 
   const {
     itemLevel,
@@ -72,28 +68,18 @@ export const CubeContainer = () => {
     resetCurrentAttempt,
   } = useCubeSimulation(cubeSimulator);
 
-  const { firstLine, secondLine, thirdLine } = useMemo(() => {
-    if (!cubeType || !itemType) return { firstLine: [], secondLine: [], thirdLine: [] };
-    return getItemOptionPoolByType(cubeType, itemType, itemLevel);
-  }, [cubeType, itemType, itemLevel]);
-
-  const firstOptions = useMemo(() => [NOT_SELECTED, ...firstLine.map((option) => option.name)], [firstLine]);
-  const secondOptions = useMemo(() => [NOT_SELECTED, ...secondLine.map((option) => option.name)], [secondLine]);
-  const thirdOptions = useMemo(() => [NOT_SELECTED, ...thirdLine.map((option) => option.name)], [thirdLine]);
-
   const [glow, setGlow] = useState(false);
   const [isMiracleChecked, setIsMiracleChecked] = useState(false);
   const [gradeUpInfos, setGradeUpInfos] = useState<string[]>([]);
 
-  const cubeTitle = cubeType === "potential" ? "잠재능력" : "에디셔널 잠재능력";
-
   /** 스피드 모드 state */
+  const { firstOptions, secondOptions, thirdOptions } = usePotentialInfo({ cubeType, itemType, itemLevel, grade: "레전드리" });
   const [firstSpeedOption, setFirstSpeedOption] = useState(firstOptions[0]);
   const [secondSpeedOption, setSecondSpeedOption] = useState(secondOptions[0]);
   const [thirdSpeedOption, setThirdSpeedOption] = useState(thirdOptions[0]);
   const [isSpeedMode, setSpeedMode] = useState(false);
-  const speedTimer = useRef<NodeJS.Timeout>();
   const [speedStep, setSpeedStep] = useState(1);
+  const speedTimer = useRef<NodeJS.Timeout>();
   const speedLabel = speedStep === MAX_SPEED_STEP ? "속도 - 5단계(MAX)" : `속도 - ${speedStep}단계`;
   const speedOptions = useMemo(
     () => [firstSpeedOption, secondSpeedOption, thirdSpeedOption],

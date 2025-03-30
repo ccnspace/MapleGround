@@ -1,19 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { useThrottle } from "@/hooks/useThrottle";
 import { useCubeStore } from "@/stores/cube";
 import { CubeSimulator } from "@/utils/CubeSimulator";
 import Image from "next/image";
-import CheckBox from "../CheckBox";
 import potentialImg from "@/images/potentialBg.png";
 import { Divider } from "../Equip/Divider";
-import { SelectBox } from "../SelectBox";
-import { useShallow } from "zustand/react/shallow";
 import { useCubeSimulation } from "@/hooks/useCubeSimulation";
 import { CubeDisplay } from "../Cube/CubeDisplay";
 import { isFullyContainedInArray } from "@/utils/arrayUtils";
 import { usePotentialInfo } from "@/hooks/usePotentialInfo";
 import { NOT_SELECTED, POTENTIAL_CUBE, ADDITIONAL_POTENTIAL_CUBE } from "@/consts/Cube";
-
+import { SettingContainer } from "../Cube/SettingContainer";
+import { CubeSetting } from "../Cube/CubeSetting";
+import { AutoResetMode } from "../Cube/AutoResetMode";
+import { Record } from "../Cube/Record";
+import { GradeUpInfo } from "../Cube/GradeUpInfo";
 const MAX_SPEED_STEP = 5;
 
 export const CubeContainer = () => {
@@ -261,113 +263,35 @@ export const CubeContainer = () => {
             </button>
           </div>
         </div>
-        {/* 큐브 유틸리티 영역 */}
-        <div
-          className={`flex p-2 flex-col gap-1 text-white rounded-lg
-             bg-black/70 border border-white/30 w-[300px]`}
-        >
-          <div className="flex p-1 flex-col gap-1">
-            <p className="text-sm font-bold mb-1 bg-white/20 p-1 rounded-md">⚙️ 기본 설정</p>
-            <div className="flex gap-2 justify-center ">
-              <CheckBox label={"큐브 사운드 재생"} checked={isSoundEnabled} onChange={setIsSoundEnabled} disabled={isSpeedMode} />
-              <CheckBox label={"미라클 타임"} checked={isMiracleChecked} onChange={setIsMiracleChecked} disabled={isSpeedMode} />
-            </div>
-            <Divider />
-            <div className="flex items-center justify-center flex-col gap-0.5 text-black dark:text-white">
-              <div
-                className="flex flex-row justify-between items-center text-sm w-full font-bold mb-1
-               bg-white/20 p-1 rounded-md text-white"
-              >
-                ⚡자동 재설정 모드
-                <p
-                  className="flex justify-center text-xs px-1.5 pt-0.5 pb-0.5
-                  text-yellow-300 font-bold"
-                >
-                  🏃{speedLabel}
-                </p>
-              </div>
-              <p style={{ fontSize: "12px" }} className="flex mb-1 font-light text-white/90">
-                순서 관계없이 선택한 옵션이 나올 때까지 재설정
-              </p>
-              <SelectBox disabled={isSpeedMode} options={firstOptions} onSelect={setFirstSpeedOption}></SelectBox>
-              <SelectBox disabled={isSpeedMode} options={secondOptions} onSelect={setSecondSpeedOption}></SelectBox>
-              <SelectBox disabled={isSpeedMode} options={thirdOptions} onSelect={setThirdSpeedOption}></SelectBox>
-              <div className="flex flex-row w-[100%] gap-1.5 justify-center items-center">
-                <button
-                  className="text-white font-bold w-[70%] text-xs p-1 mt-1.5 rounded-md flex
-                justify-center bg-gradient-to-tr from-sky-600 to-blue-700
-                hover:bg-gradient-to-tr hover:from-sky-800 hover:to-blue-900
-                "
-                  onClick={() => {
-                    if (isAllNotSelected) {
-                      alert("적어도 한 개 이상 선택해야 합니다.");
-                      return;
-                    }
-                    setSpeedMode((prev) => !prev);
-                  }}
-                >
-                  <p>{isSpeedMode ? "OFF" : "⚡START"}</p>
-                </button>
-                <button
-                  disabled={speedStep === MAX_SPEED_STEP}
-                  className="relative text-white font-bold w-[10%] text-xs p-0.5 mt-1.5 rounded-md flex
-                justify-center items-center
-                disabled:bg-gray-800 disabled:text-white/50
-                enabled:bg-gradient-to-tr from-yellow-400 to-yellow-600
-                enabled:hover:bg-gradient-to-tr hover:from-yellow-600 hover:to-yellow-700
-                "
-                  onClick={handleUpSpeed}
-                >
-                  <p>{"▲"}</p>
-                </button>
-                <button
-                  disabled={speedStep === 1}
-                  className="relative text-white font-bold w-[10%] text-xs p-0.5 mt-1.5 rounded-md flex
-                justify-center items-center
-                disabled:bg-gray-800 disabled:text-white/50
-                enabled:bg-gradient-to-tr from-yellow-400 to-yellow-600
-                enabled:hover:bg-gradient-to-tr hover:from-yellow-600 hover:to-yellow-700
-                "
-                  onClick={handleDownSpeed}
-                >
-                  <p>{"▼"}</p>
-                </button>
-              </div>
-            </div>
-            <Divider />
-            <div className="flex flex-col">
-              <div
-                className="flex flex-row justify-between items-center text-sm w-full font-bold mb-1
-               bg-white/20 p-1 rounded-md text-white"
-              >
-                ⏱️ 기록실
-                <button
-                  onClick={() => setRecords([])}
-                  className="flex justify-center text-xs px-1.5 pt-0.5 pb-0.5
-                  bg-slate-700 hover:bg-slate-900 rounded-md p-0.5 font-bold"
-                >
-                  ↻초기화
-                </button>
-              </div>
-              <div className="flex break-words overflow-y-scroll h-[72px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white">
-                {records.map((item, idx) => (
-                  <p key={idx}>·{item}</p>
-                ))}
-              </div>
-            </div>
-            <Divider />
-            <div className="flex justify-center">
-              <div className="flex flex-col min-w-[214px] gap-0.5 text-xs bg-gradient-to-br from-slate-500 to-slate-600 rounded-md p-1.5">
-                <p className="font-bold">{`🎲 ${cubeTitle} 등급 상승 확률`}</p>
-                {gradeUpInfos.map((item, idx) => (
-                  <p key={idx} className="font-light">
-                    · {item}
-                  </p>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
+        <SettingContainer>
+          <CubeSetting
+            isSoundEnabled={isSoundEnabled}
+            setIsSoundEnabled={setIsSoundEnabled}
+            isMiracleChecked={isMiracleChecked}
+            setIsMiracleChecked={setIsMiracleChecked}
+            isSpeedMode={isSpeedMode}
+          />
+          <Divider />
+          <AutoResetMode
+            speedLabel={speedLabel}
+            isSpeedMode={isSpeedMode}
+            firstOptions={firstOptions}
+            secondOptions={secondOptions}
+            thirdOptions={thirdOptions}
+            speedStep={speedStep}
+            isAllNotSelected={isAllNotSelected}
+            setSpeedMode={setSpeedMode}
+            setFirstSpeedOption={setFirstSpeedOption}
+            setSecondSpeedOption={setSecondSpeedOption}
+            setThirdSpeedOption={setThirdSpeedOption}
+            handleUpSpeed={handleUpSpeed}
+            handleDownSpeed={handleDownSpeed}
+          />
+          <Divider />
+          <Record records={records} clearRecords={() => setRecords([])} />
+          <Divider />
+          <GradeUpInfo gradeUpInfos={gradeUpInfos} cubeTitle={cubeTitle} />
+        </SettingContainer>
       </div>
       <div
         style={{ zIndex: 1001 }}

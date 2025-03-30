@@ -16,6 +16,7 @@ import { CubeSetting } from "../Cube/CubeSetting";
 import { AutoResetMode } from "../Cube/AutoResetMode";
 import { Record } from "../Cube/Record";
 import { GradeUpInfo } from "../Cube/GradeUpInfo";
+import { formatKoreanNumber } from "@/utils/formatKoreanNum";
 
 const MAX_SPEED_STEP = 5;
 
@@ -64,11 +65,13 @@ export const CubeContainer = () => {
     currentGuarantee,
     isSoundEnabled,
     prevAttempt,
+    mesoCost,
     setIsSoundEnabled,
     rollCube,
     setPrevOptions,
     setPrevGrade,
     resetCurrentAttempt,
+    setMesoCost,
   } = useCubeSimulation(cubeSimulator);
 
   const [glow, setGlow] = useState(false);
@@ -99,6 +102,11 @@ export const CubeContainer = () => {
   }, [currentAttempt, currentGuarantee]);
 
   const showAfterButton = prevGrade === afterGrade;
+
+  const mesoCostLabel = useMemo(() => {
+    const formattedMesoCost = formatKoreanNumber(mesoCost);
+    return `💸 ${formattedMesoCost} 메소 소모`;
+  }, [mesoCost]);
 
   const handleRollCubeClick = useThrottle(rollCube, 500);
 
@@ -199,9 +207,10 @@ export const CubeContainer = () => {
   }, [isSpeedMode, speedStep, reRollPotential]);
 
   useEffect(() => {
-    // 스피드 모드 시작될 때 시도횟수 초기화
+    // 스피드 모드 시작될 때 시도횟수 및 메소 소모량 초기화
     if (isSpeedMode && speedOptions) {
       resetCurrentAttempt();
+      setMesoCost(0);
     }
   }, [isSpeedMode, speedOptions]);
 
@@ -257,6 +266,7 @@ export const CubeContainer = () => {
               showSelectButton={showAfterButton}
               onSelect={handleAfterButtonClick}
             />
+            <div className="text-xs flex items-center bg-slate-900 rounded-md p-1 text-white/90">{mesoCostLabel}</div>
             <button
               disabled={isSpeedMode}
               onClick={handleRollCubeClick}

@@ -20,7 +20,7 @@ export const Record = memo(({ records, clearRecords }: RecordProps) => (
         ↻초기화
       </button>
     </p>
-    <div className="flex break-words overflow-y-scroll h-[72px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white">
+    <div className="flex break-words overflow-y-scroll h-[96px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white">
       {records.map((item, idx) => (
         <p key={idx}>·{item}</p>
       ))}

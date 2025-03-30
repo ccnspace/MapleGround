@@ -1,5 +1,4 @@
-import { getAdditionalOptionPool } from "@/utils/CubeSimulator";
-import { getItemOptionPool } from "@/utils/CubeSimulator";
+import { getAdditionalOptionPool, getItemOptionPool } from "@/utils/potentialUtils";
 import { convertItemLevel } from "@/utils/convertItemLevel";
 import type { CubeType, ItemGrade } from "@/utils/CubeSimulator";
 import { useMemo, useState } from "react";

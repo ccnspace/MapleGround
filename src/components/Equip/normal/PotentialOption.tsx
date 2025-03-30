@@ -22,7 +22,7 @@ export const PotentialOption = (props: Props) => {
       <Divider />
       <div className="flex flex-col text-xs font-medium text-white whitespace-pre-wrap gap-[1px]">
         <p className={`${potentialStyle[grade]} text-xs`}>{title}</p>
-        {options.map((item, i) => (
+        {options.filter(Boolean).map((item, i) => (
           <p key={i}>{type === "additional" ? `+ ${item}` : item}</p>
         ))}
       </div>

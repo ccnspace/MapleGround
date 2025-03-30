@@ -26,6 +26,7 @@ export const useCubeSimulation = (cubeSimulator: CubeSimulator) => {
   const [newOptions, setNewOptions] = useState<string[]>([]);
   const [prevGrade, setPrevGrade] = useState<ItemPotentialGrade>();
   const [afterGrade, setAfterGrade] = useState<ItemPotentialGrade>();
+  const [mesoCost, _setMesoCost] = useState(0);
   const [currentAttempt, setCurrentAttempt] = useState(0);
   const [currentGuarantee, setCurrentGuarantee] = useState(0);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
@@ -55,6 +56,7 @@ export const useCubeSimulation = (cubeSimulator: CubeSimulator) => {
       currentGrade: simulatorCurrentGrade,
       currentAttempt,
       currentGuarantee,
+      mesoCost,
     } = cubeSimulator.getItemState();
 
     _setPrevOptions(prevOptions);
@@ -63,6 +65,7 @@ export const useCubeSimulation = (cubeSimulator: CubeSimulator) => {
     setAfterGrade(simulatorCurrentGrade);
     setCurrentAttempt(currentAttempt);
     setCurrentGuarantee(currentGuarantee);
+    setMesoCost(mesoCost);
 
     if (simulatorPrevGrade !== simulatorCurrentGrade) {
       playSound("gradeUp");
@@ -83,6 +86,14 @@ export const useCubeSimulation = (cubeSimulator: CubeSimulator) => {
     [cubeSimulator]
   );
 
+  const setMesoCost = useCallback(
+    (cost: number) => {
+      cubeSimulator.setMesoCost(cost);
+      _setMesoCost(cost);
+    },
+    [cubeSimulator]
+  );
+
   return {
     prevOptions,
     newOptions,
@@ -90,6 +101,7 @@ export const useCubeSimulation = (cubeSimulator: CubeSimulator) => {
     afterGrade,
     currentAttempt,
     currentGuarantee,
+    mesoCost,
     isSoundEnabled,
     prevAttempt,
     setIsSoundEnabled,
@@ -97,5 +109,6 @@ export const useCubeSimulation = (cubeSimulator: CubeSimulator) => {
     setPrevOptions,
     setPrevGrade,
     resetCurrentAttempt,
+    setMesoCost,
   };
 };

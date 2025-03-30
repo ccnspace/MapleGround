@@ -46,7 +46,14 @@ export const SymbolEquipIcon = memo(
         {!!symbol?.symbol_icon && (
           <div className="flex flex-col items-center">
             {isMaxLevel && <MaxBadge />}
-            <Image src={symbol.symbol_icon} unoptimized width={30} height={30} alt={symbol?.symbol_name ?? ""} />
+            <Image
+              src={symbol.symbol_icon}
+              unoptimized
+              width={30}
+              height={30}
+              alt={symbol?.symbol_name ?? ""}
+              style={{ width: "auto", height: "auto" }}
+            />
             <p
               className={`rounded-sm font-bold px-0.5 pt-0.25 pb-0.25
               text-xs text-slate-800 dark:text-white `}

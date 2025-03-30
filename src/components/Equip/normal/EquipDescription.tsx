@@ -17,17 +17,9 @@ export const EquipDescription = ({ item_icon, item_name, baseLevel }: Props) => 
           min-w-[72px] min-h-[72px]
         bg-gray-600 dark:bg-gray-800 mt-1 pt-3 pb-3 px-3"
         >
-          <Image
-            src={item_icon}
-            unoptimized
-            style={{
-              height: "42px",
-              width: "auto",
-            }}
-            width={42}
-            height={42}
-            alt={item_name}
-          />
+          <div style={{ position: "relative", width: "52px", aspectRatio: "4 / 3" }}>
+            <Image src={item_icon} unoptimized fill style={{ objectFit: "contain" }} alt={item_name} />
+          </div>
         </div>
         {!!baseLevel && <div className="flex items-start text-xs text-white">· REQ LEVEL: {baseLevel}</div>}
       </div>

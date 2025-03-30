@@ -1,4 +1,6 @@
-export const SettingContainer = ({ children }: { children: React.ReactNode }) => {
+import { memo } from "react";
+
+export const SettingContainer = memo(({ children }: { children: React.ReactNode }) => {
   return (
     <div
       className={`flex p-2 flex-col gap-1 text-white rounded-lg
@@ -7,4 +9,6 @@ export const SettingContainer = ({ children }: { children: React.ReactNode }) =>
       <div className="flex flex-col gap-1">{children}</div>
     </div>
   );
-};
+});
+
+SettingContainer.displayName = "SettingContainer";

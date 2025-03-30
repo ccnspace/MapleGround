@@ -3,7 +3,7 @@ import { CubeType } from "@/utils/CubeSimulator";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
-interface CubeState {
+export interface CubeState {
   targetItem: {
     itemPotentialGrade: ItemPotentialGrade | null;
     additionalPotentialGrade: ItemPotentialGrade | null;

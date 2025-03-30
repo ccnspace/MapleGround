@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { memo } from "react";
 
 type BasicSelectProps = {
   options: string[];
@@ -6,7 +6,7 @@ type BasicSelectProps = {
   disabled?: boolean;
 };
 
-export const SelectBox: React.FC<BasicSelectProps> = ({ options, onSelect, disabled = false }) => {
+export const SelectBox: React.FC<BasicSelectProps> = memo(({ options, onSelect, disabled = false }) => {
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
     const selectedOption = options.find((option) => option === selectedValue);
@@ -29,4 +29,6 @@ export const SelectBox: React.FC<BasicSelectProps> = ({ options, onSelect, disab
       </select>
     </div>
   );
-};
+});
+
+SelectBox.displayName = "SelectBox";

@@ -34,7 +34,7 @@ export const AutoResetMode = ({
   isAllNotSelected,
 }: AutoResetModeProps) => (
   <div className="flex items-center justify-center flex-col gap-0.5 text-black dark:text-white">
-    <p
+    <div
       className="flex flex-row justify-between items-center text-sm w-full font-bold mb-1
       bg-white/20 p-1 rounded-md text-white"
     >
@@ -45,7 +45,7 @@ export const AutoResetMode = ({
       >
         🏃{speedLabel}
       </p>
-    </p>
+    </div>
     <p style={{ fontSize: "12px" }} className="flex mb-1 font-light text-white/90">
       순서 관계없이 선택한 옵션이 나올 때까지 재설정
     </p>

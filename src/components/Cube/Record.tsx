@@ -1,9 +1,11 @@
+import { memo } from "react";
+
 interface RecordProps {
   records: string[];
   clearRecords: () => void;
 }
 
-export const Record = ({ records, clearRecords }: RecordProps) => (
+export const Record = memo(({ records, clearRecords }: RecordProps) => (
   <div className="flex flex-col">
     <p
       className="flex flex-row justify-between items-center text-sm w-full font-bold mb-1
@@ -24,4 +26,6 @@ export const Record = ({ records, clearRecords }: RecordProps) => (
       ))}
     </div>
   </div>
-);
+));
+
+Record.displayName = "Record";

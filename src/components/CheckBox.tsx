@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 
 interface CheckBoxProps {
   checked?: boolean; // 선택된 상태 (Controlled)
@@ -8,7 +8,7 @@ interface CheckBoxProps {
   disabled?: boolean; // 비활성화 여부
 }
 
-const CheckBox: React.FC<CheckBoxProps> = ({ checked, defaultChecked, onChange, label, disabled = false }) => {
+const CheckBox: React.FC<CheckBoxProps> = memo(({ checked, defaultChecked, onChange, label, disabled = false }) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange?.(event.target.checked);
   };
@@ -26,6 +26,8 @@ const CheckBox: React.FC<CheckBoxProps> = ({ checked, defaultChecked, onChange, 
       {label && <span className="text-xs">{label}</span>}
     </label>
   );
-};
+});
+
+CheckBox.displayName = "CheckBox";
 
 export default CheckBox;

@@ -69,7 +69,7 @@ const Profile = ({ characterAttributes }: ProfileProps) => {
   return (
     <div className="flex text-base items-center flex-col gap-3">
       <div className="flex flex-row gap-2">
-        <Image src={character_image} alt="character" unoptimized width={120} height={120} />
+        <Image src={character_image} alt="character" unoptimized width={120} height={120} style={{ width: 120, height: 120 }} />
         <div className="flex flex-col gap-1.5 justify-center min-w-[100px]">
           <p className="text-slate-100 text-sm">
             <Badge bgColor="lime" text={"이름"} />
@@ -162,7 +162,14 @@ export const ProfileWrapper = () => {
       {isEmptyProfile && (
         <>
           <ProfileSearch />
-          <Image src={CharacterImg} alt="" width={110} className="absolute opacity-5 -z-0" />
+          <Image
+            src={CharacterImg}
+            alt=""
+            width={110}
+            height={110}
+            className="absolute opacity-5 -z-0"
+            style={{ width: 110, height: 110 }}
+          />
         </>
       )}
       {isSearchError && <p className="text-white text-base">검색결과가 없습니다.</p>}

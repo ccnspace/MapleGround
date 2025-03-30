@@ -11,6 +11,28 @@ import { ExpContainer } from "./ExpContainer";
 import { EquipSetContainer } from "./EquipSetContainer";
 import { useCubeStore } from "@/stores/cube";
 import { CubeContainer } from "./CubeContainer";
+import { memo } from "react";
+
+const RightSideGridContainer = memo(() => (
+  <div className="grid gap-4">
+    <AbilityContainer />
+    <PetEquipContainer />
+    <EquipSetContainer />
+  </div>
+));
+
+RightSideGridContainer.displayName = "RightSideGridContainer";
+
+const BottomGridContainer = memo(() => (
+  <>
+    <div className="col-span-2">
+      <ChartContainer />
+    </div>
+    <ExpContainer />
+  </>
+));
+
+BottomGridContainer.displayName = "BottomGridContainer";
 
 export const MainContainer = () => {
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
@@ -18,19 +40,12 @@ export const MainContainer = () => {
 
   return (
     <div className="main_container w-[1280px] gap-4">
-      {cubeTargetItem && <CubeContainer />}
       <StatContainer />
       <EquipContainer />
-      <div className="grid gap-4">
-        <AbilityContainer />
-        <PetEquipContainer />
-        <EquipSetContainer />
-      </div>
-      <div className="col-span-2">
-        <ChartContainer />
-      </div>
-      <ExpContainer />
+      <RightSideGridContainer />
+      <BottomGridContainer />
       {fetchStatus === "loading" && <DimmedLayer spinner />}
+      {cubeTargetItem && <CubeContainer />}
     </div>
   );
 };

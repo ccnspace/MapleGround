@@ -22,7 +22,7 @@ const gradeUpAudio = new Audio(AUDIO_CONFIG.gradeUp.src);
 gradeUpAudio.volume = AUDIO_CONFIG.gradeUp.volume;
 
 export const useCubeSimulation = (cubeSimulator: CubeSimulator) => {
-  const [prevOptions, setPrevOptions] = useState<string[]>([]);
+  const [prevOptions, _setPrevOptions] = useState<string[]>([]);
   const [newOptions, setNewOptions] = useState<string[]>([]);
   const [prevGrade, setPrevGrade] = useState<ItemPotentialGrade>();
   const [afterGrade, setAfterGrade] = useState<ItemPotentialGrade>();
@@ -57,7 +57,7 @@ export const useCubeSimulation = (cubeSimulator: CubeSimulator) => {
       currentGuarantee,
     } = cubeSimulator.getItemState();
 
-    setPrevOptions(prevOptions);
+    _setPrevOptions(prevOptions);
     setNewOptions(currentOptions);
     setPrevGrade(simulatorPrevGrade);
     setAfterGrade(simulatorCurrentGrade);
@@ -74,6 +74,14 @@ export const useCubeSimulation = (cubeSimulator: CubeSimulator) => {
     setCurrentAttempt(0);
     prevAttempt.current = 0;
   }, [cubeSimulator]);
+
+  const setPrevOptions = useCallback(
+    (options: string[]) => {
+      cubeSimulator.setPrevOptions(options);
+      _setPrevOptions(options);
+    },
+    [cubeSimulator]
+  );
 
   return {
     prevOptions,

@@ -1,21 +1,22 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { useShallow } from "zustand/react/shallow";
 import { useThrottle } from "@/hooks/useThrottle";
 import { useCubeStore } from "@/stores/cube";
 import { CubeSimulator } from "@/utils/CubeSimulator";
-import Image from "next/image";
 import potentialImg from "@/images/potentialBg.png";
-import { Divider } from "../Equip/Divider";
 import { useCubeSimulation } from "@/hooks/useCubeSimulation";
-import { CubeDisplay } from "../Cube/CubeDisplay";
 import { isFullyContainedInArray } from "@/utils/arrayUtils";
-import { usePotentialInfo } from "@/hooks/usePotentialInfo";
 import { NOT_SELECTED, POTENTIAL_CUBE, ADDITIONAL_POTENTIAL_CUBE } from "@/consts/Cube";
+import { usePotentialInfo } from "@/hooks/usePotentialInfo";
+import { Divider } from "../Equip/Divider";
+import { CubeDisplay } from "../Cube/CubeDisplay";
 import { SettingContainer } from "../Cube/SettingContainer";
 import { CubeSetting } from "../Cube/CubeSetting";
 import { AutoResetMode } from "../Cube/AutoResetMode";
 import { Record } from "../Cube/Record";
 import { GradeUpInfo } from "../Cube/GradeUpInfo";
+
 const MAX_SPEED_STEP = 5;
 
 export const CubeContainer = () => {
@@ -34,8 +35,8 @@ export const CubeContainer = () => {
     itemType,
     itemIcon,
     itemName,
-    itemPotentialGrade = "레어",
-    additionalPotentialGrade = "레어",
+    itemPotentialGrade,
+    additionalPotentialGrade,
     currentPotentialOptions = [],
     currentAdditionalOptions = [],
   } = targetItem || {};
@@ -103,9 +104,23 @@ export const CubeContainer = () => {
 
   const handleAfterButtonClick = useCallback(() => {
     const { currentOptions } = cubeSimulator.getItemState();
-    cubeSimulator.setPrevOptions(currentOptions);
     setPrevOptions(currentOptions);
   }, [cubeSimulator, setPrevOptions]);
+
+  const handleClearRecords = useCallback(() => {
+    setRecords([]);
+  }, []);
+
+  /** 스피드 옵션 */
+  const handleUpSpeed = useCallback(() => {
+    if (speedStep === MAX_SPEED_STEP) return;
+    setSpeedStep((prev) => prev + 1);
+  }, [speedStep]);
+
+  const handleDownSpeed = useCallback(() => {
+    if (speedStep === 1) return;
+    setSpeedStep((prev) => prev - 1);
+  }, [speedStep]);
 
   const reRollPotential = useCallback(() => {
     rollCube();
@@ -127,19 +142,19 @@ export const CubeContainer = () => {
   }, [isSpeedMode, speedOptions, currentAttempt, rollCube, resetCurrentAttempt]);
 
   /** 초기 데이터 init */
+  const initialGrade = cubeType === "potential" ? itemPotentialGrade : additionalPotentialGrade;
+  const initialOptions = cubeType === "potential" ? currentPotentialOptions : currentAdditionalOptions;
   useEffect(() => {
-    const grade = cubeType === "potential" ? itemPotentialGrade : additionalPotentialGrade;
-    const options = cubeType === "potential" ? currentPotentialOptions : currentAdditionalOptions;
+    if (!initialGrade || !initialOptions) return;
 
-    if (!grade || !options) return;
-
-    setPrevGrade(grade);
-    setPrevOptions(options);
-  }, [cubeType, itemPotentialGrade, additionalPotentialGrade, currentPotentialOptions, currentAdditionalOptions]);
+    setPrevGrade(initialGrade);
+    setPrevOptions(initialOptions);
+  }, [initialGrade, initialOptions]);
 
   /** 등업될 때 UI 효과 */
   useEffect(() => {
-    if (!afterGrade || prevGrade === afterGrade) return;
+    if (!prevGrade || !afterGrade) return;
+    if (prevGrade === afterGrade) return;
 
     const { failedAttempts } = cubeSimulator.getItemState();
     const gradeIndex = ["레어", "에픽", "유니크"].findIndex((item) => item === prevGrade);
@@ -159,7 +174,7 @@ export const CubeContainer = () => {
 
     document.addEventListener("keydown", handleKeydown);
     return () => document.removeEventListener("keydown", handleKeydown);
-  }, [handleRollCubeClick, resetCube]);
+  }, [handleRollCubeClick]);
 
   useEffect(() => {
     cubeSimulator.setMiracleTime(isMiracleChecked);
@@ -168,18 +183,7 @@ export const CubeContainer = () => {
       return `${gradeName}: ${(item.chance * 100).toFixed(4)}%`;
     });
     setGradeUpInfos(gradeUpInfos);
-  }, [cubeSimulator, isMiracleChecked]);
-
-  /** 스피드 옵션 */
-  const handleUpSpeed = () => {
-    if (speedStep === MAX_SPEED_STEP) return;
-    setSpeedStep((prev) => prev + 1);
-  };
-
-  const handleDownSpeed = () => {
-    if (speedStep === 1) return;
-    setSpeedStep((prev) => prev - 1);
-  };
+  }, [isMiracleChecked]);
 
   useEffect(() => {
     if (isSpeedMode) {
@@ -242,7 +246,6 @@ export const CubeContainer = () => {
                 />
               </div>
             </div>
-
             <CubeDisplay label="BEFORE" grade={prevGrade} options={prevOptions} />
             <CubeDisplay
               label="AFTER"
@@ -288,7 +291,7 @@ export const CubeContainer = () => {
             handleDownSpeed={handleDownSpeed}
           />
           <Divider />
-          <Record records={records} clearRecords={() => setRecords([])} />
+          <Record records={records} clearRecords={handleClearRecords} />
           <Divider />
           <GradeUpInfo gradeUpInfos={gradeUpInfos} cubeTitle={cubeTitle} />
         </SettingContainer>

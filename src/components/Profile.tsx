@@ -166,9 +166,10 @@ export const ProfileWrapper = () => {
             src={CharacterImg}
             alt=""
             width={110}
-            height={110}
+            height={173}
+            priority
             className="absolute opacity-5 -z-0"
-            style={{ width: 110, height: 110 }}
+            style={{ width: 110, height: 173 }}
           />
         </>
       )}

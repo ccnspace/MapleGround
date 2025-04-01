@@ -11,7 +11,7 @@ import { CubeSimulator } from "@/utils/CubeSimulator";
 
 type DetailCardProps = { equipName: string; characterEquipments: CharacterEquipments };
 
-const DetailCardComponent = ({ equipName, characterEquipments }: DetailCardProps) => {
+export const DetailCardComponent = ({ equipName, characterEquipments }: DetailCardProps) => {
   if (equipName.includes("아케인심볼")) {
     const item = characterEquipments["arcaneSymbol"]?.[equipName] as SymbolOption;
     return <SymbolContainer type="arcane" item={item} />;

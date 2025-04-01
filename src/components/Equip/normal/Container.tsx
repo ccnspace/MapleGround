@@ -9,15 +9,18 @@ import { type MouseEvent, useContext } from "react";
 import { useCubeStore } from "@/stores/cube";
 import { EquipActionContext } from "@/components/Container/EquipContainer";
 import { CubeType } from "@/utils/CubeSimulator";
+import { useStarforceStore } from "@/stores/starforce";
 
 type Props = {
   item: ItemEquipment;
+  enableItemMenu?: boolean;
 };
 
 /** 잠재능력 재설정 가능 아이템 리스트트 */
 const rollableItem = ["무기", "상의"];
+const starforceableItem = ["무기", "반지1", "반지2", "반지3", "반지4", "벨트", "펜던트"];
 
-export const NormalContainer = ({ item }: Props) => {
+export const NormalContainer = ({ item, enableItemMenu = true }: Props) => {
   const {
     starforce,
     item_icon,
@@ -45,10 +48,12 @@ export const NormalContainer = ({ item }: Props) => {
 
   const setSelectedEquipName = useContext(EquipActionContext);
   const setCubeTargetState = useCubeStore((state) => state.setCubeTargetState);
+  const setStarforceTargetState = useStarforceStore((state) => state.setTargetItem);
 
   const canRollPotential = !!potential_option_grade && rollableItem.includes(item_equipment_slot);
   const canRollAdditional = !!additional_potential_option_grade && rollableItem.includes(item_equipment_slot);
   const canRollCube = canRollPotential || canRollAdditional;
+  const canStarforce = starforceableItem.includes(item_equipment_slot);
 
   const handleRollCubeClick = (e: MouseEvent, cubeType: CubeType) => {
     if (!potential_option_grade && !additional_potential_option_grade) return;
@@ -67,6 +72,12 @@ export const NormalContainer = ({ item }: Props) => {
         currentAdditionalOptions: [additional_potential_option_1, additional_potential_option_2, additional_potential_option_3],
       },
     });
+  };
+
+  const handleStarforceClick = (e: MouseEvent) => {
+    e.stopPropagation();
+    setSelectedEquipName("");
+    setStarforceTargetState(item);
   };
 
   return (
@@ -108,26 +119,39 @@ export const NormalContainer = ({ item }: Props) => {
           options={[additional_potential_option_1, additional_potential_option_2, additional_potential_option_3]}
         />
       )}
-      {canRollCube && (
+      {enableItemMenu && (canRollCube || canStarforce) && (
         <>
           <Divider />
-          <div className="flex flex-row gap-2 justify-center">
-            {canRollPotential && (
-              <button
-                onClick={(e) => handleRollCubeClick(e, "potential")}
-                className="tracking-tighter text-white text-sm font-bold pt-1 pb-1 px-2 mt-1 [text-shadow:_2px_1px_3px_rgb(0_0_0_/_50%)]
+          <div className="grid grid-flow-col-dense gap-1.5 mt-1">
+            {canRollCube && (
+              <>
+                {canRollPotential && (
+                  <button
+                    onClick={(e) => handleRollCubeClick(e, "potential")}
+                    className="w-full tracking-tighter text-white text-sm font-bold pt-1 pb-1 px-1 [text-shadow:_2px_1px_3px_rgb(0_0_0_/_50%)]
               rounded-md bg-gradient-to-r from-purple-400/90 to-sky-500/90 hover:bg-gradient-to-r hover:from-purple-500/90 hover:to-sky-600/90"
-              >
-                🪄 잠재능력 재설정
-              </button>
-            )}
-            {canRollAdditional && (
-              <button
-                onClick={(e) => handleRollCubeClick(e, "additional")}
-                className="tracking-tighter text-white whitespace-pre-wrap text-sm font-bold pt-1 pb-1 px-2 mt-1 [text-shadow:_2px_1px_3px_rgb(0_0_0_/_50%)] 
+                  >
+                    🪄 잠재능력
+                  </button>
+                )}
+                {canRollAdditional && (
+                  <button
+                    onClick={(e) => handleRollCubeClick(e, "additional")}
+                    className="w-full tracking-tighter text-white whitespace-pre-wrap text-sm font-bold pt-1 pb-1 px-1 [text-shadow:_2px_1px_3px_rgb(0_0_0_/_50%)] 
               rounded-md bg-gradient-to-r from-lime-400/90 to-teal-600/90 hover:bg-gradient-to-r hover:from-lime-500/90 hover:to-teal-700/90"
+                  >
+                    {`🪄 에디셔널`}
+                  </button>
+                )}
+              </>
+            )}
+            {canStarforce && (
+              <button
+                onClick={handleStarforceClick}
+                className="w-full tracking-tighter text-white whitespace-pre-wrap text-sm font-bold pt-1 pb-1 px-1 [text-shadow:_2px_1px_3px_rgb(0_0_0_/_50%)] 
+              rounded-md bg-gradient-to-r from-yellow-400/90 to-orange-400/90 hover:bg-gradient-to-r hover:from-yellow-500/90 hover:to-orange-600/90"
               >
-                {`🪄 에디셔널 재설정`}
+                {`⭐ 스타포스`}
               </button>
             )}
           </div>

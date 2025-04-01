@@ -12,6 +12,8 @@ import { EquipSetContainer } from "./EquipSetContainer";
 import { useCubeStore } from "@/stores/cube";
 import { CubeContainer } from "./CubeContainer";
 import { memo } from "react";
+import { useStarforceStore } from "@/stores/starforce";
+import { StarforceContainer } from "./StarforceContainer";
 
 const RightSideGridContainer = memo(() => (
   <div className="grid gap-4">
@@ -37,6 +39,7 @@ BottomGridContainer.displayName = "BottomGridContainer";
 export const MainContainer = () => {
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
   const cubeTargetItem = useCubeStore((state) => state.targetItem);
+  const starforceTargetItem = useStarforceStore((state) => state.targetItem);
 
   return (
     <div className="main_container w-[1280px] gap-4">
@@ -46,6 +49,7 @@ export const MainContainer = () => {
       <BottomGridContainer />
       {fetchStatus === "loading" && <DimmedLayer spinner />}
       {cubeTargetItem && <CubeContainer />}
+      {starforceTargetItem && <StarforceContainer />}
     </div>
   );
 };

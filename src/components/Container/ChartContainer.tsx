@@ -22,6 +22,7 @@ export const ChartContainer = () => {
   const [seriesData, setSeriesData] = useState<number[]>([]);
   const { theme } = useTheme();
   const canShowChart = !!nickname && !!categories.length && !!seriesData.length;
+  const spinnerColor = theme === "dark" ? "white" : "#616161";
 
   // 초기화
   useEffect(() => {
@@ -129,7 +130,7 @@ export const ChartContainer = () => {
         )}
         {fetchStatus === "loading" && (
           <div className="flex items-center justify-center">
-            <Spinner width="3em" height="3em" />
+            <Spinner width="3em" height="3em" color={spinnerColor} />
           </div>
         )}
       </div>

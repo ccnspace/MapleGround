@@ -78,6 +78,10 @@ abbr:where([title]) {
   animation: fadein 0.36s;
 }
 
+.starforce-fade-in {
+  animation: fadein 0.12s, scalein 0.1s ease-out;
+}
+
 .cube-glow {
   animation: glowFadeout 0.8s ease-in-out;
 }
@@ -99,5 +103,14 @@ abbr:where([title]) {
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes scalein {
+  from {
+    transform: translate(-50%, -40%) scale(0.1);
+  }
+  to {
+    transform: translate(-50%, -40%) scale(1);
   }
 }

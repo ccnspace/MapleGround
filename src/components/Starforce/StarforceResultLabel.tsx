@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import type { StarforceResult } from "@/utils/StarforceSimulator";
 
 interface ResultProps {
-  result: "success" | "fail" | "destroyed" | null;
+  result: StarforceResult | null;
 }
 
 const Success = () => (
@@ -31,7 +31,7 @@ const Destroyed = () => (
   </p>
 );
 
-export const StarforceResult = ({ result }: ResultProps) => {
+export const StarforceResultLabel = ({ result }: ResultProps) => {
   if (!result) return null;
 
   return (
@@ -42,7 +42,7 @@ export const StarforceResult = ({ result }: ResultProps) => {
     >
       {result === "success" && <Success />}
       {result === "fail" && <Fail />}
-      {result === "destroyed" && <Destroyed />}
+      {result === "destroy" && <Destroyed />}
     </div>
   );
 };

@@ -49,7 +49,7 @@ export const MainContainer = () => {
       <BottomGridContainer />
       {fetchStatus === "loading" && <DimmedLayer spinner />}
       {cubeTargetItem && <CubeContainer />}
-      {starforceTargetItem && <StarforceContainer />}
+      {starforceTargetItem && <StarforceContainer targetItem={starforceTargetItem} />}
     </div>
   );
 };

@@ -79,7 +79,7 @@ abbr:where([title]) {
 }
 
 .starforce-fade-in {
-  animation: fadein 0.4s, scalein 0.12s ease-out;
+  animation: fadein 0.12s, scalein 0.1s ease-out;
 }
 
 .cube-glow {
@@ -108,7 +108,7 @@ abbr:where([title]) {
 
 @keyframes scalein {
   from {
-    transform: translate(-50%, -40%) scale(0.6);
+    transform: translate(-50%, -40%) scale(0.1);
   }
   to {
     transform: translate(-50%, -40%) scale(1);

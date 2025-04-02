@@ -13,12 +13,11 @@ export const StarforceDetail = ({ starforce, currentCost, currentProbabilities }
   const destroyRate = currentProbabilities.destroy ? `${(currentProbabilities.destroy * 100).toFixed(2)}%` : null;
 
   return (
-    <div className="flex flex-col font-bold">
+    <div className="flex flex-col font-bold text-white">
       <p>{`${starforce}성 > ${starforce + 1}성`}</p>
       <p>{`성공확률: ${successRate}`}</p>
       <p>{`실패(유지)확률: ${failRate}`}</p>
       {destroyRate && <p>{`파괴확률: ${destroyRate}`}</p>}
-      {/* <p>{`현재 비용: ${currentCost}원`}</p> */}
     </div>
   );
 };

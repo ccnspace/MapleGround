@@ -55,8 +55,6 @@ export class StarforceSimulator {
     const rand = Math.random();
     let result: StarforceResult;
 
-    console.log(rand, rate.success, adjustedFailRate, adjustedDestroyRate);
-
     if (rand < rate.success) {
       result = "success";
       this.item.starforce = (parseInt(this.item.starforce) + 1).toString();
@@ -68,7 +66,6 @@ export class StarforceSimulator {
       this.item.starforce = "12";
     }
 
-    // console.log(getStarforceProbability(parseInt(this.item.starforce)));
     this.accumulatedCost += cost;
     this.currentCost = getStarforceCost(parseInt(this.item.starforce), this.item.item_base_option.base_equipment_level);
     this.probabilities = getStarforceProbability(parseInt(this.item.starforce));

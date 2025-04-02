@@ -18,7 +18,7 @@ type Props = {
 
 /** 잠재능력 재설정 가능 아이템 리스트트 */
 const rollableItem = ["무기", "상의"];
-const starforceableItem = ["무기", "반지1", "반지2", "반지3", "반지4", "벨트", "펜던트"];
+const starforceableItem = ["모자", "반지", "벨트", "펜던트", "상의", "하의", "눈장식"];
 
 export const NormalContainer = ({ item, enableItemMenu = true }: Props) => {
   const {
@@ -53,7 +53,8 @@ export const NormalContainer = ({ item, enableItemMenu = true }: Props) => {
   const canRollPotential = !!potential_option_grade && rollableItem.includes(item_equipment_slot);
   const canRollAdditional = !!additional_potential_option_grade && rollableItem.includes(item_equipment_slot);
   const canRollCube = canRollPotential || canRollAdditional;
-  const canStarforce = starforceableItem.includes(item_equipment_slot);
+  const canStarforcePart = starforceableItem.includes(item_equipment_slot) || starforceableItem.includes(item_equipment_part);
+  const canStarforce = canStarforcePart && parseInt(item.starforce || "0") > 0;
 
   const handleRollCubeClick = (e: MouseEvent, cubeType: CubeType) => {
     if (!potential_option_grade && !additional_potential_option_grade) return;

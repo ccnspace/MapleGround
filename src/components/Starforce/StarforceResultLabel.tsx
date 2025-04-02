@@ -1,7 +1,9 @@
 import type { StarforceResult } from "@/utils/StarforceSimulator";
+import { useMemo } from "react";
 
 interface ResultProps {
   result: StarforceResult | null;
+  isAutoModePlaying: boolean;
 }
 
 const Success = () => (
@@ -31,14 +33,15 @@ const Destroyed = () => (
   </p>
 );
 
-export const StarforceResultLabel = ({ result }: ResultProps) => {
+export const StarforceResultLabel = ({ result, isAutoModePlaying }: ResultProps) => {
   if (!result) return null;
 
   return (
     <div
       style={{ transform: "translate(-50%, -40%)" }}
       className={`absolute top-[40%] left-[50%] bg-gradient-to-r from-black to-transparent
-        ${(result === "success" || result === "fail") && "starforce-fade-in"}`}
+        ${isAutoModePlaying && "opacity-25"}
+        ${!isAutoModePlaying && "starforce-fade-in"}`}
     >
       {result === "success" && <Success />}
       {result === "fail" && <Fail />}

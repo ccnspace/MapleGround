@@ -11,6 +11,9 @@ import { StarforceDetail } from "@/components/Starforce/StarforceDetail";
 import { StarforceResultLabel } from "@/components/Starforce/StarforceResultLabel";
 import { formatKoreanNumber } from "@/utils/formatKoreanNum";
 import { useThrottle } from "@/hooks/useThrottle";
+import { SelectBox } from "../SelectBox";
+
+const AUTO_MODE_OPTIONS = ["20성", "21성", "22성", "23성", "24성", "25성", "26성", "27성", "28성", "29성", "30성"];
 
 export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
   const resetStarforceTarget = useStarforceStore((state) => state.resetStarforceTarget);
@@ -22,6 +25,21 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   const [costDiscount, setCostDiscount] = useState(1);
   const [destroyReduction, setDestroyReduction] = useState(1);
   const [accumulatedCost, setAccumulatedCost] = useState(0);
+
+  const [isAutoModePlaying, setIsAutoModePlaying] = useState(false);
+  const [isAutoModeChecked, setIsAutoModeChecked] = useState(false);
+  const [autoModeOption, setAutoModeOption] = useState<string>(AUTO_MODE_OPTIONS[0]);
+
+  const starforceButtonLabel = useMemo(() => {
+    if (isAutoModePlaying) {
+      return "자동 강화 OFF";
+    }
+    return "+ 강화(D키)";
+  }, [isAutoModePlaying]);
+
+  const handleSelect = (option: string) => {
+    setAutoModeOption(option);
+  };
 
   const simulator = useMemo(
     () =>
@@ -66,20 +84,46 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
     if (timerRef.current) {
       clearTimeout(timerRef.current);
-      setResult(null);
+
+      if (!isAutoModePlaying) {
+        setResult(null);
+      }
       setTimeout(() => {
         setResult(result); // 짧은 지연 후 새로운 결과로 설정
       }, 0);
     }
     const newTimer = setTimeout(() => setResult(null), 1000);
     timerRef.current = newTimer;
-  }, [simulator]);
 
-  const throttleDoStarforce = useThrottle(doStarforce, 200);
+    if (isAutoModePlaying && autoModeOption) {
+      const targetStarforce = autoModeOption?.split("성")[0];
+      if (parseInt(item.starforce) >= parseInt(targetStarforce)) {
+        setIsAutoModePlaying(false);
+        setIsAutoModeChecked(false);
+      }
+    }
+  }, [simulator, isAutoModePlaying, autoModeOption]);
+
+  const handleClickStarforceButton = () => {
+    if (isAutoModePlaying) {
+      setIsAutoModePlaying(false);
+      return;
+    }
+
+    if (isAutoModeChecked) {
+      setIsAutoModePlaying(true);
+      return;
+    }
+
+    doStarforce();
+  };
+
+  const throttleDoStarforce = useThrottle(handleClickStarforceButton, 200);
 
   /** 스타포스 강화 키 이벤트 핸들러 */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (isAutoModePlaying) return;
       if (e.key === "d") {
         throttleDoStarforce();
       }
@@ -90,7 +134,21 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [throttleDoStarforce]);
+  }, [throttleDoStarforce, isAutoModePlaying]);
+
+  // 자동 모드
+  const autoModeTimer = useRef<NodeJS.Timeout>();
+  useEffect(() => {
+    if (isAutoModePlaying) {
+      const delay = 30;
+      autoModeTimer.current = setInterval(() => {
+        doStarforce();
+      }, delay);
+    } else {
+      clearTimeout(autoModeTimer.current);
+    }
+    return () => clearTimeout(autoModeTimer.current);
+  }, [isAutoModePlaying, doStarforce]);
 
   if (!targetItem) return null;
 
@@ -98,7 +156,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     <>
       <div style={{ zIndex: 1002 }} className="flex fixed top-[30%] left-[40%]">
         <div
-          className={`flex flex-col items-center gap-1 text-white rounded-lg
+          className={`flex flex-col items-center gap-1 rounded-lg
              bg-black/70 p-2 border border-white/30 align-center 
              justify-center w-[480px]`}
         >
@@ -107,7 +165,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
           </p>
           <div className="relative flex flex-col p-1 w-full rounded-lg bg-gradient-to-b from-gray-200 to-gray-300 gap-1">
             <div className="flex flex-col p-1 w-full rounded-lg bg-gradient-to-b from-[#4e413e] to-[#493d34] gap-1">
-              <p className="flex fade-in justify-center rounded-md bg-[#2e2521] p-1 m-1">
+              <p className="flex fade-in justify-center rounded-md bg-[#2e2521] p-1 m-1 text-white">
                 <span className="text-yellow-400">메소</span>를 사용하여 장비를 강화합니다.
               </p>
               <div className="flex flex-row">
@@ -116,15 +174,15 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                   onMouseLeave={handleMouseLeaveOnImage}
                   className="flex items-center justify-center bg-gradient-to-b from-[#3ac4ee] to-[#007a99] rounded-md p-1 w-[156px] h-[156px] m-1"
                 >
-                  <div className="flex items-center justify-center border-dashed border-white border-2 rounded-md">
+                  <div className="flex w-[130px] h-[130px] items-center justify-center border-dashed border-white border-2 rounded-md">
                     {item_icon && (
                       <Image
                         src={item_icon}
                         className="m-3.5"
                         style={{ imageRendering: "pixelated" }}
                         alt={"스타포스 아이템"}
-                        width={100}
-                        height={100}
+                        width={90}
+                        height={90}
                         unoptimized
                       />
                     )}
@@ -145,18 +203,38 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                 </div>
               </div>
               <div className="flex flex-row flew-grow w-full">
-                <div className="flex m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
-                  <CheckBox label="스타캐치 해제" />
+                <div className="flex text-white m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
+                  <CheckBox label="스타캐치 적용" />
                 </div>
-                <div className="flex m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
+                <div className="flex text-white m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
                   <CheckBox label="파괴방지" />
                 </div>
-                <div className="flex m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
-                  <CheckBox label="자동 모드" />
+              </div>
+              <div className="flex flex-row flew-grow w-full">
+                <div className="flex items-center justify-between mx-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
+                  <div className="text-white">
+                    <CheckBox
+                      label="자동 모드"
+                      disabled={isAutoModePlaying}
+                      checked={isAutoModeChecked}
+                      onChange={() => setIsAutoModeChecked((prev) => !prev)}
+                    />
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <SelectBox
+                      style={{ maxWidth: "160px" }}
+                      disabled={!isAutoModeChecked || isAutoModePlaying}
+                      options={AUTO_MODE_OPTIONS}
+                      onSelect={handleSelect}
+                    />
+                    <span className="text-xs text-white ml-1">달성까지 자동 강화</span>
+                  </div>
                 </div>
               </div>
-              <div className="flex m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
-                <p className="text-sm font-bold">🪙 필요한 메소: {formatKoreanNumber(currentCost)} 메소</p>
+              <div className="flex flex-row flew-grow w-full">
+                <div className="flex m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
+                  <p className="text-sm font-bold text-white">🪙 필요한 메소: {formatKoreanNumber(currentCost)} 메소</p>
+                </div>
               </div>
               <div className="flex flex-row justify-center">
                 <button
@@ -165,7 +243,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                   hover:bg-gradient-to-b hover:from-[#7ea338] hover:to-[#578621]
                 rounded-md p-0.5 m-1 w-[120px] justify-center text-lg font-bold"
                 >
-                  {"+ 강화(D키)"}
+                  {starforceButtonLabel}
                 </button>
                 <button
                   className="flex bg-gradient-to-b from-[#b6b6b6] to-[#868686]
@@ -177,10 +255,10 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                 </button>
               </div>
               <div className="flex bg-slate-900 rounded-md m-1">
-                <p className="text-xs p-1">💸 소모 메소량: {formatKoreanNumber(accumulatedCost)} 메소</p>
+                <p className="text-xs p-1 text-white">💸 소모 메소량: {formatKoreanNumber(accumulatedCost)} 메소</p>
               </div>
             </div>
-            <StarforceResultLabel result={result} />
+            <StarforceResultLabel result={result} isAutoModePlaying={isAutoModePlaying} />
           </div>
         </div>
       </div>

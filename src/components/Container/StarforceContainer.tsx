@@ -12,6 +12,7 @@ import { StarforceResultLabel } from "@/components/Starforce/StarforceResultLabe
 import { formatKoreanNumber } from "@/utils/formatKoreanNum";
 import { useThrottle } from "@/hooks/useThrottle";
 import { SelectBox } from "../SelectBox";
+import { StarforceRecords } from "../Starforce/StarforceRecords";
 
 const AUTO_MODE_OPTIONS = ["20성", "21성", "22성", "23성", "24성", "25성", "26성", "27성", "28성", "29성", "30성"];
 
@@ -25,10 +26,15 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   const [costDiscount, setCostDiscount] = useState(1);
   const [destroyReduction, setDestroyReduction] = useState(1);
   const [accumulatedCost, setAccumulatedCost] = useState(0);
+  const [attempts, setAttempts] = useState(0);
+  const [destroyCount, setDestroyCount] = useState(0);
 
   const [isAutoModePlaying, setIsAutoModePlaying] = useState(false);
   const [isAutoModeChecked, setIsAutoModeChecked] = useState(false);
-  const [autoModeOption, setAutoModeOption] = useState<string>(AUTO_MODE_OPTIONS[0]);
+  const [autoModeOption, setAutoModeOption] = useState<string>(AUTO_MODE_OPTIONS[0].split("성")[0]);
+  const initialStarforce = useRef<number>(0);
+
+  const [records, setRecords] = useState<string[]>([]);
 
   const starforceButtonLabel = useMemo(() => {
     if (isAutoModePlaying) {
@@ -38,7 +44,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   }, [isAutoModePlaying]);
 
   const handleSelect = (option: string) => {
-    setAutoModeOption(option);
+    setAutoModeOption(option.split("성")[0]);
   };
 
   const simulator = useMemo(
@@ -72,15 +78,67 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     setShowDetail(false);
   };
 
+  const resetDestroyCount = () => {
+    setDestroyCount(0);
+    simulator.resetDestroyCount();
+  };
+
+  const resetAttempts = () => {
+    setAttempts(0);
+    simulator.resetAttempts();
+  };
+
+  const resetAccumulatedCost = () => {
+    setAccumulatedCost(0);
+    simulator.resetAccumulatedCost();
+  };
+
+  const resetAllStarforceState = () => {
+    resetDestroyCount();
+    resetAttempts();
+    resetAccumulatedCost();
+  };
+
+  const initializeStarforce = () => {
+    const input = prompt("아이템에 설정할 스타포스 수치를 입력해주세요.");
+    if (!input) return;
+
+    const inputStarforce = parseInt(input);
+
+    if (inputStarforce >= 30) {
+      alert("30성 이상은 설정할 수 없습니다.");
+      return;
+    }
+
+    if (isNaN(inputStarforce)) {
+      alert("숫자를 입력해주세요.");
+      return;
+    }
+
+    if (inputStarforce < 0) {
+      alert("0 이상의 숫자를 입력해주세요.");
+      return;
+    }
+
+    simulator.setStarforce(inputStarforce);
+    const { item, cost, probabilities } = simulator.getState();
+    setCurrentStarforce(parseInt(item.starforce));
+    setCurrentCost(cost);
+    setCurrentProbabilities(probabilities);
+    resetAllStarforceState();
+  };
+
   const doStarforce = useCallback(() => {
     simulator.simulate();
-    const { item, cost, probabilities, result, accumulatedCost } = simulator.getState();
+    const { item, cost, probabilities, result, accumulatedCost, attempts, destroyCount } = simulator.getState();
 
     setCurrentStarforce(parseInt(item.starforce));
     setCurrentCost(cost);
     setCurrentProbabilities(probabilities);
     setResult(result);
     setAccumulatedCost(accumulatedCost);
+    setAttempts(attempts);
+    setDestroyCount(destroyCount);
 
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -96,10 +154,20 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     timerRef.current = newTimer;
 
     if (isAutoModePlaying && autoModeOption) {
-      const targetStarforce = autoModeOption?.split("성")[0];
+      const targetStarforce = autoModeOption;
       if (parseInt(item.starforce) >= parseInt(targetStarforce)) {
         setIsAutoModePlaying(false);
         setIsAutoModeChecked(false);
+        setRecords((prev) => [
+          ...prev,
+          `${
+            initialStarforce.current
+          }성 시작 -> ${targetStarforce}성 도달 (${attempts}번 시도 / ${destroyCount}번 파괴 / ${formatKoreanNumber(
+            accumulatedCost
+          )}메소 소모)`,
+        ]);
+
+        resetAllStarforceState();
       }
     }
   }, [simulator, isAutoModePlaying, autoModeOption]);
@@ -111,6 +179,10 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     }
 
     if (isAutoModeChecked) {
+      if (currentStarforce === parseInt(autoModeOption)) {
+        alert("현재 스타포스 수치가 목표치와 동일합니다.");
+        return;
+      }
       setIsAutoModePlaying(true);
       return;
     }
@@ -138,9 +210,11 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
   // 자동 모드
   const autoModeTimer = useRef<NodeJS.Timeout>();
+
   useEffect(() => {
     if (isAutoModePlaying) {
-      const delay = 30;
+      const delay = 10;
+      initialStarforce.current = parseInt(simulator.getState().item.starforce);
       autoModeTimer.current = setInterval(() => {
         doStarforce();
       }, delay);
@@ -149,6 +223,13 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     }
     return () => clearTimeout(autoModeTimer.current);
   }, [isAutoModePlaying, doStarforce]);
+
+  useEffect(() => {
+    // 자동 모드 옵션이 변경되면 모든 상태를 초기화
+    if (autoModeOption) {
+      resetAllStarforceState();
+    }
+  }, [autoModeOption]);
 
   if (!targetItem) return null;
 
@@ -233,7 +314,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
               </div>
               <div className="flex flex-row flew-grow w-full">
                 <div className="flex m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
-                  <p className="text-sm font-bold text-white">🪙 필요한 메소: {formatKoreanNumber(currentCost)} 메소</p>
+                  <p className="text-sm font-bold text-white">🪙 필요한 메소: {formatKoreanNumber(currentCost)}</p>
                 </div>
               </div>
               <div className="flex flex-row justify-center">
@@ -249,18 +330,33 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                   className="flex bg-gradient-to-b from-[#b6b6b6] to-[#868686]
                   hover:bg-gradient-to-b hover:from-[#979797] hover:to-[#6b6b6b]
                 rounded-md p-0.5 m-1 w-[120px] justify-center text-lg font-bold"
+                  onClick={initializeStarforce}
+                >
+                  {"↻ 초기화"}
+                </button>
+                <button
+                  className="flex bg-gradient-to-b from-[#b6b6b6] to-[#868686]
+                  hover:bg-gradient-to-b hover:from-[#979797] hover:to-[#6b6b6b]
+                rounded-md p-0.5 m-1 w-[120px] justify-center text-lg font-bold"
                   onClick={resetStarforceTarget}
                 >
-                  {"↻ 취소"}
+                  {"X 닫기"}
                 </button>
               </div>
-              <div className="flex bg-slate-900 rounded-md m-1">
-                <p className="text-xs p-1 text-white">💸 소모 메소량: {formatKoreanNumber(accumulatedCost)} 메소</p>
+              <p className="flex mt-1 mb-1 border-b-2 border-dotted border-b-white/20" />
+              <div className="flex flex-row flex-grow gap-2 m-1">
+                <div className="flex bg-slate-900/90 w-[65%] rounded-md p-1">
+                  <p className="text-xs p-1 text-white">💸 누적 메소: {formatKoreanNumber(accumulatedCost)}</p>
+                </div>
+                <div className="flex bg-slate-900/90 w-[35%] rounded-md p-1">
+                  <p className="text-xs p-1 text-white">☝️ 시도: {attempts}회</p>
+                </div>
               </div>
             </div>
             <StarforceResultLabel result={result} isAutoModePlaying={isAutoModePlaying} />
           </div>
         </div>
+        <StarforceRecords records={records} clearRecords={() => setRecords([])} destroyCount={destroyCount} />
       </div>
       <div
         style={{ zIndex: 1001 }}

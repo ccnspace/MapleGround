@@ -22,6 +22,8 @@ export class StarforceSimulator {
   private accumulatedCost: number;
   private probabilities: StarforceProbability;
   private result: StarforceResult | null;
+  private attempts: number;
+  private destroyCount: number;
 
   constructor(props: Constructor) {
     this.item = { ...props.item };
@@ -32,6 +34,8 @@ export class StarforceSimulator {
     const baseLevel = this.item.item_base_option.base_equipment_level;
 
     this.accumulatedCost = 0;
+    this.attempts = 0;
+    this.destroyCount = 0;
     this.currentCost = getStarforceCost(starforce, baseLevel);
     this.probabilities = getStarforceProbability(starforce);
     this.result = null;
@@ -64,12 +68,14 @@ export class StarforceSimulator {
     } else {
       result = "destroy";
       this.item.starforce = "12";
+      this.destroyCount++;
     }
 
     this.accumulatedCost += cost;
     this.currentCost = getStarforceCost(parseInt(this.item.starforce), this.item.item_base_option.base_equipment_level);
     this.probabilities = getStarforceProbability(parseInt(this.item.starforce));
     this.result = result;
+    this.attempts++;
   }
 
   getState() {
@@ -79,7 +85,27 @@ export class StarforceSimulator {
       accumulatedCost: this.accumulatedCost,
       item: this.item,
       result: this.result,
+      attempts: this.attempts,
+      destroyCount: this.destroyCount,
     };
+  }
+
+  setStarforce(starforce: number) {
+    this.item.starforce = starforce.toString();
+    this.currentCost = getStarforceCost(starforce, this.item.item_base_option.base_equipment_level);
+    this.probabilities = getStarforceProbability(starforce);
+  }
+
+  resetAttempts() {
+    this.attempts = 0;
+  }
+
+  resetAccumulatedCost() {
+    this.accumulatedCost = 0;
+  }
+
+  resetDestroyCount() {
+    this.destroyCount = 0;
   }
 
   private applyOptionUpgrades() {

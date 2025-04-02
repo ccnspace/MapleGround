@@ -24,15 +24,24 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   const [currentCost, setCurrentCost] = useState(0);
   const [currentProbabilities, setCurrentProbabilities] = useState<StarforceProbability | null>(null);
   const [costDiscount, setCostDiscount] = useState(1);
-  const [destroyReduction, setDestroyReduction] = useState(1);
+  const [destroyReduction, setDestroyReduction] = useState(0);
   const [accumulatedCost, setAccumulatedCost] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [destroyCount, setDestroyCount] = useState(0);
 
+  const formattedCurrentCost = useMemo(() => formatKoreanNumber(currentCost), [currentCost]);
+
+  // 자동 모드
   const [isAutoModePlaying, setIsAutoModePlaying] = useState(false);
   const [isAutoModeChecked, setIsAutoModeChecked] = useState(false);
   const [autoModeOption, setAutoModeOption] = useState<string>(AUTO_MODE_OPTIONS[0].split("성")[0]);
   const initialStarforce = useRef<number>(0);
+
+  // 스타캐치
+  const [isStarforceCatchChecked, setIsStarforceCatchChecked] = useState(false);
+
+  // 샤이닝 스타포스
+  const [isShiningStarforceChecked, setIsShiningStarforceChecked] = useState(false);
 
   const [records, setRecords] = useState<string[]>([]);
 
@@ -52,10 +61,28 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
       new StarforceSimulator({
         item: targetItem,
         costDiscount,
-        destroyReduction,
       }),
-    [targetItem, costDiscount, destroyReduction]
+    [targetItem, costDiscount]
   );
+
+  const updateStarforceState = useCallback(() => {
+    const { item, cost, probabilities } = simulator.getState();
+    setCurrentStarforce(parseInt(item.starforce));
+    setCurrentCost(cost);
+    setCurrentProbabilities(probabilities);
+  }, [simulator]);
+
+  // 샤타포스 적용
+  useEffect(() => {
+    simulator.applyDestroyReduction(isShiningStarforceChecked ? 0.3 : 0);
+    updateStarforceState();
+  }, [isShiningStarforceChecked, updateStarforceState]);
+
+  // 스타캐치 적용
+  useEffect(() => {
+    simulator.applySuccessRateIncrease(isStarforceCatchChecked ? 0.05 : 0);
+    updateStarforceState();
+  }, [isStarforceCatchChecked, updateStarforceState]);
 
   useEffect(() => {
     const { item, cost, probabilities } = simulator.getState();
@@ -235,7 +262,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
   return (
     <>
-      <div style={{ zIndex: 1002 }} className="flex fixed top-[30%] left-[40%]">
+      <div style={{ zIndex: 1002 }} className="flex fixed top-[30%] left-[35%]">
         <div
           className={`flex flex-col items-center gap-1 rounded-lg
              bg-black/70 p-2 border border-white/30 align-center 
@@ -270,6 +297,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                   </div>
                   {currentTarget && showDetail && (
                     <div
+                      style={{ zIndex: "10003" }}
                       className="absolute top-[20%] left-[6%] flex flex-col min-w-80 max-w-80 bg-slate-950/90 dark:bg-[#121212]/90
           border border-gray-700 rounded-lg px-5 pt-3 pb-4"
                     >
@@ -285,10 +313,23 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
               </div>
               <div className="flex flex-row flew-grow w-full">
                 <div className="flex text-white m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
-                  <CheckBox label="스타캐치 적용" />
+                  <CheckBox
+                    checked={isStarforceCatchChecked}
+                    disabled={isAutoModePlaying}
+                    label="스타캐치 적용"
+                    onChange={() => setIsStarforceCatchChecked((prev) => !prev)}
+                  />
                 </div>
                 <div className="flex text-white m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
-                  <CheckBox label="파괴방지" />
+                  <CheckBox disabled={isAutoModePlaying} label="파괴방지" />
+                </div>
+                <div className="flex text-white m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
+                  <CheckBox
+                    checked={isShiningStarforceChecked}
+                    disabled={isAutoModePlaying}
+                    label="샤타포스(파괴-30%)"
+                    onChange={() => setIsShiningStarforceChecked((prev) => !prev)}
+                  />
                 </div>
               </div>
               <div className="flex flex-row flew-grow w-full">
@@ -314,7 +355,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
               </div>
               <div className="flex flex-row flew-grow w-full">
                 <div className="flex m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
-                  <p className="text-sm font-bold text-white">🪙 필요한 메소: {formatKoreanNumber(currentCost)}</p>
+                  <p className="text-sm font-bold text-white">🪙 필요한 메소: {formattedCurrentCost}</p>
                 </div>
               </div>
               <div className="flex flex-row justify-center">

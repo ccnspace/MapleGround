@@ -37,14 +37,19 @@ bg-black/70 border border-white/30 w-[300px]`}
           ))}
         </div>
         <div
-          className="flex flex-col min-w-[214px] gap-0.5 text-xs
+          className="flex flex-col min-w-[214px] gap-0.5 text-[13px]
         bg-gradient-to-br from-slate-500 to-slate-600 rounded-md p-1.5"
         >
           <p>
-            - 자동 모드 상태에서 <b>목표 스타포스 수치를 변경</b>하면 누적 메소, 시도 횟수, 파괴 횟수가 초기화됩니다.
+            - <span className="text-lime-300 text-bold">22성 이상</span>부터는{" "}
+            <span className="text-lime-300 text-bold">샤타포스가 적용되지 않습니다.</span>
           </p>
           <p>
-            - 자동 모드로 <b>목표 스타포스를 달성</b>하면 누적 메소, 시도 횟수, 파괴 횟수가 초기화됩니다.
+            - 스타캐치는 성공 확률을 <span className="text-lime-300 text-bold">1.05배</span> 증가시킵니다.
+          </p>
+          <p>
+            - 자동 모드 상태에서 <b>목표 스타포스 수치를 변경</b>하거나 <b>목표치 달성 시</b> 누적 메소, 시도 횟수, 파괴 횟수가
+            초기화됩니다.
           </p>
         </div>
       </div>

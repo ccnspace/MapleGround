@@ -312,7 +312,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                 </div>
               </div>
               <div className="flex flex-row flew-grow w-full">
-                <div className="flex text-white m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
+                <div className="flex text-white m-1 w-[35%] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
                   <CheckBox
                     checked={isStarforceCatchChecked}
                     disabled={isAutoModePlaying}
@@ -320,14 +320,14 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                     onChange={() => setIsStarforceCatchChecked((prev) => !prev)}
                   />
                 </div>
-                <div className="flex text-white m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
+                <div className="flex text-white m-1 w-[25%] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
                   <CheckBox disabled={isAutoModePlaying} label="파괴방지" />
                 </div>
-                <div className="flex text-white m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
+                <div className="flex text-white m-1 w-[40%] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
                   <CheckBox
                     checked={isShiningStarforceChecked}
                     disabled={isAutoModePlaying}
-                    label="샤타포스(파괴-30%)"
+                    label="샤타포스(파괴 30%↓)"
                     onChange={() => setIsShiningStarforceChecked((prev) => !prev)}
                   />
                 </div>

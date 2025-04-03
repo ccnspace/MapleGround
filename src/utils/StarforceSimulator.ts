@@ -13,6 +13,7 @@ interface Constructor {
   costDiscount: number;
 }
 
+const DESTROY_REDUCTION_RATE = 0.3;
 export class StarforceSimulator {
   private item: ItemEquipment;
   private costDiscount: number;
@@ -24,20 +25,19 @@ export class StarforceSimulator {
   private destroyCount: number;
   private destroyReduction: number;
   private successRateIncrease: number;
+  private destroyEvent: { isDestroyProtection: boolean; isShiningStarforce: boolean };
 
   constructor(props: Constructor) {
     this.item = { ...props.item };
     this.costDiscount = props.costDiscount;
-
-    const starforce = parseInt(this.item.starforce);
-    const baseLevel = this.item.item_base_option.base_equipment_level;
 
     this.accumulatedCost = 0;
     this.attempts = 0;
     this.destroyCount = 0;
     this.destroyReduction = 0;
     this.successRateIncrease = 0;
-    this.currentCost = getStarforceCost(starforce, baseLevel);
+    this.destroyEvent = { isDestroyProtection: false, isShiningStarforce: false };
+    this.currentCost = this.getRealCost();
     this.probabilities = this.getRealProbabilities();
     this.result = null;
   }
@@ -46,29 +46,52 @@ export class StarforceSimulator {
     this.costDiscount = 1 - discount;
   }
 
-  applyDestroyReduction(reduction: number) {
-    this.destroyReduction = reduction;
-    this.probabilities = this.getRealProbabilities();
-  }
-
   applySuccessRateIncrease(increase: number) {
     this.successRateIncrease = increase;
     this.probabilities = this.getRealProbabilities();
   }
 
-  getRealProbabilities() {
+  setShiningStarforce(isSet: boolean) {
+    this.destroyEvent.isShiningStarforce = isSet;
+    this.probabilities = this.getRealProbabilities();
+  }
+
+  setDestroyProtection(isSet: boolean) {
+    this.destroyEvent.isDestroyProtection = isSet;
+    this.probabilities = this.getRealProbabilities();
+    this.currentCost = this.getRealCost();
+  }
+
+  private isShiningStarforceEnabled() {
+    return this.destroyEvent.isShiningStarforce && parseInt(this.item.starforce) < 22;
+  }
+
+  private isDestroyProtectionEnabled() {
+    return this.destroyEvent.isDestroyProtection && parseInt(this.item.starforce) >= 15 && parseInt(this.item.starforce) <= 17;
+  }
+
+  private getRealCost() {
+    const baseCost = getStarforceCost(parseInt(this.item.starforce), this.item.item_base_option.base_equipment_level);
+    return baseCost + (this.isDestroyProtectionEnabled() ? baseCost : 0);
+  }
+
+  private getRealProbabilities() {
     const baseProbabilities = getStarforceProbability(parseInt(this.item.starforce));
 
-    // 22성 이상은 파괴 확률 감소 적용 안됨
-    let destroyReduction = this.destroyReduction;
-    if (parseInt(this.item.starforce) >= 22) {
-      destroyReduction = 0;
+    if (this.isShiningStarforceEnabled()) {
+      this.destroyReduction = DESTROY_REDUCTION_RATE;
+    } else {
+      this.destroyReduction = 0;
+    }
+
+    if (this.isDestroyProtectionEnabled()) {
+      this.destroyReduction = 1;
     }
 
     const adjustedSuccessRate = (baseProbabilities.success || 0) * (1 + this.successRateIncrease);
     const remainRate = 1 - adjustedSuccessRate;
 
-    const destroyRate = (baseProbabilities.destroy || 0) * (1 - destroyReduction);
+    const destroyRate = (baseProbabilities.destroy || 0) * (1 - this.destroyReduction);
     const failRate = baseProbabilities.fail + (baseProbabilities.destroy ? baseProbabilities.destroy - destroyRate : 0);
 
     const adjustedFailDestroySum = (failRate || 0) + (destroyRate || 0);
@@ -107,7 +130,8 @@ export class StarforceSimulator {
     }
 
     this.accumulatedCost += cost;
-    this.currentCost = getStarforceCost(parseInt(this.item.starforce), this.item.item_base_option.base_equipment_level);
+
+    this.currentCost = this.getRealCost();
     this.probabilities = this.getRealProbabilities();
     this.result = result;
     this.attempts++;

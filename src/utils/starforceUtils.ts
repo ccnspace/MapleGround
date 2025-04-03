@@ -57,7 +57,7 @@ export const starforceProbabilities: { [key: number]: StarforceProbability } = {
   12: { success: 0.4, fail: 0.6 },
   13: { success: 0.35, fail: 0.65 },
   14: { success: 0.3, fail: 0.7 },
-  15: { success: 0.3, fail: 0.679 },
+  15: { success: 0.3, fail: 0.679, destroy: 0.021 },
   16: { success: 0.3, fail: 0.679, destroy: 0.021 },
   17: { success: 0.15, fail: 0.782, destroy: 0.068 },
   18: { success: 0.15, fail: 0.782, destroy: 0.068 },

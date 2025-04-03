@@ -14,7 +14,7 @@ import { useThrottle } from "@/hooks/useThrottle";
 import { SelectBox } from "../SelectBox";
 import { StarforceRecords } from "../Starforce/StarforceRecords";
 
-const AUTO_MODE_OPTIONS = ["20성", "21성", "22성", "23성", "24성", "25성", "26성", "27성", "28성", "29성", "30성"];
+const AUTO_MODE_OPTIONS = ["18성", "19성", "20성", "21성", "22성", "23성", "24성", "25성", "26성", "27성", "28성", "29성", "30성"];
 
 export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
   const resetStarforceTarget = useStarforceStore((state) => state.resetStarforceTarget);
@@ -39,9 +39,16 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
   // 스타캐치
   const [isStarforceCatchChecked, setIsStarforceCatchChecked] = useState(false);
-
   // 샤이닝 스타포스
   const [isShiningStarforceChecked, setIsShiningStarforceChecked] = useState(false);
+  const isWithinShiningStarforce = useMemo(() => {
+    return currentStarforce < 22;
+  }, [currentStarforce]);
+  // 파괴방지
+  const [isDestroyProtectionChecked, setIsDestroyProtectionChecked] = useState(false);
+  const isWithinDestroyProtection = useMemo(() => {
+    return currentStarforce >= 15 && currentStarforce <= 17;
+  }, [currentStarforce]);
 
   const [records, setRecords] = useState<string[]>([]);
 
@@ -74,7 +81,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
   // 샤타포스 적용
   useEffect(() => {
-    simulator.applyDestroyReduction(isShiningStarforceChecked ? 0.3 : 0);
+    simulator.setShiningStarforce(isShiningStarforceChecked);
     updateStarforceState();
   }, [isShiningStarforceChecked, updateStarforceState]);
 
@@ -83,6 +90,12 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     simulator.applySuccessRateIncrease(isStarforceCatchChecked ? 0.05 : 0);
     updateStarforceState();
   }, [isStarforceCatchChecked, updateStarforceState]);
+
+  // 파괴방지 (15~17성 단계에서 가능)
+  useEffect(() => {
+    simulator.setDestroyProtection(isDestroyProtectionChecked);
+    updateStarforceState();
+  }, [isDestroyProtectionChecked, updateStarforceState]);
 
   useEffect(() => {
     const { item, cost, probabilities } = simulator.getState();
@@ -206,8 +219,8 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     }
 
     if (isAutoModeChecked) {
-      if (currentStarforce === parseInt(autoModeOption)) {
-        alert("현재 스타포스 수치가 목표치와 동일합니다.");
+      if (currentStarforce >= parseInt(autoModeOption)) {
+        alert("현재 스타포스 수치가 목표치 이상입니다.");
         return;
       }
       setIsAutoModePlaying(true);
@@ -321,7 +334,12 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                   />
                 </div>
                 <div className="flex text-white m-1 w-[25%] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
-                  <CheckBox disabled={isAutoModePlaying} label="파괴방지" />
+                  <CheckBox
+                    checked={isDestroyProtectionChecked}
+                    disabled={isAutoModePlaying}
+                    label="파괴방지"
+                    onChange={() => setIsDestroyProtectionChecked((prev) => !prev)}
+                  />
                 </div>
                 <div className="flex text-white m-1 w-[40%] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
                   <CheckBox
@@ -358,7 +376,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                   <p className="text-sm font-bold text-white">🪙 필요한 메소: {formattedCurrentCost}</p>
                 </div>
               </div>
-              <div className="flex flex-row justify-center">
+              <div className="flex flex-row justify-center text-white">
                 <button
                   onClick={throttleDoStarforce}
                   className="flex bg-gradient-to-b from-[#8fb843] to-[#73b12c]
@@ -368,8 +386,10 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                   {starforceButtonLabel}
                 </button>
                 <button
-                  className="flex bg-gradient-to-b from-[#b6b6b6] to-[#868686]
-                  hover:bg-gradient-to-b hover:from-[#979797] hover:to-[#6b6b6b]
+                  disabled={isAutoModePlaying}
+                  className="flex disabled:bg-gray-600/70 disabled:text-white/20
+                  enabled:bg-gradient-to-b from-[#b6b6b6] to-[#868686]
+                  enabled:hover:bg-gradient-to-b hover:from-[#979797] hover:to-[#6b6b6b]
                 rounded-md p-0.5 m-1 w-[120px] justify-center text-lg font-bold"
                   onClick={initializeStarforce}
                 >

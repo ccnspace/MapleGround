@@ -31,7 +31,7 @@ bg-black/70 border border-white/30 w-[300px]`}
         <div className="flex flex-col gap-1 bg-slate-900/70 rounded-md p-1 text-sm text-white">
           <p>💥 파괴: {destroyCount}회</p>
         </div>
-        <div className="flex break-words overflow-y-scroll h-[100%] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white">
+        <div className="flex break-words overflow-y-scroll h-[260px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white">
           {records.map((item, idx) => (
             <p key={idx}>·{item}</p>
           ))}
@@ -40,6 +40,10 @@ bg-black/70 border border-white/30 w-[300px]`}
           className="flex flex-col min-w-[214px] gap-0.5 text-[13px]
         bg-gradient-to-br from-slate-500 to-slate-600 rounded-md p-1.5"
         >
+          <p>
+            - 파괴방지는 <span className="text-lime-300 text-bold">15~17성</span>일 때만 적용되며{" "}
+            <span className="text-lime-300 text-bold">2배의 메소</span>가 필요합니다.
+          </p>
           <p>
             - <span className="text-lime-300 text-bold">22성 이상</span>부터는{" "}
             <span className="text-lime-300 text-bold">샤타포스가 적용되지 않습니다.</span>

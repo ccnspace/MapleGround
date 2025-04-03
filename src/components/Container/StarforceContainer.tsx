@@ -35,6 +35,9 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   const [isAutoModePlaying, setIsAutoModePlaying] = useState(false);
   const [isAutoModeChecked, setIsAutoModeChecked] = useState(false);
   const [autoModeOption, setAutoModeOption] = useState<string>(AUTO_MODE_OPTIONS[0].split("성")[0]);
+  const [isAutoModeRestartChecked, setIsAutoModeRestartChecked] = useState(false);
+  // const [hasAccomplished, setHasAccomplished] = useState(false);
+  const hasAccomplished = useRef(false);
   const initialStarforce = useRef<number>(0);
 
   // 스타캐치
@@ -197,7 +200,6 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
       const targetStarforce = autoModeOption;
       if (parseInt(item.starforce) >= parseInt(targetStarforce)) {
         setIsAutoModePlaying(false);
-        setIsAutoModeChecked(false);
         setRecords((prev) => [
           ...prev,
           `${
@@ -206,7 +208,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
             accumulatedCost
           )}메소 소모)`,
         ]);
-
+        hasAccomplished.current = true;
         resetAllStarforceState();
       }
     }
@@ -263,6 +265,25 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     }
     return () => clearTimeout(autoModeTimer.current);
   }, [isAutoModePlaying, doStarforce]);
+
+  const restartTimer = useRef<NodeJS.Timeout>();
+  useEffect(() => {
+    if (isAutoModeRestartChecked) {
+      if (!isAutoModePlaying && hasAccomplished.current) {
+        hasAccomplished.current = false;
+        restartTimer.current = setTimeout(() => {
+          simulator.setStarforce(0);
+          const { item } = simulator.getState();
+          setCurrentStarforce(parseInt(item.starforce));
+
+          setIsAutoModePlaying(true);
+        }, 600);
+      }
+    } else {
+      clearTimeout(restartTimer.current);
+    }
+    return () => clearTimeout(restartTimer.current);
+  }, [isAutoModeRestartChecked, isAutoModeChecked, isAutoModePlaying]);
 
   useEffect(() => {
     // 자동 모드 옵션이 변경되면 모든 상태를 초기화
@@ -335,6 +356,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                 </div>
                 <div className="flex text-white m-1 w-[25%] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
                   <CheckBox
+                    labelStyle={{ fontWeight: "bold" }}
                     checked={isDestroyProtectionChecked}
                     disabled={isAutoModePlaying}
                     label="파괴방지"
@@ -343,6 +365,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                 </div>
                 <div className="flex text-white m-1 w-[40%] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
                   <CheckBox
+                    labelStyle={{ fontWeight: "bold" }}
                     checked={isShiningStarforceChecked}
                     disabled={isAutoModePlaying}
                     label="샤타포스(파괴 30%↓)"
@@ -354,20 +377,31 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                 <div className="flex items-center justify-between mx-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
                   <div className="text-white">
                     <CheckBox
+                      labelStyle={{ fontWeight: "bold" }}
                       label="자동 모드"
                       disabled={isAutoModePlaying}
                       checked={isAutoModeChecked}
                       onChange={() => setIsAutoModeChecked((prev) => !prev)}
                     />
                   </div>
-                  <div className="flex items-center justify-center">
-                    <SelectBox
-                      style={{ maxWidth: "160px" }}
-                      disabled={!isAutoModeChecked || isAutoModePlaying}
-                      options={AUTO_MODE_OPTIONS}
-                      onSelect={handleSelect}
-                    />
-                    <span className="text-xs text-white ml-1">달성까지 자동 강화</span>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center">
+                      <SelectBox
+                        style={{ maxWidth: "160px" }}
+                        disabled={!isAutoModeChecked || isAutoModePlaying}
+                        options={AUTO_MODE_OPTIONS}
+                        onSelect={handleSelect}
+                      />
+                      <span className={`text-xs text-white ml-1 ${!isAutoModeChecked ? "opacity-50" : ""}`}>달성까지 자동 강화</span>
+                    </div>
+                    <div className="flex items-center text-white">
+                      <CheckBox
+                        label="달성 완료 후 0성부터 재시작"
+                        checked={isAutoModeRestartChecked}
+                        disabled={!isAutoModeChecked}
+                        onChange={() => setIsAutoModeRestartChecked((prev) => !prev)}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

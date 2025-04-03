@@ -60,19 +60,20 @@ bg-black/70 border border-white/30 w-[300px]`}
           </p>
         </div>
         <div className="flex flex-col gap-1 bg-slate-900/70 rounded-md p-1 text-[13px] text-white">
-          <p>💥 평균 파괴 횟수: {averageDestroyCount}회</p>
-          <p>💸 평균 메소 소모량: {averageAccumulatedCost}</p>
+          <p>💥 현재 파괴 횟수: {destroyCount}회</p>
+          <p>💥 [자동] 평균 파괴: {averageDestroyCount}회</p>
+          <p>💸 [자동] 평균 메소: {averageAccumulatedCost}</p>
         </div>
         <div
           ref={recordContainerRef}
-          className="flex break-words overflow-y-scroll h-[260px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white"
+          className="flex break-words overflow-y-scroll h-[240px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white"
         >
           {records.map((item, idx) => (
             <p key={idx}>·{makeRecordString(item)}</p>
           ))}
         </div>
         <div
-          className="flex flex-col min-w-[214px] gap-0.5 text-[13px]
+          className="flex flex-col min-w-[192px] gap-0.5 text-[13px]
         bg-gradient-to-br from-slate-500 to-slate-600 rounded-md p-1.5"
         >
           <p>

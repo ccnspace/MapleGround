@@ -461,7 +461,14 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
             <StarforceResultLabel result={result} isAutoModePlaying={isAutoModePlaying} />
           </div>
         </div>
-        <StarforceRecords records={records} clearRecords={() => setRecords([])} destroyCount={destroyCount} />
+        <StarforceRecords
+          records={records}
+          clearRecords={() => {
+            setRecords([]);
+            resetDestroyCount();
+          }}
+          destroyCount={destroyCount}
+        />
       </div>
       <div
         style={{ zIndex: 1001 }}

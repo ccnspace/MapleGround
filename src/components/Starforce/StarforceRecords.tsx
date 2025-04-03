@@ -1,12 +1,43 @@
+import { useEffect, useMemo, useRef } from "react";
+import type { StarforceRecord } from "@/components/Container/StarforceContainer";
+import { formatKoreanNumber } from "@/utils/formatKoreanNum";
+
 export const StarforceRecords = ({
   records,
   clearRecords,
   destroyCount,
 }: {
-  records: string[];
+  records: StarforceRecord[];
   clearRecords: () => void;
   destroyCount: number;
 }) => {
+  const recordContainerRef = useRef<HTMLDivElement>(null);
+
+  const averageDestroyCount = useMemo(() => {
+    if (records.length === 0) return "0";
+    const totalDestroyCount = records.reduce((acc, curr) => acc + curr.destroyCount, 0);
+    return (totalDestroyCount / records.length).toFixed(2);
+  }, [records]);
+
+  const averageAccumulatedCost = useMemo(() => {
+    if (records.length === 0) return "0";
+    const totalAccumulatedCost = records.reduce((acc, curr) => acc + curr.accumulatedCost, 0);
+    const averageAccumulatedCost = Math.floor(totalAccumulatedCost / records.length);
+    return formatKoreanNumber(averageAccumulatedCost);
+  }, [records]);
+
+  const makeRecordString = (record: StarforceRecord) => {
+    return `${record.initialStarforce}성 시작 -> ${record.targetStarforce}성 도달 (${record.attempts}번 시도, ${
+      record.destroyCount
+    }번 파괴, ${formatKoreanNumber(record.accumulatedCost)}메소 소모)`;
+  };
+
+  useEffect(() => {
+    if (recordContainerRef.current) {
+      recordContainerRef.current.scrollTop = recordContainerRef.current.scrollHeight;
+    }
+  }, [records]);
+
   return (
     <div
       className={`flex p-2 flex-col gap-1 text-white rounded-lg
@@ -28,12 +59,16 @@ bg-black/70 border border-white/30 w-[300px]`}
             </button>
           </p>
         </div>
-        <div className="flex flex-col gap-1 bg-slate-900/70 rounded-md p-1 text-sm text-white">
-          <p>💥 파괴: {destroyCount}회</p>
+        <div className="flex flex-col gap-1 bg-slate-900/70 rounded-md p-1 text-[13px] text-white">
+          <p>💥 평균 파괴 횟수: {averageDestroyCount}회</p>
+          <p>💸 평균 메소 소모량: {averageAccumulatedCost}</p>
         </div>
-        <div className="flex break-words overflow-y-scroll h-[260px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white">
+        <div
+          ref={recordContainerRef}
+          className="flex break-words overflow-y-scroll h-[260px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white"
+        >
           {records.map((item, idx) => (
-            <p key={idx}>·{item}</p>
+            <p key={idx}>·{makeRecordString(item)}</p>
           ))}
         </div>
         <div

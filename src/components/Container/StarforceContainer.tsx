@@ -16,6 +16,14 @@ import { StarforceRecords } from "../Starforce/StarforceRecords";
 
 const AUTO_MODE_OPTIONS = ["18성", "19성", "20성", "21성", "22성", "23성", "24성", "25성", "26성", "27성", "28성", "29성", "30성"];
 
+export type StarforceRecord = {
+  initialStarforce: number;
+  targetStarforce: number;
+  attempts: number;
+  destroyCount: number;
+  accumulatedCost: number;
+};
+
 export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
   const resetStarforceTarget = useStarforceStore((state) => state.resetStarforceTarget);
 
@@ -53,7 +61,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     return currentStarforce >= 15 && currentStarforce <= 17;
   }, [currentStarforce]);
 
-  const [records, setRecords] = useState<string[]>([]);
+  const [records, setRecords] = useState<StarforceRecord[]>([]);
 
   const starforceButtonLabel = useMemo(() => {
     if (isAutoModePlaying) {
@@ -202,11 +210,13 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
         setIsAutoModePlaying(false);
         setRecords((prev) => [
           ...prev,
-          `${
-            initialStarforce.current
-          }성 시작 -> ${targetStarforce}성 도달 (${attempts}번 시도 / ${destroyCount}번 파괴 / ${formatKoreanNumber(
-            accumulatedCost
-          )}메소 소모)`,
+          {
+            initialStarforce: initialStarforce.current,
+            targetStarforce: parseInt(targetStarforce),
+            attempts,
+            destroyCount,
+            accumulatedCost,
+          },
         ]);
         hasAccomplished.current = true;
         resetAllStarforceState();
@@ -255,7 +265,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
   useEffect(() => {
     if (isAutoModePlaying) {
-      const delay = 10;
+      const delay = 0;
       initialStarforce.current = parseInt(simulator.getState().item.starforce);
       autoModeTimer.current = setInterval(() => {
         doStarforce();
@@ -270,18 +280,18 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   useEffect(() => {
     if (isAutoModeRestartChecked) {
       if (!isAutoModePlaying && hasAccomplished.current) {
-        hasAccomplished.current = false;
         restartTimer.current = setTimeout(() => {
           simulator.setStarforce(0);
           const { item } = simulator.getState();
           setCurrentStarforce(parseInt(item.starforce));
 
           setIsAutoModePlaying(true);
-        }, 600);
+        }, 500);
       }
     } else {
       clearTimeout(restartTimer.current);
     }
+    hasAccomplished.current = false;
     return () => clearTimeout(restartTimer.current);
   }, [isAutoModeRestartChecked, isAutoModeChecked, isAutoModePlaying]);
 

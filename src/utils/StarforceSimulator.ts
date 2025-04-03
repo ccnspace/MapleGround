@@ -114,7 +114,7 @@ export class StarforceSimulator {
     const rate = this.probabilities;
     const rand = Math.random();
 
-    console.log("[simulate] : ", rate, "/ [rand]: ", rand);
+    // console.log("[simulate] : ", rate, "/ [rand]: ", rand);
     let result: StarforceResult;
 
     if (rand < rate.success) {

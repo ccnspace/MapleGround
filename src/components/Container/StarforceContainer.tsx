@@ -15,6 +15,7 @@ import { SelectBox } from "../SelectBox";
 import { StarforceRecords } from "../Starforce/StarforceRecords";
 import { openModal } from "@/utils/openModal";
 import { useModalStore } from "@/stores/modal";
+import { RadioButtonGroup } from "../RadioButtonGroup";
 
 const MVP_OPTIONS = ["실버(메소 3%↓)", "골드(메소 5%↓)", "레드(메소 10%↓)"];
 const getMaxStarforce = (baseEquipmentLevel: number) => {
@@ -69,9 +70,13 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   const [isAutoModePlaying, setIsAutoModePlaying] = useState(false);
   const [isAutoModeChecked, setIsAutoModeChecked] = useState(false);
   const [autoModeOption, setAutoModeOption] = useState<string>(autoModeOptions[0]);
-  const [isAutoModeRestartChecked, setIsAutoModeRestartChecked] = useState(false);
   const hasAccomplished = useRef(false);
   const initialStarforce = useRef<number>(0);
+  const [autoModeRestartOption, setAutoModeRestartOption] = useState<"stop" | "toZero" | "toOriginal">("stop");
+
+  const handleAutoModeRestartChange = (value: string) => {
+    setAutoModeRestartOption(value as "stop" | "toZero" | "toOriginal");
+  };
 
   // 스타캐치
   const [isStarforceCatchChecked, setIsStarforceCatchChecked] = useState(false);
@@ -160,6 +165,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   const [result, setResult] = useState<StarforceResult | null>(null);
   const [showDetail, setShowDetail] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const showBadge = currentStarforce >= 22;
 
   const handleMouseOverOnImage = () => {
     setShowDetail(true);
@@ -302,7 +308,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     if (isAutoModeChecked) {
       if (currentStarforce >= parseInt(autoModeOption)) {
         openModal({
-          type: "confirm",
+          type: "alert",
           message: `현재 스타포스 수치가 목표치 이상입니다.`,
         });
         return;
@@ -338,6 +344,8 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
   // 자동 모드
   const autoModeTimer = useRef<NodeJS.Timeout>();
+  // 자동모드 재시작
+  const restartTimer = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     if (isAutoModePlaying) {
@@ -352,24 +360,32 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     return () => clearTimeout(autoModeTimer.current);
   }, [isAutoModePlaying, doStarforce]);
 
-  const restartTimer = useRef<NodeJS.Timeout>();
   useEffect(() => {
-    if (isAutoModeRestartChecked) {
+    if (autoModeRestartOption === "stop") {
+      clearTimeout(restartTimer.current);
+    } else {
       if (!isAutoModePlaying && hasAccomplished.current) {
         restartTimer.current = setTimeout(() => {
-          simulator.setStarforce(0);
-          const { item } = simulator.getState();
-          setCurrentStarforce(parseInt(item.starforce));
+          const targetStarforce = autoModeRestartOption === "toZero" ? 0 : parseInt(targetItem.starforce);
 
-          setIsAutoModePlaying(true);
+          if (targetStarforce >= currentStarforce) {
+            openModal({
+              type: "alert",
+              message: `기존의 스타포스 수치보다 목표치를 높게 설정해 주세요.\n기존 스타포스 수치: ${targetItem.starforce}성\n목표 스타포스 수치: ${autoModeOption}성`,
+            });
+          } else {
+            simulator.setStarforce(targetStarforce);
+
+            const { item } = simulator.getState();
+            setCurrentStarforce(parseInt(item.starforce));
+            setIsAutoModePlaying(true);
+          }
         }, 500);
       }
-    } else {
-      clearTimeout(restartTimer.current);
     }
     hasAccomplished.current = false;
     return () => clearTimeout(restartTimer.current);
-  }, [isAutoModeRestartChecked, isAutoModeChecked, isAutoModePlaying]);
+  }, [autoModeRestartOption, currentStarforce, autoModeOption, targetItem.starforce, isAutoModePlaying]);
 
   useEffect(() => {
     // 자동 모드 옵션이 변경되면 유저의 모든 스타포스 상태를 초기화
@@ -400,7 +416,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                 <div
                   onMouseOver={handleMouseOverOnImage}
                   onMouseLeave={handleMouseLeaveOnImage}
-                  className="flex items-center justify-center bg-gradient-to-b from-[#3ac4ee] to-[#007a99] rounded-md p-1 w-[156px] h-[156px] m-1"
+                  className="relative flex items-center justify-center bg-gradient-to-b from-[#3ac4ee] to-[#007a99] rounded-md p-1 w-[156px] h-[156px] m-1"
                 >
                   <div className="flex w-[130px] h-[130px] items-center justify-center border-dashed border-white border-2 rounded-md">
                     {item_icon && (
@@ -424,6 +440,16 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                       <NormalContainer item={currentTarget} enableItemMenu={false} />
                     </div>
                   )}
+                  {showBadge && (
+                    <div
+                      className="absolute border border-t-transparent border-b-yellow-300 border-l-yellow-300 border-r-yellow-300
+                      text-xs top-[0%] left-[3%] bg-black rounded-b-md p-1
+                      drop-shadow-[0_0_10px_rgba(0,0,0,0.3)]
+                  text-yellow-300 font-bold"
+                    >
+                      22성+
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-grow overflow-y-scroll bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-3 m-1">
                   {currentProbabilities && (
@@ -437,7 +463,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                 </div>
               </div>
               {/** 확률 메뉴 */}
-              <div className="flex flex-row flew-grow w-full">
+              <div className="flex flex-row flew-grow w-full bg-white/10 rounded-md">
                 <div className="flex text-white m-1 w-[30%] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
                   <CheckBox
                     checked={isStarforceCatchChecked}
@@ -466,7 +492,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                 </div>
               </div>
               {/** 할인 메뉴 */}
-              <div className="flex flex-row flew-grow w-full">
+              <div className="flex flex-row flew-grow w-full bg-white/10 rounded-md">
                 <div className="flex items-center text-white m-1 w-[35%] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
                   <CheckBox
                     labelStyle={{ fontWeight: "bold" }}
@@ -500,8 +526,8 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                   />
                 </div>
               </div>
-              <div className="flex flex-row flew-grow w-full">
-                <div className="flex items-center justify-between mx-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
+              <div className="flex flex-row flew-grow w-full bg-white/10 rounded-md">
+                <div className="flex items-center m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
                   <div className="text-white">
                     <CheckBox
                       labelStyle={{ fontWeight: "bold" }}
@@ -511,7 +537,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                       onChange={() => setIsAutoModeChecked((prev) => !prev)}
                     />
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 ml-[60px]">
                     <div className="flex items-center">
                       <SelectBox
                         style={{ maxWidth: "160px" }}
@@ -521,13 +547,20 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                       />
                       <span className={`text-xs text-white ml-1 ${!isAutoModeChecked ? "opacity-50" : ""}`}>달성까지 자동 강화</span>
                     </div>
-                    <div className="flex items-center text-white">
-                      <CheckBox
-                        label="달성 완료 후 0성부터 재시작"
-                        checked={isAutoModeRestartChecked}
-                        disabled={!isAutoModeChecked}
-                        onChange={() => setIsAutoModeRestartChecked((prev) => !prev)}
-                      />
+                    <div className={`flex flex-col ml-1 gap-0.5 ${!isAutoModeChecked ? "opacity-50" : ""}`}>
+                      <p className="text-xs text-white">↪ 달성 완료 후</p>
+                      <div className="flex items-center gap-2 text-white">
+                        <RadioButtonGroup
+                          name="autoModeRestart"
+                          defaultvalue="stop"
+                          options={[
+                            { label: "종료", value: "stop" },
+                            { label: "0성부터 재시작", value: "toZero" },
+                            { label: "기존 수치부터 재시작", value: "toOriginal" },
+                          ]}
+                          onChange={handleAutoModeRestartChange}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

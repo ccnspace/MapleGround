@@ -55,7 +55,7 @@ export const Modal = () => {
          bg-white dark:bg-[#2c2e38] shadow rounded-lg gap-2 text-center
       px-3 pt-6 pb-6"
       >
-        <p className="flex whitespace-pre-wrap text-[18px] pt-2 pb-2 justify-center font-medium">{message}</p>
+        <p className="flex whitespace-pre-wrap text-[16px] pt-2 pb-2 justify-center font-medium">{message}</p>
         <div className="flex flex-row gap-2 justify-center">
           {type === "confirm" && <ModalButton onClick={handleCancelClick}>{cancelLabel}</ModalButton>}
           <ModalButton onClick={handleConfirmClick}>{confirmLabel}</ModalButton>

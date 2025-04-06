@@ -43,7 +43,7 @@ export const StarforceRecords = ({
       className={`flex p-2 flex-col gap-1 text-white rounded-lg
 bg-black/70 border border-white/30 w-[300px]`}
     >
-      <div className="flex flex-col gap-1 h-full">
+      <div className="flex flex-col gap-1.5 h-full">
         <div className="flex flex-col items-center">
           <p
             className="flex flex-row justify-between items-center text-sm w-full font-bold
@@ -66,7 +66,7 @@ bg-black/70 border border-white/30 w-[300px]`}
         </div>
         <div
           ref={recordContainerRef}
-          className="flex break-words overflow-y-scroll h-[240px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white"
+          className="flex break-words overflow-y-scroll h-[256px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white"
         >
           {records.map((item, idx) => (
             <p key={idx}>·{makeRecordString(item)}</p>

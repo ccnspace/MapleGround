@@ -91,7 +91,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
   const starforceButtonLabel = useMemo(() => {
     if (isAutoModePlaying) {
-      return "자동 강화 OFF";
+      return "OFF";
     }
     return "+ 강화(D키)";
   }, [isAutoModePlaying]);
@@ -231,7 +231,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
   const doStarforce = useCallback(() => {
     simulator.simulate();
-    const { item, cost, probabilities, result, accumulatedCost, attempts, destroyCount } = simulator.getState();
+    const { item, cost, probabilities, result, accumulatedCost, attempts, destroyCount, discountRatio } = simulator.getState();
 
     setCurrentStarforce(parseInt(item.starforce));
     setCurrentCost(cost);
@@ -240,6 +240,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     setAccumulatedCost(accumulatedCost);
     setAttempts(attempts);
     setDestroyCount(destroyCount);
+    setDiscountRate((1 - discountRatio) * 100);
 
     if (timerRef.current) {
       clearTimeout(timerRef.current);

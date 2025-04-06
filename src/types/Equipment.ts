@@ -22,7 +22,7 @@ export type TotalItemOption = ItemOption & {
   damage: string;
   equipment_level_decrease: number;
 };
-type ExceptionalOption = {
+export type ExceptionalOption = {
   str: string;
   dex: string;
   int: string;

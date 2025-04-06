@@ -36,11 +36,11 @@ export const SideBar = () => {
   return (
     <div className="flex-shrink-0 w-96 font-bold text-lg border-r border-r-slate-200 dark:border-r-white/10">
       <ProfileWrapper />
-      <ul className="text-black">
+      {/* <ul className="text-black">
         {sidebarItem.map((item, i) => (
           <SideBarItem key={i} item={item} />
         ))}
-      </ul>
+      </ul> */}
     </div>
   );
 };

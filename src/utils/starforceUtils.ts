@@ -1,4 +1,8 @@
-const roundToTens = (num: number) => {
+export const roundToHundred = (num: number) => {
+  return Math.round(num / 100) * 100;
+};
+
+export const roundToTens = (num: number) => {
   return Math.round(num / 10) * 10;
 };
 
@@ -32,7 +36,7 @@ export const getStarforceCost = (starforce: number, itemLevel: number) => {
 
   const divisor = starforceDivisors[starforce] || 200;
   const multiplier = starforce < 9 ? starforce + 1 : Math.pow(starforce + 1, 2.7);
-  return roundToTens(baseCost + (itemLevelCubed * multiplier) / divisor);
+  return baseCost + (itemLevelCubed * multiplier) / divisor;
 };
 
 export interface StarforceProbability {
@@ -57,7 +61,7 @@ export const starforceProbabilities: { [key: number]: StarforceProbability } = {
   12: { success: 0.4, fail: 0.6 },
   13: { success: 0.35, fail: 0.65 },
   14: { success: 0.3, fail: 0.7 },
-  15: { success: 0.3, fail: 0.679 },
+  15: { success: 0.3, fail: 0.679, destroy: 0.021 },
   16: { success: 0.3, fail: 0.679, destroy: 0.021 },
   17: { success: 0.15, fail: 0.782, destroy: 0.068 },
   18: { success: 0.15, fail: 0.782, destroy: 0.068 },

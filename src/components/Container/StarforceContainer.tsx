@@ -14,6 +14,7 @@ import { useThrottle } from "@/hooks/useThrottle";
 import { SelectBox } from "../SelectBox";
 import { StarforceRecords } from "../Starforce/StarforceRecords";
 import { openModal } from "@/utils/openModal";
+import { useModalStore } from "@/stores/modal";
 
 const MVP_OPTIONS = ["실버(메소 3%↓)", "골드(메소 5%↓)", "레드(메소 10%↓)"];
 const getMaxStarforce = (baseEquipmentLevel: number) => {
@@ -195,18 +196,27 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
     const inputStarforce = parseInt(input);
 
-    if (inputStarforce >= 30) {
-      alert("30성 이상은 설정할 수 없습니다.");
+    if (isNaN(inputStarforce)) {
+      openModal({
+        type: "confirm",
+        message: `숫자를 입력해주세요.`,
+      });
       return;
     }
 
-    if (isNaN(inputStarforce)) {
-      alert("숫자를 입력해주세요.");
+    if (inputStarforce >= 30) {
+      openModal({
+        type: "confirm",
+        message: `30성 이상은 설정할 수 없습니다.`,
+      });
       return;
     }
 
     if (inputStarforce < 0) {
-      alert("0 이상의 숫자를 입력해주세요.");
+      openModal({
+        type: "confirm",
+        message: `0 이상의 숫자를 입력해주세요.`,
+      });
       return;
     }
 
@@ -291,7 +301,10 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
     if (isAutoModeChecked) {
       if (currentStarforce >= parseInt(autoModeOption)) {
-        alert("현재 스타포스 수치가 목표치 이상입니다.");
+        openModal({
+          type: "confirm",
+          message: `현재 스타포스 수치가 목표치 이상입니다.`,
+        });
         return;
       }
       setIsAutoModePlaying(true);
@@ -311,6 +324,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
         throttleDoStarforce();
       }
       if (e.key === "Escape") {
+        if (useModalStore.getState().modal) return;
         resetStarforceTarget();
       }
     };

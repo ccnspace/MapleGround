@@ -50,8 +50,8 @@ export const Modal = () => {
   return (
     <>
       <div
-        style={{ zIndex: 2000 }}
-        className="flex shrink-0 w-[350px] absolute left-[45%] top-1/3 flex-col
+        style={{ zIndex: 11000 }}
+        className="flex shrink-0 w-[350px] absolute left-[45%] top-[35%] flex-col
          bg-white dark:bg-[#2c2e38] shadow rounded-lg gap-2 text-center
       px-3 pt-6 pb-6"
       >
@@ -61,7 +61,7 @@ export const Modal = () => {
           <ModalButton onClick={handleConfirmClick}>{confirmLabel}</ModalButton>
         </div>
       </div>
-      <DimmedLayer />
+      <DimmedLayer style={{ zIndex: 10000 }} />
     </>
   );
 };

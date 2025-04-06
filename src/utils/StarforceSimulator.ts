@@ -1,5 +1,5 @@
 import { ItemEquipment } from "@/types/Equipment";
-import { getStarforceCost, getStarforceProbability, StarforceProbability } from "./starforceUtils";
+import { getStarforceCost, getStarforceProbability, StarforceProbability, roundToTens, roundToHundred } from "./starforceUtils";
 export type StarforceResult = "success" | "fail" | "destroy";
 
 interface Item {
@@ -77,9 +77,9 @@ export class StarforceSimulator {
   }
 
   private getRealCost() {
-    const baseCost = getStarforceCost(parseInt(this.item.starforce), this.item.item_base_option.base_equipment_level);
+    const baseCost = roundToHundred(getStarforceCost(parseInt(this.item.starforce), this.item.item_base_option.base_equipment_level));
     const discountCost = baseCost * this.getCostDiscountRatio();
-    return discountCost + (this.isDestroyProtectionEnabled() ? baseCost : 0);
+    return roundToTens(discountCost + (this.isDestroyProtectionEnabled() ? baseCost : 0));
   }
 
   private getRealProbabilities() {

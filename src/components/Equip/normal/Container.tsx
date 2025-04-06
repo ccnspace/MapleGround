@@ -56,7 +56,7 @@ export const NormalContainer = ({ item, enableItemMenu = true }: Props) => {
   const canRollAdditional = !!additional_potential_option_grade && rollableItem.includes(item_equipment_slot);
   const canRollCube = canRollPotential || canRollAdditional;
   const canStarforcePart = starforceableItem.includes(item_equipment_slot) || starforceableItem.includes(item_equipment_part);
-  const canStarforce = canStarforcePart && !isAmazingForce && parseInt(item.starforce || "0") >= 0;
+  const canStarforce = canStarforcePart && !isAmazingForce && parseInt(item.starforce || "0") > 0;
   const canShowExceptionalOption = !!item_exceptional_option && item_exceptional_option.exceptional_upgrade > 0;
 
   const handleRollCubeClick = (e: MouseEvent, cubeType: CubeType) => {

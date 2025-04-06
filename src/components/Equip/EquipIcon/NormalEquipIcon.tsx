@@ -5,7 +5,21 @@ import { ItemEquipment } from "@/types/Equipment";
 import { StarIcon } from "../../svg/StarIcon";
 import { ItemIcon } from "./ItemIcon";
 import { EquipDetailCard } from "../EquiqDetailCard";
-import { CubeSimulator } from "@/utils/CubeSimulator";
+
+const SeedRingBadge = ({ item }: { item: ItemEquipment }) => {
+  const seedRingLevel = item?.special_ring_level;
+  if (!seedRingLevel) return null;
+
+  return (
+    <div
+      className="absolute flex items-center shadow top-0 left-0 font-medium rounded-sm
+          text-xs px-0.5 bg-black/60 text-white"
+    >
+      <span className="text-yellow-300">LV</span>
+      {seedRingLevel}
+    </div>
+  );
+};
 
 const StarForceBadge = ({ item }: { item: ItemEquipment }) => {
   const starforce = parseInt(item?.starforce);
@@ -77,6 +91,7 @@ export const NormalEquipIcon = memo(({ name, equipData, customClass, isSelected 
       {equipData?.[name] && (
         <>
           <StarForceBadge item={equipData[name]} />
+          <SeedRingBadge item={equipData[name]} />
           <ItemIcon item={equipData[name]} />
         </>
       )}

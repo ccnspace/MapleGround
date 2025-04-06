@@ -73,22 +73,28 @@ bg-black/70 border border-white/30 w-[300px]`}
           ))}
         </div>
         <div
-          className="flex flex-col min-w-[192px] gap-0.5 text-[13px]
+          className="flex flex-col min-w-[192px] gap-1.5 text-[13px]
         bg-gradient-to-br from-slate-500 to-slate-600 rounded-md p-1.5"
         >
           <p>
-            - 파괴방지는 <span className="text-lime-300 text-bold">15~17성</span>일 때만 적용되며{" "}
-            <span className="text-lime-300 text-bold">2배의 메소</span>가 필요합니다.
+            · <span className="bg-slate-700 rounded-md p-1">스타캐치</span>는 성공 확률을{" "}
+            <span className="text-lime-300 text-bold">1.05배</span> 증가시킵니다.
           </p>
           <p>
-            - <span className="text-lime-300 text-bold">22성 이상</span>부터는{" "}
-            <span className="text-lime-300 text-bold">샤타포스가 적용되지 않습니다.</span>
+            · <span className="bg-slate-700 rounded-md p-1">파괴방지</span>는 <span className="text-lime-300 text-bold">15~17성</span>일
+            때만 적용되며 <span className="text-lime-300 text-bold">2배의 메소</span>가 필요합니다. 추가되는 메소는 할인되지 않습니다.
           </p>
           <p>
-            - 스타캐치는 성공 확률을 <span className="text-lime-300 text-bold">1.05배</span> 증가시킵니다.
+            · <span className="bg-slate-700 rounded-md p-1">샤탸포스</span>는 <span className="text-lime-300 text-bold">22성 이상</span>
+            부터는 <span className="text-lime-300 text-bold">적용되지 않습니다.</span>
           </p>
           <p>
-            - 자동 모드 상태에서 <b>목표 스타포스 수치를 변경</b>하거나 <b>목표치 달성 시</b> 누적 메소, 시도 횟수, 파괴 횟수가
+            · <span className="bg-slate-700 rounded-md p-1">MVP/PC방 할인</span>은{" "}
+            <span className="text-lime-300 text-bold">18성 이상</span>부터는{" "}
+            <span className="text-lime-300 text-bold">적용되지 않습니다.</span>
+          </p>
+          <p>
+            · <b>목표 스타포스 수치를 변경</b>하거나 <b>자동 모드 상태에서 목표치 달성 시</b> 누적 메소, 시도 횟수, 파괴 횟수가
             초기화됩니다.
           </p>
         </div>

@@ -10,13 +10,18 @@ interface Item {
 
 interface Constructor {
   item: ItemEquipment;
-  costDiscount: number;
+}
+
+interface DiscountInfo {
+  sundayDiscount: number;
+  pcDiscount: number;
+  mvpDiscount: number;
 }
 
 const DESTROY_REDUCTION_RATE = 0.3;
 export class StarforceSimulator {
   private item: ItemEquipment;
-  private costDiscount: number;
+  private discountInfo: DiscountInfo;
   private currentCost: number;
   private accumulatedCost: number;
   private probabilities: StarforceProbability;
@@ -29,7 +34,7 @@ export class StarforceSimulator {
 
   constructor(props: Constructor) {
     this.item = { ...props.item };
-    this.costDiscount = props.costDiscount;
+    this.discountInfo = { sundayDiscount: 0, pcDiscount: 0, mvpDiscount: 0 };
 
     this.accumulatedCost = 0;
     this.attempts = 0;
@@ -42,8 +47,9 @@ export class StarforceSimulator {
     this.result = null;
   }
 
-  applyCostDiscount(discount: number) {
-    this.costDiscount = 1 - discount;
+  applyCostDiscount(discountInfo: DiscountInfo) {
+    this.discountInfo = discountInfo;
+    this.currentCost = this.getRealCost();
   }
 
   applySuccessRateIncrease(increase: number) {
@@ -72,7 +78,8 @@ export class StarforceSimulator {
 
   private getRealCost() {
     const baseCost = getStarforceCost(parseInt(this.item.starforce), this.item.item_base_option.base_equipment_level);
-    return baseCost + (this.isDestroyProtectionEnabled() ? baseCost : 0);
+    const discountCost = baseCost * this.getCostDiscountRatio();
+    return discountCost + (this.isDestroyProtectionEnabled() ? baseCost : 0);
   }
 
   private getRealProbabilities() {
@@ -109,8 +116,18 @@ export class StarforceSimulator {
     } satisfies StarforceProbability;
   }
 
+  private getCostDiscountRatio() {
+    const { sundayDiscount, pcDiscount, mvpDiscount } = this.discountInfo;
+
+    const isPcDiscountEnabled = parseInt(this.item.starforce) <= 17;
+    const isMvpDiscountEnabled = parseInt(this.item.starforce) <= 17;
+    const realPcDiscount = isPcDiscountEnabled ? pcDiscount : 0;
+    const realMvpDiscount = isMvpDiscountEnabled ? mvpDiscount : 0;
+    return (1 - (realPcDiscount + realMvpDiscount)) * (1 - sundayDiscount);
+  }
+
   simulate() {
-    const cost = Math.floor(this.currentCost * this.costDiscount);
+    const cost = this.getRealCost();
     const rate = this.probabilities;
     const rand = Math.random();
 
@@ -146,12 +163,14 @@ export class StarforceSimulator {
       result: this.result,
       attempts: this.attempts,
       destroyCount: this.destroyCount,
+      discountInfo: this.discountInfo,
+      discountRatio: this.getCostDiscountRatio(),
     };
   }
 
   setStarforce(starforce: number) {
     this.item.starforce = starforce.toString();
-    this.currentCost = getStarforceCost(starforce, this.item.item_base_option.base_equipment_level);
+    this.currentCost = this.getRealCost();
     this.probabilities = this.getRealProbabilities();
   }
 

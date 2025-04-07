@@ -6,7 +6,7 @@ import Image from "next/image";
 import { NormalContainer } from "@/components/Equip/normal/Container";
 import { type StarforceResult, StarforceSimulator } from "@/utils/StarforceSimulator";
 import { ItemEquipment } from "@/types/Equipment";
-import { StarforceProbability } from "@/utils/starforceUtils";
+import { getStarforceUpgradeOptions, StarforceProbability } from "@/utils/starforceUtils";
 import { StarforceDetail } from "@/components/Starforce/StarforceDetail";
 import { StarforceResultLabel } from "@/components/Starforce/StarforceResultLabel";
 import { formatKoreanNumber } from "@/utils/formatKoreanNum";
@@ -92,6 +92,21 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   const [isMvpDiscountChecked, setIsMvpDiscountChecked] = useState(false);
   const [mvpOption, setMvpOption] = useState(MVP_OPTIONS[0]);
   const [discountRate, setDiscountRate] = useState(0);
+  // 스타포스 증가옵션
+  const starforceUpgradeOptions = useMemo(() => {
+    const { statUpgradeOptions, powerUpgradeOptions } = getStarforceUpgradeOptions({
+      itemLevel: targetItem.item_base_option.base_equipment_level,
+      itemSlot: targetItem.item_equipment_slot,
+      starforce: currentStarforce,
+    });
+
+    const statResult = statUpgradeOptions !== 0 ? `STAT : +${statUpgradeOptions}` : "";
+    const powerResult = powerUpgradeOptions !== 0 ? `공격력 : +${powerUpgradeOptions}` : "";
+    const magicResult = powerUpgradeOptions !== 0 ? `마력 : +${powerUpgradeOptions}` : "";
+    const results = [statResult, powerResult, magicResult].filter(Boolean).join("\n");
+
+    return results;
+  }, [targetItem, currentStarforce]);
 
   const [records, setRecords] = useState<StarforceRecord[]>([]);
 
@@ -167,13 +182,13 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const showBadge = currentStarforce >= 22;
 
-  const handleMouseOverOnImage = () => {
-    setShowDetail(true);
-  };
+  // const handleMouseOverOnImage = () => {
+  //   setShowDetail(true);
+  // };
 
-  const handleMouseLeaveOnImage = () => {
-    setShowDetail(false);
-  };
+  // const handleMouseLeaveOnImage = () => {
+  //   setShowDetail(false);
+  // };
 
   const resetDestroyCount = () => {
     setDestroyCount(0);
@@ -414,8 +429,8 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
               </p>
               <div className="flex flex-row">
                 <div
-                  onMouseOver={handleMouseOverOnImage}
-                  onMouseLeave={handleMouseLeaveOnImage}
+                  // onMouseOver={handleMouseOverOnImage}
+                  // onMouseLeave={handleMouseLeaveOnImage}
                   className="relative flex items-center justify-center bg-gradient-to-b from-[#3ac4ee] to-[#007a99] rounded-md p-1 w-[156px] h-[156px] m-1"
                 >
                   <div className="flex w-[130px] h-[130px] items-center justify-center border-dashed border-white border-2 rounded-md">
@@ -431,7 +446,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                       />
                     )}
                   </div>
-                  {currentTarget && showDetail && (
+                  {/* {currentTarget && showDetail && (
                     <div
                       style={{ zIndex: "10003" }}
                       className="absolute top-[20%] left-[6%] flex flex-col min-w-80 max-w-80 bg-slate-950/90 dark:bg-[#121212]/90
@@ -439,7 +454,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                     >
                       <NormalContainer item={currentTarget} enableItemMenu={false} />
                     </div>
-                  )}
+                  )} */}
                   {showBadge && (
                     <div
                       className="absolute border border-t-transparent border-b-yellow-300 border-l-yellow-300 border-r-yellow-300
@@ -451,13 +466,13 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                     </div>
                   )}
                 </div>
-                <div className="flex flex-grow overflow-y-scroll bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-3 m-1">
+                <div className="flex flex-grow overflow-y-scroll max-h-[156px] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-3 m-1">
                   {currentProbabilities && (
                     <StarforceDetail
                       isMaxStarforce={isMaxStarforce}
                       starforce={currentStarforce}
-                      currentCost={currentCost}
                       currentProbabilities={currentProbabilities}
+                      starforceUpgradeOptions={starforceUpgradeOptions}
                     />
                   )}
                 </div>

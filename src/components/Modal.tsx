@@ -49,18 +49,20 @@ export const Modal = () => {
 
   return (
     <>
-      <div
-        style={{ zIndex: 11000 }}
-        className="flex shrink-0 w-[350px] absolute left-[45%] top-[35%] flex-col
+      <div className="modal_container">
+        <div
+          className="modal flex shrink-0 w-[350px] absolute left-[45%] top-[35%] flex-col
          bg-white dark:bg-[#2c2e38] shadow rounded-lg gap-2 text-center
       px-3 pt-6 pb-6"
-      >
-        <p className="flex whitespace-pre-wrap text-[16px] pt-2 pb-2 justify-center font-medium">{message}</p>
-        <div className="flex flex-row gap-2 justify-center">
-          {type === "confirm" && <ModalButton onClick={handleCancelClick}>{cancelLabel}</ModalButton>}
-          <ModalButton onClick={handleConfirmClick}>{confirmLabel}</ModalButton>
+        >
+          <p className="flex whitespace-pre-wrap text-[16px] pt-2 pb-2 justify-center font-medium">{message}</p>
+          <div className="flex flex-row gap-2 justify-center">
+            {type === "confirm" && <ModalButton onClick={handleCancelClick}>{cancelLabel}</ModalButton>}
+            <ModalButton onClick={handleConfirmClick}>{confirmLabel}</ModalButton>
+          </div>
         </div>
       </div>
+
       <DimmedLayer style={{ zIndex: 10000 }} />
     </>
   );

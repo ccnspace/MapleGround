@@ -218,7 +218,7 @@ export const CubeContainer = () => {
 
   return (
     <>
-      <div style={{ zIndex: 1002 }} className="flex fixed top-[30%] left-[40%]">
+      <div style={{ zIndex: 1002 }} className="cube_container flex fixed top-[30%] left-[40%]">
         <div
           className={`flex p-1 flex-col items-center gap-2 text-white rounded-lg
              bg-black/70 border ${isMiracleChecked ? "border-lime-300/70" : "border-white/30"} p-2 align-center 
@@ -227,8 +227,15 @@ export const CubeContainer = () => {
           {isMiracleChecked ? (
             <p className="text-sm font-bold text-lime-400">{`✨ 지금은 미라클 타임!! (${cubeTitle})✨`}</p>
           ) : (
-            <p className="text-sm font-bold">
+            <p className="text-sm font-bold flex justify-between">
               <span className="text-cyan-400">{cubeTitle}</span>을 재설정합니다.
+              <button
+                onClick={resetCube}
+                className="text-xs px-1 pt-0.5 pb-0.5
+               bg-slate-700 hover:bg-slate-900 rounded-md p-0.5 font-bold"
+              >
+                닫기
+              </button>
             </p>
           )}
           <div className="flex flex-col p-1 rounded-lg bg-gradient-to-b from-gray-200 to-gray-300 gap-2">

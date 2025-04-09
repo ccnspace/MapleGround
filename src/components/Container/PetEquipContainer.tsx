@@ -7,6 +7,7 @@ import Image from "next/image";
 import { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Divider } from "../Equip/Divider";
 import { useClickOutside } from "@/hooks/useClickOutside";
+import { ContainerWrapper } from "./ContainerWrapper";
 
 type PetInfo = {
   name: string | null;
@@ -188,10 +189,7 @@ export const PetEquipContainer = () => {
   }, [petEquip]);
 
   return (
-    <div
-      className="flex shrink-0 min-w-96 flex-col bg-slate-100 dark:bg-[#1f2024] px-3 pt-3 pb-3
-    rounded-lg gap-1 min-h-72"
-    >
+    <ContainerWrapper>
       {petInfos.length > 0 ? (
         <div className="flex flex-col justify-center">
           <div className="flex justify-between mb-2">
@@ -221,6 +219,6 @@ export const PetEquipContainer = () => {
           <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60">펫 정보가 없습니다.</p>
         </div>
       )}
-    </div>
+    </ContainerWrapper>
   );
 };

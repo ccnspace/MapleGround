@@ -2,7 +2,7 @@
 
 import { EquipContainer } from "@/components/Container/EquipContainer";
 import { AbilityContainer } from "@/components/Container/AbilityContainer";
-import { StatContainer } from "@/components/StatContainer";
+import { StatContainer } from "@/components/Container/StatContainer";
 import { PetEquipContainer } from "@/components/Container/PetEquipContainer";
 import { ChartContainer } from "@/components/Container/ChartContainer";
 import { DimmedLayer } from "../DimmedLayer";

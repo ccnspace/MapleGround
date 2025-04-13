@@ -36,7 +36,7 @@ export const CubeDisplay = ({ cubeType, grade, options, label, showSelectButton,
   }, [options]);
 
   return (
-    <div className="flex flex-col w-[280px] rounded-md bg-sky-400">
+    <div className="flex flex-col w-[340px] p-1 border border-white/20 rounded-md bg-gradient-to-b from-[#223a49]/50 to-[#232c30]/40">
       <div className="flex flex-row items-center justify-between">
         <p className="text-sm px-1 pt-1 pb-0.5 font-bold [text-shadow:_1px_2px_4px_rgb(0_0_0/_0.4)]">{label}</p>
         {showSelectButton && (
@@ -50,8 +50,8 @@ export const CubeDisplay = ({ cubeType, grade, options, label, showSelectButton,
           </button>
         )}
       </div>
-      <div className="flex flex-col gap-0.5 bg-gradient-to-br from-slate-800 to-slate-900 m-1 text-sm rounded-md min-h-[96px]">
-        {grade && <p className={`flex justify-center mb-1 font-medium rounded-tl-md rounded-tr-md ${GRADE_BACKGROUNDS[grade]}`}>{grade}</p>}
+      <div className="flex flex-col gap-0.5 p-1.5 bg-gradient-to-b from-black/30 to-slate-800/30 m-1 text-sm rounded-md h-[108px]">
+        {grade && <p className={`flex justify-center mb-1 font-medium rounded-sm ${GRADE_BACKGROUNDS[grade]}`}>{grade}</p>}
         {options?.map((option, idx) => (
           <p key={idx} className={`font-medium px-2 text-sm ${fadeIn ? "fade-in" : ""}`}>
             {cubeType === "additional" ? `+ ${option}` : option}

@@ -66,7 +66,7 @@ bg-black/70 border border-white/30 w-[300px]`}
         </div>
         <div
           ref={recordContainerRef}
-          className="max-[600px]:h-[200px] flex break-words overflow-y-scroll h-[256px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white"
+          className="max-[600px]:h-[200px] flex break-words overflow-y-scroll h-[312px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white"
         >
           {records.map((item, idx) => (
             <p key={idx}>·{makeRecordString(item)}</p>

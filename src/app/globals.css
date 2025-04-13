@@ -118,9 +118,11 @@ abbr:where([title]) {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    top: 0;
+    top: -2em;
     left: 0;
     margin: 0 auto;
+    width: 100%;
+    transform: scale(0.85);
   }
 
   .cube_records {

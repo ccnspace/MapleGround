@@ -114,7 +114,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     if (isAutoModePlaying) {
       return "OFF";
     }
-    return "+ 강화(D키)";
+    return "강화(Space)";
   }, [isAutoModePlaying]);
 
   const handleSelect = (option: string) => {
@@ -181,6 +181,13 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   const [showDetail, setShowDetail] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const showBadge = currentStarforce >= 22;
+  const [optionFoldLabel, setOptionFoldLabel] = useState("🡹 시뮬레이터 옵션 접기");
+  const [isOptionFolded, setIsOptionFolded] = useState(false);
+
+  const handleOptionFold = () => {
+    setIsOptionFolded((prev) => !prev);
+    setOptionFoldLabel(isOptionFolded ? "🡹 시뮬레이터 옵션 접기" : "🡻 시뮬레이터 옵션 펼치기");
+  };
 
   // const handleMouseOverOnImage = () => {
   //   setShowDetail(true);
@@ -341,10 +348,10 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isAutoModePlaying) return;
-      if (e.key === "d") {
+      if (e.code === "Space") {
+        e.preventDefault();
         throttleDoStarforce();
-      }
-      if (e.key === "Escape") {
+      } else if (e.key === "Escape") {
         if (useModalStore.getState().modal) return;
         resetStarforceTarget();
       }
@@ -413,204 +420,212 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
   return (
     <>
-      <div style={{ zIndex: 1002 }} className="starforce_container flex fixed top-[25%] left-[35%]">
+      <div style={{ zIndex: 1002 }} className="starforce_container flex fixed top-[15%] left-[30%]">
         <div
           className={`flex flex-col items-center gap-1 rounded-lg
-             bg-black/70 p-2 border border-white/30 align-center 
-             justify-center w-[480px]`}
+             bg-[#293541]/80 p-2 border border-white/20 align-center 
+             w-[480px]`}
         >
-          <p className="text-sm font-medium">
-            <span className="text-yellow-400 font-bold">스타포스</span>
-          </p>
-          <div className="relative flex flex-col p-1 w-full rounded-lg bg-gradient-to-b from-gray-200 to-gray-300 gap-1">
-            <div className="flex flex-col p-1 w-full rounded-lg bg-gradient-to-b from-[#4e413e] to-[#493d34] gap-1">
-              <p className="flex fade-in justify-center rounded-md bg-[#2e2521] p-1 m-1 text-white">
-                <span className="text-yellow-400">메소</span>를 사용하여 장비를 강화합니다.
-              </p>
-              <div className="flex flex-row">
+          <div className="flex flex-row gap-1 w-full justify-between">
+            <span className="flex items-center gap-1 font-bold text-[#d6fc48]">STARFORCE</span>
+            <button
+              onClick={resetStarforceTarget}
+              className="flex text-xs px-2 justify-center items-center
+               bg-slate-800 hover:bg-slate-900 rounded-md font-bold text-white"
+            >
+              닫기
+            </button>
+          </div>
+          <div className="relative flex flex-col p-1 w-full rounded-lg gap-1">
+            <div className="flex flex-col p-1 w-full rounded-lg bg-[#293541]/80 gap-1">
+              <div className="flex flex-col gap-2">
                 <div
-                  // onMouseOver={handleMouseOverOnImage}
-                  // onMouseLeave={handleMouseLeaveOnImage}
-                  className="relative flex items-center justify-center bg-gradient-to-b from-[#3ac4ee] to-[#007a99] rounded-md p-1 w-[156px] h-[156px] m-1"
+                  className="relative flex flex-col gap-2 items-center justify-center w-full h-[160px] rounded-md
+             bg-[linear-gradient(to_bottom,rgba(152,192,202,0.25)_6%,rgba(65,81,85,0.5)_20%,rgba(65,81,85,0.4)_100%)] p-2.5 border border-white/20"
                 >
-                  <div className="flex w-[130px] h-[130px] items-center justify-center border-dashed border-white border-2 rounded-md">
-                    {item_icon && (
-                      <Image
-                        src={item_icon}
-                        className="m-3.5"
-                        style={{ imageRendering: "pixelated" }}
-                        alt={"스타포스 아이템"}
-                        width={90}
-                        height={90}
-                        unoptimized
-                      />
-                    )}
-                  </div>
-                  {/* {currentTarget && showDetail && (
-                    <div
-                      style={{ zIndex: "10003" }}
-                      className="absolute top-[20%] left-[6%] flex flex-col min-w-80 max-w-80 bg-slate-950/90 dark:bg-[#121212]/90
-          border border-gray-700 rounded-lg px-5 pt-3 pb-4"
-                    >
-                      <NormalContainer item={currentTarget} enableItemMenu={false} />
+                  <div className="relative flex items-center justify-center border border-white/20 bg-gradient-to-b from-[#223a49] to-[#43839c] rounded-md p-1 w-[120px] h-[120px]">
+                    <div className="flex w-[100px] h-[100px] items-center justify-center border-dashed border-white border-2 rounded-md">
+                      {item_icon && (
+                        <Image
+                          src={item_icon}
+                          className="m-3.5"
+                          style={{ imageRendering: "pixelated" }}
+                          alt={"스타포스 아이템"}
+                          width={90}
+                          height={90}
+                          unoptimized
+                        />
+                      )}
                     </div>
-                  )} */}
-                  {showBadge && (
-                    <div
-                      className="absolute border border-t-transparent border-b-yellow-300 border-l-yellow-300 border-r-yellow-300
+                    {showBadge && (
+                      <div
+                        className="absolute border border-t-transparent border-b-yellow-300 border-l-yellow-300 border-r-yellow-300
                       text-xs top-[0%] left-[3%] bg-black rounded-b-md p-1
                       drop-shadow-[0_0_10px_rgba(0,0,0,0.3)]
                   text-yellow-300 font-bold"
-                    >
-                      22성+
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-grow overflow-y-scroll max-h-[156px] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-3 m-1">
-                  {currentProbabilities && (
-                    <StarforceDetail
-                      isMaxStarforce={isMaxStarforce}
-                      starforce={currentStarforce}
-                      currentProbabilities={currentProbabilities}
-                      starforceUpgradeOptions={starforceUpgradeOptions}
-                    />
-                  )}
-                </div>
-              </div>
-              {/** 확률 메뉴 */}
-              <div className="flex flex-row flew-grow w-full bg-white/10 rounded-md">
-                <div className="flex text-white m-1 w-[30%] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
-                  <CheckBox
-                    checked={isStarforceCatchChecked}
-                    disabled={isAutoModePlaying}
-                    label="스타캐치"
-                    onChange={() => setIsStarforceCatchChecked((prev) => !prev)}
-                  />
-                </div>
-                <div className="flex text-white m-1 w-[30%] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
-                  <CheckBox
-                    labelStyle={{ fontWeight: "bold" }}
-                    checked={isDestroyProtectionChecked}
-                    disabled={isAutoModePlaying}
-                    label="파괴방지"
-                    onChange={() => setIsDestroyProtectionChecked((prev) => !prev)}
-                  />
-                </div>
-                <div className="flex text-white m-1 w-[40%] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
-                  <CheckBox
-                    labelStyle={{ fontWeight: "bold" }}
-                    checked={isShiningStarforceChecked}
-                    disabled={isAutoModePlaying}
-                    label="샤타포스(파괴 30%↓)"
-                    onChange={() => setIsShiningStarforceChecked((prev) => !prev)}
-                  />
-                </div>
-              </div>
-              {/** 할인 메뉴 */}
-              <div className="flex flex-row flew-grow w-full bg-white/10 rounded-md">
-                <div className="flex items-center text-white m-1 w-[35%] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
-                  <CheckBox
-                    labelStyle={{ fontWeight: "bold" }}
-                    checked={isSundayChecked}
-                    disabled={isAutoModePlaying}
-                    label="썬데이(메소 30%↓)"
-                    onChange={() => setIsSundayChecked((prev) => !prev)}
-                  />
-                </div>
-                <div className="flex items-center gap-1 m-1 w-[35%] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
-                  <CheckBox
-                    labelStyle={{ fontWeight: "bold" }}
-                    checked={isMvpDiscountChecked}
-                    disabled={isAutoModePlaying}
-                    onChange={() => setIsMvpDiscountChecked((prev) => !prev)}
-                  />
-                  <SelectBox
-                    style={{ maxWidth: "160px" }}
-                    disabled={!isMvpDiscountChecked || isAutoModePlaying}
-                    options={MVP_OPTIONS}
-                    onSelect={(option) => setMvpOption(option)}
-                  />
-                </div>
-                <div className="flex items-center text-white m-1 w-[30%] bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-1">
-                  <CheckBox
-                    labelStyle={{ fontWeight: "bold" }}
-                    checked={isPcDiscountChecked}
-                    disabled={isAutoModePlaying}
-                    label="PC방(메소 5%↓)"
-                    onChange={() => setIsPcDiscountChecked((prev) => !prev)}
-                  />
-                </div>
-              </div>
-              <div className="flex flex-row flew-grow w-full bg-white/10 rounded-md">
-                <div className="flex items-center m-1 w-full bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
-                  <div className="text-white">
-                    <CheckBox
-                      labelStyle={{ fontWeight: "bold" }}
-                      label="자동 모드"
-                      disabled={isAutoModePlaying}
-                      checked={isAutoModeChecked}
-                      onChange={() => setIsAutoModeChecked((prev) => !prev)}
-                    />
+                      >
+                        22성+
+                      </div>
+                    )}
                   </div>
-                  <div className="flex flex-col gap-2 ml-[60px]">
-                    <div className="flex items-center">
+                </div>
+                {currentProbabilities && (
+                  <StarforceDetail
+                    isMaxStarforce={isMaxStarforce}
+                    starforce={currentStarforce}
+                    currentProbabilities={currentProbabilities}
+                    starforceUpgradeOptions={starforceUpgradeOptions}
+                  />
+                )}
+              </div>
+              <div className="flex flex-col bg-black/30 rounded-md mt-1 p-1">
+                <button className="flex p-1 rounded-md text-sm text-lime-200 justify-center" onClick={handleOptionFold}>
+                  {optionFoldLabel}
+                </button>
+                <div style={{ display: isOptionFolded ? "none" : "block" }}>
+                  {/** 확률 메뉴 */}
+                  <div className="flex flex-row flew-grow w-full bg-white/10 rounded-md">
+                    <div className="flex text-white m-1 w-[30%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
+                      <CheckBox
+                        checked={isStarforceCatchChecked}
+                        disabled={isAutoModePlaying}
+                        label="스타캐치"
+                        onChange={() => setIsStarforceCatchChecked((prev) => !prev)}
+                      />
+                    </div>
+                    <div className="flex text-white m-1 w-[30%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
+                      <CheckBox
+                        labelStyle={{ fontWeight: "bold" }}
+                        checked={isDestroyProtectionChecked}
+                        disabled={isAutoModePlaying}
+                        label="파괴방지"
+                        onChange={() => setIsDestroyProtectionChecked((prev) => !prev)}
+                      />
+                    </div>
+                    <div className="flex text-white m-1 w-[40%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
+                      <CheckBox
+                        labelStyle={{ fontWeight: "bold" }}
+                        checked={isShiningStarforceChecked}
+                        disabled={isAutoModePlaying}
+                        label="샤타포스(파괴 30%↓)"
+                        onChange={() => setIsShiningStarforceChecked((prev) => !prev)}
+                      />
+                    </div>
+                  </div>
+                  {/** 할인 메뉴 */}
+                  <div className="flex flex-row flew-grow w-full bg-white/10 rounded-md">
+                    <div className="flex items-center text-white m-1 w-[35%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
+                      <CheckBox
+                        labelStyle={{ fontWeight: "bold" }}
+                        checked={isSundayChecked}
+                        disabled={isAutoModePlaying}
+                        label="썬데이(메소 30%↓)"
+                        onChange={() => setIsSundayChecked((prev) => !prev)}
+                      />
+                    </div>
+                    <div className="flex items-center gap-1 m-1 w-[35%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
+                      <CheckBox
+                        labelStyle={{ fontWeight: "bold" }}
+                        checked={isMvpDiscountChecked}
+                        disabled={isAutoModePlaying}
+                        onChange={() => setIsMvpDiscountChecked((prev) => !prev)}
+                      />
                       <SelectBox
                         style={{ maxWidth: "160px" }}
-                        disabled={!isAutoModeChecked || isAutoModePlaying}
-                        options={autoModeOptions}
-                        onSelect={handleSelect}
+                        disabled={!isMvpDiscountChecked || isAutoModePlaying}
+                        options={MVP_OPTIONS}
+                        onSelect={(option) => setMvpOption(option)}
                       />
-                      <span className={`text-xs text-white ml-1 ${!isAutoModeChecked ? "opacity-50" : ""}`}>달성까지 자동 강화</span>
                     </div>
-                    <div className={`flex flex-col ml-1 gap-0.5 ${!isAutoModeChecked ? "opacity-50" : ""}`}>
-                      <p className="text-xs text-white">↪ 달성 완료 후</p>
-                      <div className="flex items-center gap-2 text-white">
-                        <RadioButtonGroup
-                          name="autoModeRestart"
-                          defaultvalue="stop"
-                          options={[
-                            { label: "종료", value: "stop" },
-                            { label: "0성부터 재시작", value: "toZero" },
-                            { label: "기존 수치부터 재시작", value: "toOriginal" },
-                          ]}
-                          onChange={handleAutoModeRestartChange}
+                    <div className="flex items-center text-white m-1 w-[30%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-1">
+                      <CheckBox
+                        labelStyle={{ fontWeight: "bold" }}
+                        checked={isPcDiscountChecked}
+                        disabled={isAutoModePlaying}
+                        label="PC방(메소 5%↓)"
+                        onChange={() => setIsPcDiscountChecked((prev) => !prev)}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-row flew-grow w-full bg-white/10 rounded-md">
+                    <div className="flex items-center m-1 w-full bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
+                      <div className="text-white">
+                        <CheckBox
+                          labelStyle={{ fontWeight: "bold" }}
+                          label="자동 모드"
+                          disabled={isAutoModePlaying}
+                          checked={isAutoModeChecked}
+                          onChange={() => setIsAutoModeChecked((prev) => !prev)}
                         />
+                      </div>
+                      <div className="flex flex-col gap-2 ml-[60px]">
+                        <div className="flex items-center">
+                          <SelectBox
+                            style={{ maxWidth: "160px" }}
+                            disabled={!isAutoModeChecked || isAutoModePlaying}
+                            options={autoModeOptions}
+                            onSelect={handleSelect}
+                          />
+                          <span className={`text-xs text-white ml-1 ${!isAutoModeChecked ? "opacity-50" : ""}`}>달성까지 자동 강화</span>
+                        </div>
+                        <div className={`flex flex-col ml-1 gap-0.5 ${!isAutoModeChecked ? "opacity-50" : ""}`}>
+                          <p className="text-xs text-white">↪ 달성 완료 후</p>
+                          <div className="flex items-center gap-2 text-white">
+                            <RadioButtonGroup
+                              name="autoModeRestart"
+                              defaultvalue="stop"
+                              options={[
+                                { label: "종료", value: "stop" },
+                                { label: "0성부터 재시작", value: "toZero" },
+                                { label: "기존 수치부터 재시작", value: "toOriginal" },
+                              ]}
+                              onChange={handleAutoModeRestartChange}
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+
               <div className="flex flex-row flew-grow w-full">
-                <div className="flex m-1 w-full items-center justify-between bg-gradient-to-b from-[#3b302b] to-[#302622] rounded-md p-2">
-                  <p className="text-sm font-bold text-white">🪙 필요한 메소: {formattedCurrentCost}</p>
+                <div
+                  className="flex m-1 w-full items-center justify-between
+                bg-[linear-gradient(to_top,rgba(152,192,202,0.15)_6%,rgba(65,81,85,0.5)_20%,rgba(65,81,85,0.4)_100%)]
+                rounded-md p-2"
+                >
+                  <p className="text-sm font-bold text-white">사용 재화 🪙 {formattedCurrentCost}</p>
                   <p className="text-xs font-bold text-red-200">🔻할인율: {discountRate.toFixed(2)}%</p>
                 </div>
               </div>
               <div className="flex flex-row justify-center text-white">
                 <button
                   onClick={throttleDoStarforce}
-                  className="flex bg-gradient-to-b from-[#8fb843] to-[#73b12c]
-                  hover:bg-gradient-to-b hover:from-[#7ea338] hover:to-[#578621]
-                rounded-md p-0.5 m-1 w-[120px] justify-center text-lg font-bold"
+                  className="flex items-center
+                  border border-white/20
+                  enabled:bg-gradient-to-b from-slate-700/50 to-cyan-400/50
+                  hover:from-slate-700/70 hover:to-cyan-400/70
+                rounded-md p-1 m-1 w-[120px] justify-center text-md font-bold"
                 >
                   {starforceButtonLabel}
                 </button>
                 <button
                   disabled={isAutoModePlaying}
-                  className="flex disabled:bg-gray-600/70 disabled:text-white/20
+                  className="flex items-center disabled:bg-gray-600/70 disabled:text-white/20
                   enabled:bg-gradient-to-b from-[#b6b6b6] to-[#868686]
                   enabled:hover:bg-gradient-to-b hover:from-[#979797] hover:to-[#6b6b6b]
-                rounded-md p-0.5 m-1 w-[120px] justify-center text-lg font-bold"
+                rounded-md p-1 m-1 w-[120px] justify-center text-md font-bold"
                   onClick={initializeStarforce}
                 >
                   {"↻ 초기화"}
                 </button>
                 <button
                   disabled={isAutoModePlaying}
-                  className="flex disabled:bg-gray-600/70 disabled:text-white/20
+                  className="flex items-center disabled:bg-gray-600/70 disabled:text-white/20
                   enabled:bg-gradient-to-b from-[#b6b6b6] to-[#868686]
                   enabled:hover:bg-gradient-to-b hover:from-[#979797] hover:to-[#6b6b6b]
-                rounded-md p-0.5 m-1 w-[120px] justify-center text-lg font-bold"
+                rounded-md p-1 m-1 w-[120px] justify-center text-md font-bold"
                   onClick={() => {
                     openModal({
                       type: "confirm",
@@ -624,9 +639,9 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                   {"↻ 0성으로"}
                 </button>
                 <button
-                  className="flex bg-gradient-to-b from-[#b6b6b6] to-[#868686]
+                  className="flex items-center bg-gradient-to-b from-[#b6b6b6] to-[#868686]
                   hover:bg-gradient-to-b hover:from-[#979797] hover:to-[#6b6b6b]
-                rounded-md p-0.5 m-1 w-[120px] justify-center text-lg font-bold"
+                rounded-md p-1 m-1 w-[120px] justify-center text-md font-bold"
                   onClick={resetStarforceTarget}
                 >
                   {"X 닫기"}
@@ -634,10 +649,10 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
               </div>
               <p className="flex mt-1 mb-1 border-b-2 border-dotted border-b-white/20" />
               <div className="flex flex-row flex-grow gap-2 m-1">
-                <div className="flex bg-slate-900/90 w-[65%] rounded-md p-1">
-                  <p className="text-xs p-1 text-white">💸 누적 메소: {formatKoreanNumber(accumulatedCost)}</p>
+                <div className="flex bg-slate-900/70 w-[65%] rounded-md p-1">
+                  <p className="text-xs p-1 text-white">🪙 누적 메소: {formatKoreanNumber(accumulatedCost)}</p>
                 </div>
-                <div className="flex bg-slate-900/90 w-[35%] rounded-md p-1">
+                <div className="flex bg-slate-900/70 w-[35%] rounded-md p-1">
                   <p className="text-xs p-1 text-white">☝️ 시도: {attempts}회</p>
                 </div>
               </div>

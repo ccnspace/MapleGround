@@ -90,7 +90,7 @@ bg-black/70 border border-white/30 w-[300px]`}
           </p>
           <p>
             · <span className="bg-slate-700 rounded-md p-1">MVP/PC방 할인</span>은{" "}
-            <span className="text-lime-300 text-bold">18성 이상</span>부터는{" "}
+            <span className="text-lime-300 text-bold">17성 이상</span>부터는{" "}
             <span className="text-lime-300 text-bold">적용되지 않습니다.</span>
           </p>
           <p>

@@ -38,7 +38,7 @@ export const StarforceDetail = ({ isMaxStarforce, starforce, currentProbabilitie
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex justify-center p-1 rounded-xl gap-5 bg-black/25">
-        <div className="grid w-[50%] grid-cols-3 gap-1 text-xs">
+        <div className="grid w-[50%] grid-cols-3 gap-1 text-xs fade-in">
           {starGroups.map((group, idx) => (
             <div key={idx} className="flex justify-center">
               {group}
@@ -46,10 +46,14 @@ export const StarforceDetail = ({ isMaxStarforce, starforce, currentProbabilitie
           ))}
         </div>
       </div>
-      <div className="flex w-full items-center justify-center p-1 rounded-xl gap-5 bg-black/25 text-white font-bold text-lg">
+      <div className="flex w-full items-center justify-center p-1 rounded-xl gap-5 bg-black/25 text-white font-bold text-lg fade-in">
         <p className="text-yellow-300">⭐{starforce}</p>
-        <p className="text-sm">{`>>>`}</p>
-        <p>⭐{starforce + 1}</p>
+        {!isMaxStarforce && (
+          <>
+            <p className="text-sm">{`>>>`}</p>
+            <p>⭐{starforce + 1}</p>
+          </>
+        )}
       </div>
       <div
         className="flex rounded-md flex-grow h-[140px] bg-gradient-to-b p-3 from-black/20 to-slate-800/30

@@ -438,7 +438,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
           </div>
           <div className="relative flex flex-col p-1 w-full rounded-lg gap-1">
             <div className="flex flex-col p-1 w-full rounded-lg bg-[#293541]/80 gap-1">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2  m-1 ">
                 <div
                   className="relative flex flex-col gap-2 items-center justify-center w-full h-[160px] rounded-md
              bg-[linear-gradient(to_bottom,rgba(152,192,202,0.25)_6%,rgba(65,81,85,0.5)_20%,rgba(65,81,85,0.4)_100%)] p-2.5 border border-white/20"
@@ -478,7 +478,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                   />
                 )}
               </div>
-              <div className="flex flex-col bg-black/30 rounded-md mt-1 p-1">
+              <div className="flex flex-col bg-black/30 rounded-md mx-1 mt-1 p-1">
                 <button className="flex p-1 rounded-md text-sm text-lime-200 justify-center" onClick={handleOptionFold}>
                   {optionFoldLabel}
                 </button>
@@ -588,7 +588,6 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                   </div>
                 </div>
               </div>
-
               <div className="flex flex-row flew-grow w-full">
                 <div
                   className="flex m-1 w-full items-center justify-between

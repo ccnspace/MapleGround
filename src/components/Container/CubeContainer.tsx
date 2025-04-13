@@ -241,16 +241,17 @@ export const CubeContainer = () => {
           </div>
           <div className="flex flex-col gap-2">
             <div
-              className="relative flex flex-col gap-2 items-center justify-center w-[340px] h-[160px] rounded-md
+              className="relative flex flex-col gap-1.5 items-center justify-center w-[340px] h-[180px] rounded-md
              bg-[linear-gradient(to_bottom,rgba(152,192,202,0.25)_6%,rgba(65,81,85,0.5)_20%,rgba(65,81,85,0.4)_100%)] p-2.5 border border-white/20"
             >
               <div className="relative flex items-center justify-center border border-white/20 bg-gradient-to-b from-[#223a49] to-[#43839c] rounded-md p-1 w-[120px] h-[120px]">
                 <div className="flex w-[100px] h-[100px] items-center justify-center border-dashed border-white border-2 rounded-md">
                   {itemIcon && (
-                    <div style={{ zIndex: 1000 }} className="mt-7 mb-5">
+                    <div style={{ zIndex: 1000 }}>
                       <Image
                         style={{ imageRendering: "pixelated" }}
                         src={itemIcon}
+                        className="m-3.5"
                         alt={itemName || "cube-target"}
                         unoptimized
                         width={64}
@@ -260,7 +261,7 @@ export const CubeContainer = () => {
                   )}
                 </div>
               </div>
-              <div className="flex flex-row gap-1 items-center justify-between w-full">
+              <div className="flex flex-col gap-0.5 items-center justify-between w-full">
                 <div className="flex border border-slate-800 bg-black/50 w-[276px] relative h-2.5 rounded-lg">
                   <div
                     style={{ width: `${remainGradeUpRatio * 100}%`, transition: "width 0.5s ease" }}
@@ -288,7 +289,7 @@ export const CubeContainer = () => {
                enabled:bg-gradient-to-t from-slate-900/50 to-[#386e7e]/60 hover:from-slate-900/70 hover:to-[#386e7e]/70
                text-sm font-bold text-white rounded-md p-2"
             >
-              <p className="flex">재설정하기(혹은 [SPACE] 키)</p>
+              <p className="flex">재설정하기(혹은 Space 키)</p>
             </button>
           </div>
         </div>

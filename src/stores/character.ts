@@ -11,7 +11,7 @@ type CharacterAction = {
   setFetchStatus: (status: "success" | "error" | "idle" | "loading") => void;
   setCharacterAttributes: (data: CharacterAttributes) => void;
   resetCharacterData: () => void;
-  fetchCharacterAttributes: (nickname: string) => Promise<void>;
+  fetchCharacterAttributes: (nickname: string, signal?: AbortSignal) => Promise<void>;
 };
 
 const initialState: CharacterState = {
@@ -20,33 +20,32 @@ const initialState: CharacterState = {
 };
 
 export const useCharacterStore = create<CharacterState & CharacterAction>()(
-  devtools(
-    persist(
-      (set, get) => ({
-        ...initialState,
-        setCharacterAttributes: (characterAttributes) => {
-          set({ characterAttributes });
-        },
-        setFetchStatus: (fetchStatus) => {
-          set({ fetchStatus });
-        },
-        resetCharacterData: () => {
-          set({ ...initialState });
-        },
-        fetchCharacterAttributes: async (nickname: string) => {
-          const { setFetchStatus, setCharacterAttributes, resetCharacterData } = get();
-          try {
-            setFetchStatus("loading");
-            const response = await getCharacterAttributes(nickname);
-            setCharacterAttributes(response);
-            setFetchStatus("success");
-          } catch {
-            resetCharacterData();
-            setFetchStatus("error");
-          }
-        },
-      }),
-      { name: "character" }
-    )
-  )
+  devtools((set, get) => ({
+    ...initialState,
+    setCharacterAttributes: (characterAttributes) => {
+      set({ characterAttributes });
+    },
+    setFetchStatus: (fetchStatus) => {
+      set({ fetchStatus });
+    },
+    resetCharacterData: () => {
+      set({ ...initialState });
+    },
+    fetchCharacterAttributes: async (nickname: string, signal?: AbortSignal) => {
+      const { setFetchStatus, setCharacterAttributes, resetCharacterData } = get();
+      try {
+        setFetchStatus("loading");
+        const response = await getCharacterAttributes(nickname, "", signal);
+        setCharacterAttributes(response);
+        setFetchStatus("success");
+      } catch (error) {
+        // AbortError는 에러 처리하지 않음
+        if (error instanceof Error && error.name === "AbortError") {
+          return;
+        }
+        resetCharacterData();
+        setFetchStatus("error");
+      }
+    },
+  }))
 );

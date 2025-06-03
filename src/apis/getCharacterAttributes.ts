@@ -21,7 +21,7 @@ export type CharacterAttributes = {
 };
 
 /** 캐릭터에 필요한 모든 정보를 요청하여 반환하는 함수 */
-export const getCharacterAttributes = async (nickname: string, date = "") => {
-  const response = await apiFetcher<CharacterAttributes>(`/user/all/${nickname}?date=${date}`);
+export const getCharacterAttributes = async (nickname: string, date = "", signal?: AbortSignal) => {
+  const response = await apiFetcher<CharacterAttributes>(`/user/all/${nickname}?date=${date}`, signal);
   return response;
 };

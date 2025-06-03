@@ -2,12 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "react-calendar/dist/Calendar.css";
 import { Header } from "@/components/Header";
-import { SideBar } from "@/components/SideBar";
-import { NoticeSideBar } from "@/components/NoticeSideBar";
 import { pretendard } from "./fonts/pretendard";
 import { Modal } from "@/components/Modal";
 import { ThemeProvider } from "next-themes";
-import { DimmedLayer } from "@/components/DimmedLayer";
 
 export const metadata: Metadata = {
   title: "MapleDot: 메닷",
@@ -29,16 +26,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${pretendard.variable} font-pretendard bg-white dark:bg-[#131313]`}>
+      <body className={`${pretendard.variable} font-pretendard bg-white dark:bg-[#131313] min-h-screen flex flex-col`}>
         <ThemeProvider attribute="class" defaultTheme="system">
           <Header />
           <Modal />
-          <div className="root_container flex flex-row gap-4 justify-center">
-            <SideBar />
-            {children}
-            {/* <NoticeSideBar /> */}
-          </div>
-          <div className="flex mt-auto pb-3">Footer</div>
+          <main className="flex-1">{children}</main>
+          <footer className="flex justify-center items-center py-4 border-t border-slate-200 dark:border-white/10">
+            <p className="text-sm text-slate-600 dark:text-slate-400">© 2024 MapleDot. All rights reserved.</p>
+          </footer>
         </ThemeProvider>
       </body>
     </html>

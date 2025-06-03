@@ -36,8 +36,13 @@ export const ChartContainer = () => {
   useEffect(() => {
     if (!nickname || characterPower) return;
 
-    fetchCharacterPower(nickname);
-  }, [nickname, characterPower]);
+    const abortController = new AbortController();
+    fetchCharacterPower(nickname, abortController.signal);
+
+    return () => {
+      abortController.abort();
+    };
+  }, [nickname, characterPower, fetchCharacterPower]);
 
   useEffect(() => {
     if (!characterPower) return;

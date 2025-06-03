@@ -14,17 +14,18 @@ module.exports = {
       keyframes: {
         starBlink: {
           "0%": {
-            opacity: "1",
-            transform: "scale(1) rotate(0deg)",
+            opacity: "0.7",
+            transform: "scale(0.5) rotate(0deg)",
             color: "rgb(255 255 255)",
             textShadow: "0 0 0px rgba(255, 255, 255, 0)",
           },
           "20%": {
             opacity: "1",
-            transform: "scale(4) rotate(36deg)",
+            transform: "scale(6) rotate(32deg)",
+            filter: "blur(1px)",
             color: "rgb(255 255 255)",
             textShadow:
-              "0 0 8px rgba(255, 255, 255, 1), 0 0 15px rgba(255, 255, 255, 0.95), 0 0 20px rgba(255, 255, 255, 0.85), 0 0 25px rgba(255, 255, 255, 0.8), 0 0 35px rgba(253, 224, 71, 0.9), 0 0 40px rgba(253, 224, 71, 0.8)",
+              "0 0 20px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.5), 0 0 25px rgba(255, 255, 255, 0.5), 0 0 25px rgba(255, 255, 255, 0.5), 0 0 30px rgba(253, 224, 71, 0.5), 0 0 30px rgba(253, 224, 71, 0.5)",
           },
           "100%": {
             opacity: "1",

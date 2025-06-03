@@ -25,6 +25,7 @@ export const NormalContainer = ({ item, enableItemMenu = true }: Props) => {
   const {
     starforce,
     item_icon,
+    scroll_upgrade,
     item_name,
     item_equipment_slot,
     item_equipment_part,
@@ -87,7 +88,7 @@ export const NormalContainer = ({ item, enableItemMenu = true }: Props) => {
   return (
     <>
       {showStarforceBadge && <StarforceBadge isAmazingForce={isAmazingForce} starforce={starforce} />}
-      <EquipDescription item_icon={item_icon} item_name={item_name} baseLevel={base_equipment_level} />
+      <EquipDescription scroll_upgrade={scroll_upgrade} item_icon={item_icon} item_name={item_name} baseLevel={base_equipment_level} />
       {enableItemMenu && (canRollCube || canStarforce) && (
         <>
           <Divider />

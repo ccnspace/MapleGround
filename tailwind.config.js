@@ -16,11 +16,11 @@ module.exports = {
           "0%": {
             opacity: "1",
             transform: "scale(1) rotate(0deg)",
-            color: "rgb(253 224 71)",
+            color: "rgb(255 255 255)",
             textShadow: "0 0 0px rgba(255, 255, 255, 0)",
           },
-          "50%": {
-            opacity: "0.8",
+          "20%": {
+            opacity: "1",
             transform: "scale(3) rotate(30deg)",
             color: "rgb(255 255 255)",
             textShadow:
@@ -35,7 +35,7 @@ module.exports = {
         },
       },
       animation: {
-        starBlink: "starBlink 0.24s ease-out",
+        starBlink: "starBlink 0.3s ease-out",
       },
     },
   },

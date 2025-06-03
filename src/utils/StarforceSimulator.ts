@@ -119,7 +119,7 @@ export class StarforceSimulator {
       customProbabilities = { ...baseProbabilities };
     }
 
-    const adjustedSuccessRate = (customProbabilities.success || 0) * (1 + this.successRateIncrease);
+    const adjustedSuccessRate = Math.min(1, (customProbabilities.success || 0) * (1 + this.successRateIncrease));
     const remainRate = 1 - adjustedSuccessRate;
 
     const destroyRate = (customProbabilities.destroy || 0) * (1 - this.destroyReduction);

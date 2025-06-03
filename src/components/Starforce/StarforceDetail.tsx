@@ -12,7 +12,8 @@ interface Props {
 
 export const StarforceDetail = ({ isMaxStarforce, starforce, currentProbabilities, starforceUpgradeOptions, prevStarforce }: Props) => {
   const isNewStar = (idx: number) => {
-    const result = prevStarforce !== starforce && idx + 1 === starforce;
+    console.log(prevStarforce, starforce);
+    const result = prevStarforce < starforce && idx + 1 === starforce;
     return result;
   };
 

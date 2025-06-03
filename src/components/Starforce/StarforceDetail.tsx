@@ -1,5 +1,6 @@
 import { StarforceProbability } from "@/utils/starforceUtils";
 import { Divider } from "../Equip/Divider";
+import { useEffect, useRef } from "react";
 
 interface Props {
   isMaxStarforce: boolean;
@@ -9,6 +10,18 @@ interface Props {
 }
 
 export const StarforceDetail = ({ isMaxStarforce, starforce, currentProbabilities, starforceUpgradeOptions }: Props) => {
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    // 첫 렌더링 이후에 false로 설정
+    isFirstRender.current = false;
+  }, []);
+
+  const isNewStar = (idx: number) => {
+    if (isFirstRender.current) return false;
+    return idx + 1 === starforce;
+  };
+
   // 아래 확률을 소수점 둘째자리까지 보여 주게 변경
   const successRate = `${(currentProbabilities.success * 100).toFixed(2)}%`;
   const failRate = currentProbabilities.fail ? `${(currentProbabilities.fail * 100).toFixed(2)}%` : null;
@@ -24,7 +37,7 @@ export const StarforceDetail = ({ isMaxStarforce, starforce, currentProbabilitie
     return Array.from({ length: starsPerRow }, (_, j) => {
       const idx = start + j;
       return idx < starforce ? (
-        <span key={idx} className="text-yellow-300">
+        <span key={idx} className={`text-yellow-300 ${isNewStar(idx) ? "animate-starBlink" : ""}`}>
           ★
         </span>
       ) : (

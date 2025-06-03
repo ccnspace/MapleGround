@@ -6,6 +6,7 @@ import { useCharacterStore } from "@/stores/character";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { InfoIcon } from "../svg/InfoIcon";
+import { ContainerWrapper } from "./ContainerWrapper";
 
 export const ExpContainer = () => {
   const nickname = useCharacterStore((state) => state.characterAttributes?.basic.character_name);
@@ -97,15 +98,12 @@ export const ExpContainer = () => {
   ];
 
   return (
-    <div
-      className="flex shrink-0 min-h-[400px] flex-col bg-slate-100 dark:bg-[#1f2024] px-3 pt-3 pb-3
-        rounded-lg gap-0.5 justify-center"
-    >
+    <ContainerWrapper className="exp_container justify-center">
       <div className="flex flex-col h-32 justify-center">
         <div className="flex items-center justify-center">
-          <p className="font-bold text-sm text-slate-950/50 dark:text-white/60">여기에 캐릭터의 경험치 차트가 표시됩니다.</p>
+          <p className="font-bold text-sm text-slate-950/50 dark:text-white/60">Coming Soon</p>
         </div>
       </div>
-    </div>
+    </ContainerWrapper>
   );
 };

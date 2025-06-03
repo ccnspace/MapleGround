@@ -64,7 +64,6 @@ export const CubeContainer = () => {
     currentAttempt,
     currentGuarantee,
     isSoundEnabled,
-    prevAttempt,
     mesoCost,
     setIsSoundEnabled,
     rollCube,
@@ -105,7 +104,7 @@ export const CubeContainer = () => {
 
   const mesoCostLabel = useMemo(() => {
     const formattedMesoCost = formatKoreanNumber(mesoCost);
-    return `💸 ${formattedMesoCost} 메소 소모`;
+    return `🪙 ${formattedMesoCost} 메소 소모`;
   }, [mesoCost]);
 
   const handleRollCubeClick = useThrottle(rollCube, 500);
@@ -133,7 +132,7 @@ export const CubeContainer = () => {
   const reRollPotential = useCallback(() => {
     rollCube();
 
-    const { currentOptions: newOptions } = cubeSimulator.getItemState();
+    const { currentOptions: newOptions, currentAttempt } = cubeSimulator.getItemState();
 
     if (isSpeedMode) {
       const filteredOptions = [...speedOptions].filter((item) => item !== NOT_SELECTED);
@@ -141,13 +140,13 @@ export const CubeContainer = () => {
 
       const isFullyMatched = isFullyContainedInArray(filteredOptions, newOptions);
 
-      if (isFullyMatched && prevAttempt.current !== currentAttempt) {
+      if (isFullyMatched) {
         setSpeedMode(false);
         setRecords((prev) => [...prev, `${newOptions.join("/")} - ${currentAttempt}번만에 획득`]);
         resetCurrentAttempt();
       }
     }
-  }, [isSpeedMode, speedOptions, currentAttempt, rollCube, resetCurrentAttempt]);
+  }, [isSpeedMode, speedOptions, rollCube, resetCurrentAttempt]);
 
   /** 초기 데이터 init */
   const initialGrade = cubeType === "potential" ? itemPotentialGrade : additionalPotentialGrade;
@@ -176,8 +175,10 @@ export const CubeContainer = () => {
   /** 키 이벤트 핸들러 */
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
-      if (e.key === "d") handleRollCubeClick();
-      else if (e.key === "Escape") resetCube();
+      if (e.code === "Space") {
+        e.preventDefault();
+        handleRollCubeClick();
+      } else if (e.key === "Escape") resetCube();
     };
 
     document.addEventListener("keydown", handleKeydown);
@@ -218,43 +219,55 @@ export const CubeContainer = () => {
 
   return (
     <>
-      <div style={{ zIndex: 1002 }} className="flex fixed top-[30%] left-[40%]">
+      <div style={{ zIndex: 1002 }} className="cube_container flex fixed top-[25%] left-[35%]">
         <div
           className={`flex p-1 flex-col items-center gap-2 text-white rounded-lg
-             bg-black/70 border ${isMiracleChecked ? "border-lime-300/70" : "border-white/30"} p-2 align-center 
-             justify-center w-[312px] ${glow ? "cube-glow" : ""}`}
+             bg-[#293541]/80 border ${isMiracleChecked ? "border-lime-300/70" : "border-white/20"} p-2 align-center 
+             justify-center w-[360px] ${glow ? "cube-glow" : ""}`}
         >
-          {isMiracleChecked ? (
-            <p className="text-sm font-bold text-lime-400">{`✨ 지금은 미라클 타임!! (${cubeTitle})✨`}</p>
-          ) : (
-            <p className="text-sm font-bold">
-              <span className="text-cyan-400">{cubeTitle}</span>을 재설정합니다.
-            </p>
-          )}
-          <div className="flex flex-col p-1 rounded-lg bg-gradient-to-b from-gray-200 to-gray-300 gap-2">
-            <div className="relative flex flex-col gap-2 items-center justify-center w-[280px] h-[124px] rounded-md bg-slate-700">
-              <Image className="rounded-md" src={potentialImg} alt="potential-bg" layout="fill" objectFit="cover" objectPosition="center" />
-              {itemIcon && (
-                <div style={{ zIndex: 1000 }} className="mt-7 mb-5">
-                  <Image
-                    style={{ imageRendering: "pixelated" }}
-                    src={itemIcon}
-                    alt={itemName || "cube-target"}
-                    unoptimized
-                    width={40}
-                    height={40}
+          <div className="flex flex-row gap-1 w-full justify-between">
+            <span className="flex items-center gap-1 font-bold text-[#d6fc48]">
+              {cubeTitle}
+              {isMiracleChecked && <span className="text-[#d6fc48] text-xs">{` | 미라클 타임`}</span>}
+            </span>
+            <button
+              onClick={resetCube}
+              className="flex text-xs px-2 justify-center items-center
+               bg-slate-800 hover:bg-slate-900 rounded-md font-bold"
+            >
+              닫기
+            </button>
+          </div>
+          <div className="flex flex-col gap-2">
+            <div
+              className="relative flex flex-col gap-1.5 items-center justify-center w-[340px] h-[180px] rounded-md
+             bg-[linear-gradient(to_bottom,rgba(152,192,202,0.25)_6%,rgba(65,81,85,0.5)_20%,rgba(65,81,85,0.4)_100%)] p-2.5 border border-white/20"
+            >
+              <div className="relative flex items-center justify-center border border-white/20 bg-gradient-to-b from-[#223a49] to-[#43839c] rounded-md p-1 w-[120px] h-[120px]">
+                <div className="flex w-[100px] h-[100px] items-center justify-center border-dashed border-white border-2 rounded-md">
+                  {itemIcon && (
+                    <div style={{ zIndex: 1000 }}>
+                      <Image
+                        style={{ imageRendering: "pixelated" }}
+                        src={itemIcon}
+                        className="m-3.5"
+                        alt={itemName || "cube-target"}
+                        unoptimized
+                        width={64}
+                        height={64}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col gap-0.5 items-center justify-between w-full">
+                <div className="flex border border-slate-800 bg-black/50 w-[276px] relative h-2.5 rounded-lg">
+                  <div
+                    style={{ width: `${remainGradeUpRatio * 100}%`, transition: "width 0.5s ease" }}
+                    className="flex bg-gradient-to-r from-sky-500 to-sky-300 h-2 rounded-lg"
                   />
                 </div>
-              )}
-              <div className="flex border border-slate-800 bg-slate-800 w-[260px] relative h-3.5 rounded-sm">
-                <p
-                  className="absolute mx-auto text-xs font-extralight text-white"
-                  style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
-                >{`${currentAttempt} / ${currentGuarantee}`}</p>
-                <div
-                  style={{ width: `${remainGradeUpRatio * 100}%`, transition: "width 0.5s ease" }}
-                  className="flex bg-gradient-to-r from-sky-400 to-blue-600 h-3 rounded-sm"
-                />
+                <p className="flex text-[10px] font-extralight text-white">{`${currentAttempt} / ${currentGuarantee}`}</p>
               </div>
             </div>
             <CubeDisplay label="BEFORE" cubeType={cubeType} grade={prevGrade} options={prevOptions} />
@@ -266,16 +279,16 @@ export const CubeContainer = () => {
               showSelectButton={showAfterButton}
               onSelect={handleAfterButtonClick}
             />
-            <div className="text-xs flex items-center bg-slate-900 rounded-md p-1 text-white/90">{mesoCostLabel}</div>
+            <div className="text-xs flex items-center bg-slate-900/50 rounded-md p-1 text-white/90">{mesoCostLabel}</div>
             <button
               disabled={isSpeedMode}
               onClick={handleRollCubeClick}
-              className="flex justify-center border-2 border-white/50
+              className="flex justify-center border border-white/10
                disabled:gray-200 disabled:text-gray-400
-               enabled:bg-gradient-to-r from-lime-300 to-lime-400 hover:from-lime-400 hover:to-lime-500
-               text-sm font-bold text-black rounded-md p-1"
+               enabled:bg-gradient-to-t from-slate-900/50 to-[#386e7e]/60 hover:from-slate-900/70 hover:to-[#386e7e]/70
+               text-sm font-bold text-white rounded-md p-2"
             >
-              <p className="flex">한 번 더 재설정하기(혹은 [D]키 입력)</p>
+              <p className="flex">재설정하기(혹은 Space 키)</p>
             </button>
           </div>
         </div>

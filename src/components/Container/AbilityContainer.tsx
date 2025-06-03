@@ -3,6 +3,7 @@
 import { useCharacterInfo } from "@/hooks/useCharacterInfo";
 import { Ability } from "@/types/Ability";
 import { useEffect, useState } from "react";
+import { ContainerWrapper } from "./ContainerWrapper";
 
 const getGradeBgColor = (grade: string | null) => {
   if (grade === "레전드리") return "bg-lime-400/70";
@@ -57,10 +58,7 @@ export const AbilityContainer = () => {
   }, [preset, ability]);
 
   return (
-    <div
-      className="flex shrink-0 flex-col bg-slate-100 dark:bg-[#1f2024] px-3 pt-3 pb-3
-   rounded-lg gap-1 min-h-48"
-    >
+    <ContainerWrapper>
       {!!currentAbility ? (
         <div className="flex flex-col justify-center">
           <div className="flex justify-between mb-2">
@@ -120,6 +118,6 @@ export const AbilityContainer = () => {
           <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60">여기에 어빌리티 정보가 표시됩니다.</p>
         </div>
       )}
-    </div>
+    </ContainerWrapper>
   );
 };

@@ -31,8 +31,6 @@ export const useCubeSimulation = (cubeSimulator: CubeSimulator) => {
   const [currentGuarantee, setCurrentGuarantee] = useState(0);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
-  const prevAttempt = useRef<number>(0);
-
   const playSound = useCallback(
     (type: "roll" | "gradeUp") => {
       if (!isSoundEnabled) return;
@@ -75,7 +73,6 @@ export const useCubeSimulation = (cubeSimulator: CubeSimulator) => {
   const resetCurrentAttempt = useCallback(() => {
     cubeSimulator.setCurrentAttempt(0);
     setCurrentAttempt(0);
-    prevAttempt.current = 0;
   }, [cubeSimulator]);
 
   const setPrevOptions = useCallback(
@@ -103,7 +100,6 @@ export const useCubeSimulation = (cubeSimulator: CubeSimulator) => {
     currentGuarantee,
     mesoCost,
     isSoundEnabled,
-    prevAttempt,
     setIsSoundEnabled,
     rollCube,
     setPrevOptions,

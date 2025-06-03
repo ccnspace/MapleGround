@@ -5,7 +5,21 @@ import { ItemEquipment } from "@/types/Equipment";
 import { StarIcon } from "../../svg/StarIcon";
 import { ItemIcon } from "./ItemIcon";
 import { EquipDetailCard } from "../EquiqDetailCard";
-import { CubeSimulator } from "@/utils/CubeSimulator";
+
+const SeedRingBadge = ({ item }: { item: ItemEquipment }) => {
+  const seedRingLevel = item?.special_ring_level;
+  if (!seedRingLevel) return null;
+
+  return (
+    <div
+      className="absolute flex items-center shadow top-0 left-0 font-medium rounded-sm
+          text-xs px-0.5 bg-black/60 text-white"
+    >
+      <span className="text-yellow-300">LV</span>
+      {seedRingLevel}
+    </div>
+  );
+};
 
 const StarForceBadge = ({ item }: { item: ItemEquipment }) => {
   const starforce = parseInt(item?.starforce);
@@ -49,7 +63,7 @@ const potentialStyle: Record<string, string> = {
   레어: "border-2 border-sky-400",
 };
 
-const commonEquipStyle = `equip_wrapper flex hover:bg-slate-400/60 dark:hover:bg-white/40 relative justify-center
+const commonEquipClassName = `equip_wrapper flex hover:bg-slate-400/60 dark:hover:bg-white/40 justify-center
   items-center bg-slate-300 dark:bg-[#4f515a] w-16 h-16 rounded-md cursor-pointer`;
 
 // TODO: EquipDetailCard에 공통화
@@ -73,15 +87,16 @@ export const NormalEquipIcon = memo(({ name, equipData, customClass, isSelected 
   };
 
   return (
-    <div id={name} className={`${getPotentialStyle(name)} ${commonEquipStyle} ${customClass}`}>
+    <div id={name} className={`${getPotentialStyle(name)} ${commonEquipClassName} ${customClass}`}>
       {equipData?.[name] && (
         <>
           <StarForceBadge item={equipData[name]} />
+          <SeedRingBadge item={equipData[name]} />
           <ItemIcon item={equipData[name]} />
         </>
       )}
       {isSelected && (
-        <div ref={equipDetailRef} style={commonDetailStyle}>
+        <div ref={equipDetailRef} className="equip_detail_card">
           <EquipDetailCard equipName={name} />
         </div>
       )}

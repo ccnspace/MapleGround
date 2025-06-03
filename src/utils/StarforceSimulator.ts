@@ -119,8 +119,8 @@ export class StarforceSimulator {
   private getCostDiscountRatio() {
     const { sundayDiscount, pcDiscount, mvpDiscount } = this.discountInfo;
 
-    const isPcDiscountEnabled = parseInt(this.item.starforce) <= 17;
-    const isMvpDiscountEnabled = parseInt(this.item.starforce) <= 17;
+    const isPcDiscountEnabled = parseInt(this.item.starforce) < 17;
+    const isMvpDiscountEnabled = parseInt(this.item.starforce) < 17;
     const realPcDiscount = isPcDiscountEnabled ? pcDiscount : 0;
     const realMvpDiscount = isMvpDiscountEnabled ? mvpDiscount : 0;
     return (1 - (realPcDiscount + realMvpDiscount)) * (1 - sundayDiscount);

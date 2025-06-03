@@ -19,7 +19,7 @@ export const ExceptionalOptionComponent = ({ options }: { options: ExceptionalOp
     }
 
     if (isAllValidStat(max_hp, max_mp) && [max_hp, max_mp].every((item) => item === max_hp)) {
-      setOptionDescription((prev) => [...prev, `최대 HP / 최대 MP: +${max_mp}`]);
+      setOptionDescription((prev) => [...prev, `최대 HP / 최대 MP : +${max_mp}`]);
     } else if (isAllValidStat(max_hp, max_mp)) {
       setOptionDescription((prev) => [...prev, `최대 HP : +${max_hp}`, `최대 MP : +${max_mp}`]);
     }

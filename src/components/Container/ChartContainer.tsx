@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { useCharacterPowerStore } from "@/stores/characterPower";
 import { useShallow } from "zustand/shallow";
 import { Spinner } from "../svg/Spinner";
+import { ContainerWrapper } from "./ContainerWrapper";
 
 export const ChartContainer = () => {
   const nickname = useCharacterStore((state) => state.characterAttributes?.basic.character_name);
@@ -106,10 +107,7 @@ export const ChartContainer = () => {
   ];
 
   return (
-    <div
-      className="flex shrink-0 w-full min-h-[400px] flex-col bg-slate-100 dark:bg-[#1f2024] px-3 pt-3 pb-3
-        rounded-lg gap-0.5 justify-center"
-    >
+    <ContainerWrapper className="w-full min-h-[400px] gap-0.5 justify-center">
       <div className="flex flex-col h-32 justify-center">
         {canShowChart && (
           <>
@@ -134,6 +132,6 @@ export const ChartContainer = () => {
           </div>
         )}
       </div>
-    </div>
+    </ContainerWrapper>
   );
 };

@@ -3,6 +3,7 @@
 import { CharacterEquipments, useCharacterInfo } from "@/hooks/useCharacterInfo";
 import { createContext, useEffect, useMemo, useState } from "react";
 import { EquipInventory } from "../Equip/EquipInventory";
+import { ContainerWrapper } from "./ContainerWrapper";
 
 type EquipContextType = {
   characterEquipments: CharacterEquipments | undefined;
@@ -47,10 +48,7 @@ export const EquipContainer = () => {
   );
 
   return (
-    <div
-      className="flex shrink-0 min-w-96 justify-center bg-slate-100 flex-col dark:bg-[#1f2024] px-3 pt-3 pb-3
-      rounded-lg gap-1"
-    >
+    <ContainerWrapper className="gap-1">
       <div className="flex flex-col justify-center">
         {!!characterInfo?.equipments ? (
           <div className="flex justify-between mb-4">
@@ -92,6 +90,6 @@ export const EquipContainer = () => {
           </EquipActionContext.Provider>
         </EquipContext.Provider>
       </div>
-    </div>
+    </ContainerWrapper>
   );
 };

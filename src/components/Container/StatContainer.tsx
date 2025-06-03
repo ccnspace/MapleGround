@@ -4,6 +4,7 @@ import { useCharacterInfo } from "@/hooks/useCharacterInfo";
 import { type PropsWithChildren, useMemo } from "react";
 import { formatKoreanNumber } from "@/utils/formatKoreanNum";
 import { StatName } from "@/types/CharacterStat";
+import { ContainerWrapper } from "./ContainerWrapper";
 
 const getCombatPowerBgColor = (combatPower: number) => {
   if (combatPower < 50_000_000) {
@@ -182,10 +183,7 @@ export const StatContainer = () => {
   const combatDescription = getCombatDescription(combatPower);
 
   return (
-    <div
-      className="flex shrink-0 min-w-96 bg-slate-100 flex-col dark:bg-[#1f2024] px-3 pt-3 pb-3
-      rounded-lg gap-1"
-    >
+    <ContainerWrapper>
       {characterInfo?.stat ? (
         <div className="flex flex-col gap-3">
           <p
@@ -248,6 +246,6 @@ export const StatContainer = () => {
           <p className="font-bold text-sm text-slate-950/50 dark:text-white/60">여기에 캐릭터의 전투 정보가 표시됩니다.</p>
         </div>
       )}
-    </div>
+    </ContainerWrapper>
   );
 };

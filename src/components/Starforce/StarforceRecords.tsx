@@ -40,7 +40,7 @@ export const StarforceRecords = ({
 
   return (
     <div
-      className={`flex p-2 flex-col gap-1 text-white rounded-lg
+      className={`starforce_records flex p-2 flex-col gap-1 text-white rounded-lg
 bg-black/70 border border-white/30 w-[300px]`}
     >
       <div className="flex flex-col gap-1.5 h-full">
@@ -66,14 +66,14 @@ bg-black/70 border border-white/30 w-[300px]`}
         </div>
         <div
           ref={recordContainerRef}
-          className="flex break-words overflow-y-scroll h-[256px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white"
+          className="max-[600px]:h-[200px] flex break-words overflow-y-scroll h-[312px] flex-col gap-1 bg-black/60 rounded-md p-2 text-xs text-white"
         >
           {records.map((item, idx) => (
             <p key={idx}>·{makeRecordString(item)}</p>
           ))}
         </div>
         <div
-          className="flex flex-col min-w-[192px] gap-1.5 text-[13px]
+          className="starforce_guide flex flex-col min-w-[192px] gap-1.5 text-[13px]
         bg-gradient-to-br from-slate-500 to-slate-600 rounded-md p-1.5"
         >
           <p>
@@ -90,7 +90,7 @@ bg-black/70 border border-white/30 w-[300px]`}
           </p>
           <p>
             · <span className="bg-slate-700 rounded-md p-1">MVP/PC방 할인</span>은{" "}
-            <span className="text-lime-300 text-bold">18성 이상</span>부터는{" "}
+            <span className="text-lime-300 text-bold">17성 이상</span>부터는{" "}
             <span className="text-lime-300 text-bold">적용되지 않습니다.</span>
           </p>
           <p>

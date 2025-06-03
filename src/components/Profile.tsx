@@ -153,7 +153,7 @@ export const ProfileWrapper = () => {
 
   return (
     <div
-      className={`flex flex-col gap-3 items-center justify-center
+      className={`profile flex flex-col gap-3 items-center justify-center
      font-medium rounded-lg relative
       mx-5 mt-6 mb-4 px-3 pt-2 pb-2 h-56 
      ${bgColor}`}

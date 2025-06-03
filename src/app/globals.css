@@ -156,10 +156,11 @@ abbr:where([title]) {
   }
 }
 
+.expContent_container {
+  grid-row: span 30;
+}
+
 @media (max-width: 600px) {
-  .equipset_container {
-    display: none;
-  }
   .exp_container {
     display: none;
   }

@@ -161,7 +161,6 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
   // 5-10-15성에서 강화 시도 100%
   useEffect(() => {
-    console.log("isStarforceCatch100Checked", isStarforceCatch100Checked);
     simulator.setStarforceCatch100(isStarforceCatch100Checked);
     updateStarforceState();
   }, [isStarforceCatch100Checked, updateStarforceState]);

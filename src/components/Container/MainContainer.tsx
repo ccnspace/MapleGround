@@ -7,8 +7,7 @@ import { PetEquipContainer } from "@/components/Container/PetEquipContainer";
 import { ChartContainer } from "@/components/Container/ChartContainer";
 import { DimmedLayer } from "../DimmedLayer";
 import { useCharacterStore } from "@/stores/character";
-import { ExpContainer } from "./ExpContainer";
-import { EquipSetContainer } from "./EquipSetContainer";
+import { ExpContentContainer } from "./ExpContentContainer";
 import { useCubeStore } from "@/stores/cube";
 import { CubeContainer } from "./CubeContainer";
 import { memo } from "react";
@@ -16,10 +15,10 @@ import { useStarforceStore } from "@/stores/starforce";
 import { StarforceContainer } from "./StarforceContainer";
 
 const RightSideGridContainer = memo(() => (
-  <div className="grid gap-4">
+  <div className="grid gap-4" style={{ gridRow: "span 2" }}>
     <AbilityContainer />
     <PetEquipContainer />
-    <EquipSetContainer />
+    <ExpContentContainer />
   </div>
 ));
 
@@ -30,7 +29,7 @@ const BottomGridContainer = memo(() => (
     <div className="col-span-2">
       <ChartContainer />
     </div>
-    <ExpContainer />
+    {/* <ExpContainer /> */}
   </>
 ));
 

@@ -84,6 +84,8 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   const [isShiningStarforceChecked, setIsShiningStarforceChecked] = useState(false);
   // 파괴방지
   const [isDestroyProtectionChecked, setIsDestroyProtectionChecked] = useState(false);
+  // 5-10-15성에서 강화 시도 100%
+  const [isStarforceCatch100Checked, setIsStarforceCatch100Checked] = useState(false);
   // 썬데이
   const [isSundayChecked, setIsSundayChecked] = useState(false);
   // PC방 할인
@@ -154,6 +156,13 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     simulator.setDestroyProtection(isDestroyProtectionChecked);
     updateStarforceState();
   }, [isDestroyProtectionChecked, updateStarforceState]);
+
+  // 5-10-15성에서 강화 시도 100%
+  useEffect(() => {
+    console.log("isStarforceCatch100Checked", isStarforceCatch100Checked);
+    simulator.setStarforceCatch100(isStarforceCatch100Checked);
+    updateStarforceState();
+  }, [isStarforceCatch100Checked, updateStarforceState]);
 
   // 할인 적용
   useEffect(() => {
@@ -485,7 +494,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                 <div style={{ display: isOptionFolded ? "none" : "block" }}>
                   {/** 확률 메뉴 */}
                   <div className="flex flex-row flew-grow w-full bg-white/10 rounded-md">
-                    <div className="flex text-white m-1 w-[30%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
+                    <div className="flex text-white m-1 w-[50%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
                       <CheckBox
                         checked={isStarforceCatchChecked}
                         disabled={isAutoModePlaying}
@@ -493,7 +502,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                         onChange={() => setIsStarforceCatchChecked((prev) => !prev)}
                       />
                     </div>
-                    <div className="flex text-white m-1 w-[30%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
+                    <div className="flex text-white m-1 w-[50%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
                       <CheckBox
                         labelStyle={{ fontWeight: "bold" }}
                         checked={isDestroyProtectionChecked}
@@ -502,13 +511,25 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                         onChange={() => setIsDestroyProtectionChecked((prev) => !prev)}
                       />
                     </div>
-                    <div className="flex text-white m-1 w-[40%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
+                  </div>
+                  {/** 확률 메뉴 2*/}
+                  <div className="flex flex-row flew-grow w-full bg-white/10 rounded-md">
+                    <div className="flex text-white m-1 w-[50%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
                       <CheckBox
                         labelStyle={{ fontWeight: "bold" }}
                         checked={isShiningStarforceChecked}
                         disabled={isAutoModePlaying}
-                        label="샤타포스(파괴 30%↓)"
+                        label="21성 이하 파괴 30%↓"
                         onChange={() => setIsShiningStarforceChecked((prev) => !prev)}
+                      />
+                    </div>
+                    <div className="flex text-white m-1 w-[50%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
+                      <CheckBox
+                        labelStyle={{ fontWeight: "bold" }}
+                        checked={isStarforceCatch100Checked}
+                        disabled={isAutoModePlaying}
+                        label="5-10-15성에서 강화 시도 100%"
+                        onChange={() => setIsStarforceCatch100Checked((prev) => !prev)}
                       />
                     </div>
                   </div>
@@ -519,7 +540,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                         labelStyle={{ fontWeight: "bold" }}
                         checked={isSundayChecked}
                         disabled={isAutoModePlaying}
-                        label="썬데이(메소 30%↓)"
+                        label="메소 30%↓"
                         onChange={() => setIsSundayChecked((prev) => !prev)}
                       />
                     </div>

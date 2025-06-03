@@ -85,10 +85,6 @@ bg-black/70 border border-white/30 w-[300px]`}
             때만 적용되며 <span className="text-lime-300 text-bold">2배의 메소</span>가 필요합니다. 추가되는 메소는 할인되지 않습니다.
           </p>
           <p>
-            · <span className="bg-slate-700 rounded-md p-1">샤탸포스</span>는 <span className="text-lime-300 text-bold">22성 이상</span>
-            부터는 <span className="text-lime-300 text-bold">적용되지 않습니다.</span>
-          </p>
-          <p>
             · <span className="bg-slate-700 rounded-md p-1">MVP/PC방 할인</span>은{" "}
             <span className="text-lime-300 text-bold">17성 이상</span>부터는{" "}
             <span className="text-lime-300 text-bold">적용되지 않습니다.</span>

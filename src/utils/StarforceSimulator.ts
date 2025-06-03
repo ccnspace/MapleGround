@@ -30,7 +30,7 @@ export class StarforceSimulator {
   private destroyCount: number;
   private destroyReduction: number;
   private successRateIncrease: number;
-  private destroyEvent: { isDestroyProtection: boolean; isShiningStarforce: boolean };
+  private destroyEvent: { isDestroyProtection: boolean; isShiningStarforce: boolean; isStarforceCatch100: boolean };
 
   constructor(props: Constructor) {
     this.item = { ...props.item };
@@ -41,7 +41,7 @@ export class StarforceSimulator {
     this.destroyCount = 0;
     this.destroyReduction = 0;
     this.successRateIncrease = 0;
-    this.destroyEvent = { isDestroyProtection: false, isShiningStarforce: false };
+    this.destroyEvent = { isDestroyProtection: false, isShiningStarforce: false, isStarforceCatch100: false };
     this.currentCost = this.getRealCost();
     this.probabilities = this.getRealProbabilities();
     this.result = null;
@@ -68,12 +68,24 @@ export class StarforceSimulator {
     this.currentCost = this.getRealCost();
   }
 
+  setStarforceCatch100(isSet: boolean) {
+    this.destroyEvent.isStarforceCatch100 = isSet;
+    this.probabilities = this.getRealProbabilities();
+  }
+
   private isShiningStarforceEnabled() {
     return this.destroyEvent.isShiningStarforce && parseInt(this.item.starforce) < 22;
   }
 
   private isDestroyProtectionEnabled() {
     return this.destroyEvent.isDestroyProtection && parseInt(this.item.starforce) >= 15 && parseInt(this.item.starforce) <= 17;
+  }
+
+  private isStarforceCatch100Enabled() {
+    return (
+      this.destroyEvent.isStarforceCatch100 &&
+      (parseInt(this.item.starforce) === 5 || parseInt(this.item.starforce) === 10 || parseInt(this.item.starforce) === 15)
+    );
   }
 
   private getRealCost() {
@@ -84,6 +96,7 @@ export class StarforceSimulator {
 
   private getRealProbabilities() {
     const baseProbabilities = getStarforceProbability(parseInt(this.item.starforce));
+    let customProbabilities = { ...baseProbabilities };
 
     if (this.isShiningStarforceEnabled()) {
       this.destroyReduction = DESTROY_REDUCTION_RATE;
@@ -95,21 +108,29 @@ export class StarforceSimulator {
       this.destroyReduction = 1;
     }
 
-    const adjustedSuccessRate = (baseProbabilities.success || 0) * (1 + this.successRateIncrease);
+    if (this.isStarforceCatch100Enabled()) {
+      customProbabilities.success = 1;
+      customProbabilities.fail = 0;
+      customProbabilities.destroy = 0;
+    } else {
+      customProbabilities = { ...baseProbabilities };
+    }
+
+    const adjustedSuccessRate = (customProbabilities.success || 0) * (1 + this.successRateIncrease);
     const remainRate = 1 - adjustedSuccessRate;
 
-    const destroyRate = (baseProbabilities.destroy || 0) * (1 - this.destroyReduction);
-    const failRate = baseProbabilities.fail + (baseProbabilities.destroy ? baseProbabilities.destroy - destroyRate : 0);
+    const destroyRate = (customProbabilities.destroy || 0) * (1 - this.destroyReduction);
+    const failRate = customProbabilities.fail + (customProbabilities.destroy ? customProbabilities.destroy - destroyRate : 0);
 
     const adjustedFailDestroySum = (failRate || 0) + (destroyRate || 0);
-    const destroyRatio = (destroyRate || 0) / adjustedFailDestroySum;
-    const failRatio = (failRate || 0) / adjustedFailDestroySum;
+    const destroyRatio = adjustedFailDestroySum > 0 ? (destroyRate || 0) / adjustedFailDestroySum : 0;
+    const failRatio = adjustedFailDestroySum > 0 ? (failRate || 0) / adjustedFailDestroySum : 0;
 
     const adjustedDestroyRate = remainRate * destroyRatio;
     const adjustedFailRate = remainRate * failRatio;
 
     return {
-      ...baseProbabilities,
+      ...customProbabilities,
       success: adjustedSuccessRate,
       fail: adjustedFailRate,
       destroy: adjustedDestroyRate,
@@ -131,7 +152,6 @@ export class StarforceSimulator {
     const rate = this.probabilities;
     const rand = Math.random();
 
-    // console.log("[simulate] : ", rate, "/ [rand]: ", rand);
     let result: StarforceResult;
 
     if (rand < rate.success) {

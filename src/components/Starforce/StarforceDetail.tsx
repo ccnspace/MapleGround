@@ -1,6 +1,4 @@
 import { StarforceProbability } from "@/utils/starforceUtils";
-import { Divider } from "../Equip/Divider";
-import { useEffect, useRef } from "react";
 
 interface Props {
   isMaxStarforce: boolean;
@@ -12,7 +10,6 @@ interface Props {
 
 export const StarforceDetail = ({ isMaxStarforce, starforce, currentProbabilities, starforceUpgradeOptions, prevStarforce }: Props) => {
   const isNewStar = (idx: number) => {
-    console.log(prevStarforce, starforce);
     const result = prevStarforce < starforce && idx + 1 === starforce;
     return result;
   };

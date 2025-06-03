@@ -19,9 +19,9 @@ module.exports = {
             color: "rgb(255 255 255)",
             textShadow: "0 0 0px rgba(255, 255, 255, 0)",
           },
-          "20%": {
+          "15%": {
             opacity: "1",
-            transform: "scale(3) rotate(30deg)",
+            transform: "scale(4) rotate(36deg)",
             color: "rgb(255 255 255)",
             textShadow:
               "0 0 8px rgba(255, 255, 255, 1), 0 0 15px rgba(255, 255, 255, 0.95), 0 0 20px rgba(255, 255, 255, 0.85), 0 0 25px rgba(255, 255, 255, 0.8), 0 0 35px rgba(253, 224, 71, 0.9), 0 0 40px rgba(253, 224, 71, 0.8)",
@@ -35,7 +35,7 @@ module.exports = {
         },
       },
       animation: {
-        starBlink: "starBlink 0.3s ease-out",
+        starBlink: "starBlink 0.4s ease-out",
       },
     },
   },

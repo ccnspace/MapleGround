@@ -9,7 +9,7 @@ type Props = {
 
 // TODO: 추옵 정보/주흔 작 등 다양한 정보를 간략화하여 제공
 export const EquipDescription = ({ item_icon, item_name, baseLevel, scroll_upgrade }: Props) => {
-  const itemName = scroll_upgrade !== "0" ? `${item_name} (+${scroll_upgrade})` : item_name;
+  const itemName = !!scroll_upgrade && scroll_upgrade !== "0" ? `${item_name} (+${scroll_upgrade})` : item_name;
   return (
     <>
       <p className="flex justify-center text-white text-base font-medium">{itemName}</p>

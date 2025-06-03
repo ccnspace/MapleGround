@@ -7,19 +7,13 @@ interface Props {
   starforce: number;
   currentProbabilities: StarforceProbability;
   starforceUpgradeOptions: string;
+  prevStarforce: number;
 }
 
-export const StarforceDetail = ({ isMaxStarforce, starforce, currentProbabilities, starforceUpgradeOptions }: Props) => {
-  const isFirstRender = useRef(true);
-
-  useEffect(() => {
-    // 첫 렌더링 이후에 false로 설정
-    isFirstRender.current = false;
-  }, []);
-
+export const StarforceDetail = ({ isMaxStarforce, starforce, currentProbabilities, starforceUpgradeOptions, prevStarforce }: Props) => {
   const isNewStar = (idx: number) => {
-    if (isFirstRender.current) return false;
-    return idx + 1 === starforce;
+    const result = prevStarforce !== starforce && idx + 1 === starforce;
+    return result;
   };
 
   // 아래 확률을 소수점 둘째자리까지 보여 주게 변경

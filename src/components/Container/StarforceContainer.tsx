@@ -50,6 +50,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
   const [currentTarget, setCurrentTarget] = useState<ItemEquipment | null>(null);
   const [currentStarforce, setCurrentStarforce] = useState(0);
+  const [prevStarforce, setPrevStarforce] = useState(0);
   const [currentCost, setCurrentCost] = useState(0);
   const [currentProbabilities, setCurrentProbabilities] = useState<StarforceProbability | null>(null);
   const [accumulatedCost, setAccumulatedCost] = useState(0);
@@ -124,8 +125,9 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   };
 
   const updateStarforceState = useCallback(() => {
-    const { item, cost, probabilities } = simulator.getState();
+    const { item, cost, probabilities, prevStarforce } = simulator.getState();
     setCurrentStarforce(parseInt(item.starforce));
+    setPrevStarforce(prevStarforce);
     setCurrentCost(cost);
     setCurrentProbabilities(probabilities);
   }, [simulator]);
@@ -278,8 +280,10 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
   const doStarforce = useCallback(() => {
     simulator.simulate();
-    const { item, cost, probabilities, result, accumulatedCost, attempts, destroyCount, discountRatio } = simulator.getState();
+    const { item, cost, probabilities, result, accumulatedCost, attempts, destroyCount, discountRatio, prevStarforce } =
+      simulator.getState();
 
+    setPrevStarforce(prevStarforce);
     setCurrentStarforce(parseInt(item.starforce));
     setCurrentCost(cost);
     setCurrentProbabilities(probabilities);
@@ -402,13 +406,14 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
           if (targetStarforce >= currentStarforce) {
             openModal({
               type: "alert",
-              message: `기존의 스타포스 수치보다 목표치를 높게 설정해 주세요.\n기존 스타포스 수치: ${targetItem.starforce}성\n목표 스타포스 수치: ${autoModeOption}성`,
+              message: `기존의 스타포스 수치보다 목표치를 높게 설정해 주세요.\n기존 스타포스 수치: ${targetItem.starforce}성\n목표 스타포스 수치: ${autoModeOption}`,
             });
           } else {
             simulator.setStarforce(targetStarforce);
 
             const { item } = simulator.getState();
             setCurrentStarforce(parseInt(item.starforce));
+            setPrevStarforce(parseInt(item.starforce));
             setIsAutoModePlaying(true);
           }
         }, 500);
@@ -482,6 +487,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                   <StarforceDetail
                     isMaxStarforce={isMaxStarforce}
                     starforce={currentStarforce}
+                    prevStarforce={prevStarforce}
                     currentProbabilities={currentProbabilities}
                     starforceUpgradeOptions={starforceUpgradeOptions}
                   />

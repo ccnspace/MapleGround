@@ -31,10 +31,13 @@ export class StarforceSimulator {
   private destroyReduction: number;
   private successRateIncrease: number;
   private destroyEvent: { isDestroyProtection: boolean; isShiningStarforce: boolean; isStarforceCatch100: boolean };
+  private prevStarforce: number;
 
   constructor(props: Constructor) {
     this.item = { ...props.item };
     this.discountInfo = { sundayDiscount: 0, pcDiscount: 0, mvpDiscount: 0 };
+
+    this.prevStarforce = parseInt(this.item.starforce);
 
     this.accumulatedCost = 0;
     this.attempts = 0;
@@ -154,6 +157,10 @@ export class StarforceSimulator {
 
     let result: StarforceResult;
 
+    if (this.prevStarforce !== parseInt(this.item.starforce)) {
+      this.prevStarforce = parseInt(this.item.starforce);
+    }
+
     if (rand < rate.success) {
       result = "success";
       this.item.starforce = (parseInt(this.item.starforce) + 1).toString();
@@ -185,6 +192,7 @@ export class StarforceSimulator {
       destroyCount: this.destroyCount,
       discountInfo: this.discountInfo,
       discountRatio: this.getCostDiscountRatio(),
+      prevStarforce: this.prevStarforce,
     };
   }
 
@@ -192,6 +200,10 @@ export class StarforceSimulator {
     this.item.starforce = starforce.toString();
     this.currentCost = this.getRealCost();
     this.probabilities = this.getRealProbabilities();
+  }
+
+  setPrevStarforce(starforce: number) {
+    this.prevStarforce = starforce;
   }
 
   resetAttempts() {

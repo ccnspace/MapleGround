@@ -188,6 +188,27 @@ abbr:where([title]) {
   }
 }
 
+.equip_wrapper {
+  position: relative;
+}
+
+.equip_detail_card {
+  position: absolute;
+  z-index: 1000;
+  top: 10px;
+  left: 10px;
+}
+@media (max-width: 600px) {
+  .equip_detail_card {
+    position: fixed;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    left: 0;
+    top: 0;
+  }
+}
+
 .fade-in {
   animation: fadein 0.36s;
 }

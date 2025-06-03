@@ -64,7 +64,6 @@ export const CubeContainer = () => {
     currentAttempt,
     currentGuarantee,
     isSoundEnabled,
-    prevAttempt,
     mesoCost,
     setIsSoundEnabled,
     rollCube,
@@ -133,7 +132,7 @@ export const CubeContainer = () => {
   const reRollPotential = useCallback(() => {
     rollCube();
 
-    const { currentOptions: newOptions } = cubeSimulator.getItemState();
+    const { currentOptions: newOptions, currentAttempt } = cubeSimulator.getItemState();
 
     if (isSpeedMode) {
       const filteredOptions = [...speedOptions].filter((item) => item !== NOT_SELECTED);
@@ -141,13 +140,13 @@ export const CubeContainer = () => {
 
       const isFullyMatched = isFullyContainedInArray(filteredOptions, newOptions);
 
-      if (isFullyMatched && prevAttempt.current !== currentAttempt) {
+      if (isFullyMatched) {
         setSpeedMode(false);
         setRecords((prev) => [...prev, `${newOptions.join("/")} - ${currentAttempt}번만에 획득`]);
         resetCurrentAttempt();
       }
     }
-  }, [isSpeedMode, speedOptions, currentAttempt, rollCube, resetCurrentAttempt]);
+  }, [isSpeedMode, speedOptions, rollCube, resetCurrentAttempt]);
 
   /** 초기 데이터 init */
   const initialGrade = cubeType === "potential" ? itemPotentialGrade : additionalPotentialGrade;

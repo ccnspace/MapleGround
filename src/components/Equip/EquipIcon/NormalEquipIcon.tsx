@@ -63,7 +63,7 @@ const potentialStyle: Record<string, string> = {
   레어: "border-2 border-sky-400",
 };
 
-const commonEquipStyle = `equip_wrapper flex hover:bg-slate-400/60 dark:hover:bg-white/40 relative justify-center
+const commonEquipClassName = `equip_wrapper flex hover:bg-slate-400/60 dark:hover:bg-white/40 justify-center
   items-center bg-slate-300 dark:bg-[#4f515a] w-16 h-16 rounded-md cursor-pointer`;
 
 // TODO: EquipDetailCard에 공통화
@@ -87,7 +87,7 @@ export const NormalEquipIcon = memo(({ name, equipData, customClass, isSelected 
   };
 
   return (
-    <div id={name} className={`${getPotentialStyle(name)} ${commonEquipStyle} ${customClass}`}>
+    <div id={name} className={`${getPotentialStyle(name)} ${commonEquipClassName} ${customClass}`}>
       {equipData?.[name] && (
         <>
           <StarForceBadge item={equipData[name]} />
@@ -96,7 +96,7 @@ export const NormalEquipIcon = memo(({ name, equipData, customClass, isSelected 
         </>
       )}
       {isSelected && (
-        <div ref={equipDetailRef} style={commonDetailStyle}>
+        <div ref={equipDetailRef} className="equip_detail_card">
           <EquipDetailCard equipName={name} />
         </div>
       )}

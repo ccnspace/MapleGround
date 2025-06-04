@@ -53,6 +53,7 @@ export const Modal = () => {
         <div
           className="modal flex shrink-0 w-[350px] absolute left-[45%] top-[35%] flex-col
          bg-white dark:bg-[#2c2e38] shadow rounded-lg gap-2 text-center
+         dark:border dark:border-slate-200/50
       px-3 pt-6 pb-6"
         >
           <p className="flex whitespace-pre-wrap text-[16px] pt-2 pb-2 justify-center font-medium">{message}</p>

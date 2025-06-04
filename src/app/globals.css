@@ -57,6 +57,7 @@ abbr:where([title]) {
   grid-auto-flow: row;
   padding-top: 16px;
   height: fit-content;
+  padding-bottom: 12px;
 }
 
 .main_container::-webkit-scrollbar {
@@ -158,11 +159,12 @@ abbr:where([title]) {
 
 .expContent_container {
   grid-row: span 30;
+  max-height: 700px;
 }
 
 @media (max-width: 600px) {
-  .exp_container {
-    display: none;
+  .expContent_container {
+    max-height: 500px;
   }
 }
 

@@ -578,13 +578,13 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                       <div className="text-white">
                         <CheckBox
                           labelStyle={{ fontWeight: "bold" }}
-                          label="자동 모드"
+                          label="자동 모드⚡"
                           disabled={isAutoModePlaying}
                           checked={isAutoModeChecked}
                           onChange={() => setIsAutoModeChecked((prev) => !prev)}
                         />
                       </div>
-                      <div className="flex flex-col gap-2 ml-[60px]">
+                      <div className="flex flex-col gap-2 ml-[40px]">
                         <div className="flex items-center">
                           <SelectBox
                             style={{ maxWidth: "160px" }}

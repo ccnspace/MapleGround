@@ -32,7 +32,9 @@ export default function RootLayout({
           <Modal />
           <main className="flex-1">{children}</main>
           <footer className="flex justify-center items-center py-4 border-t border-slate-200 dark:border-white/10">
-            <p className="text-sm text-slate-600 dark:text-slate-400">© 2024 MapleDot. All rights reserved.</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              © 2025 MapleDot. All rights reserved. | Data based on <span className="font-bold">NEXON Open API</span>
+            </p>
           </footer>
         </ThemeProvider>
       </body>

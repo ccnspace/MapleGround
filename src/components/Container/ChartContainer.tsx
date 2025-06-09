@@ -111,17 +111,17 @@ const ChartContainer = () => {
   ];
 
   return (
-    <ContainerWrapper className="w-full min-h-[400px] gap-0.5 justify-center">
-      <div className="flex flex-col h-32 justify-center">
+    <ContainerWrapper className="w-full min-h-[400px] gap-0.5">
+      <p
+        className="flex font-extrabold text-base px-2 pt-0.5
+          border-l-4 border-l-indigo-400
+         "
+      >
+        전투력 추이
+      </p>
+      <div className="flex flex-col h-[360px] justify-center">
         {canShowChart && (
           <>
-            <p
-              className="flex font-extrabold text-base mb-auto px-2 pt-0.5
-                border-l-4 border-l-indigo-400
-               "
-            >
-              전투력 추이
-            </p>
             <Chart options={chartOptions} series={series} type="line" height="310" />
           </>
         )}

@@ -1,11 +1,13 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { EnterIcon } from "@/components/svg/EnterIcon";
 import Image from "next/image";
 import CharacterImg from "@/images/0.png";
 import MainBg from "@/images/mainBg.jpg";
+import { useCharacterStore } from "@/stores/character";
+import { useCharacterPowerStore } from "@/stores/characterPower";
 
 export default function Home() {
   const [nickname, setNickname] = useState("");

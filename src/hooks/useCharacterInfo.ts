@@ -6,6 +6,7 @@ import { SymbolEquipmentInfo, SymbolOption } from "@/types/SymbolEquipment";
 import { useCharacterStore } from "@/stores/character";
 import { useShallow } from "zustand/shallow";
 import { useMemo } from "react";
+import { useNickname } from "./useNickname";
 
 /** equiments를 컴포넌트에서 사용하기 쉽게 가공 */
 export type CharacterEquipments = {
@@ -24,16 +25,17 @@ export type CharacterInfo = {
 
 /** 현재 검색한 캐릭터의 정보를 반환하는 hook */
 export const useCharacterInfo = (preset?: number) => {
+  const nickname = useNickname();
   const { characterAttributes, basic, normalEquip, cashEquip, symbolEquip, androidEquip, stat, ability } = useCharacterStore(
     useShallow((state) => ({
-      characterAttributes: state.characterAttributes,
-      basic: state.characterAttributes?.basic,
-      normalEquip: state.characterAttributes?.normalEquip,
-      cashEquip: state.characterAttributes?.cashEquip,
-      symbolEquip: state.characterAttributes?.symbolEquip,
-      androidEquip: state.characterAttributes?.androidEquip,
-      stat: state.characterAttributes?.stat,
-      ability: state.characterAttributes?.ability,
+      characterAttributes: state.characterAttributes?.[nickname],
+      basic: state.characterAttributes?.[nickname]?.basic,
+      normalEquip: state.characterAttributes?.[nickname]?.normalEquip,
+      cashEquip: state.characterAttributes?.[nickname]?.cashEquip,
+      symbolEquip: state.characterAttributes?.[nickname]?.symbolEquip,
+      androidEquip: state.characterAttributes?.[nickname]?.androidEquip,
+      stat: state.characterAttributes?.[nickname]?.stat,
+      ability: state.characterAttributes?.[nickname]?.ability,
     }))
   );
 

@@ -1,15 +1,14 @@
 "use client";
 
 import Chart, { type Props } from "react-apexcharts";
-import { getCharacterCombatPower } from "@/apis/getCharacterCombatPower";
 import { useCharacterStore } from "@/stores/character";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { InfoIcon } from "../svg/InfoIcon";
 import { ContainerWrapper } from "./ContainerWrapper";
+import { useNickname } from "@/hooks/useNickname";
 
 export const ExpContainer = () => {
-  const nickname = useCharacterStore((state) => state.characterAttributes?.basic.character_name);
+  const nickname = useNickname();
   const [categories, setCategories] = useState<string[]>([]);
   const [seriesData, setSeriesData] = useState<number[]>([]);
 

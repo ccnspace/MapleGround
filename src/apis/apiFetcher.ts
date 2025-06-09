@@ -1,3 +1,5 @@
+import { useCharacterStore } from "@/stores/character";
+import { useCharacterPowerStore } from "@/stores/characterPower";
 import { useModalStore } from "@/stores/modal";
 
 export const apiFetcher = async <T>(url: string, signal?: AbortSignal): Promise<T> => {

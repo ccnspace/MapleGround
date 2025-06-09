@@ -8,13 +8,14 @@ import { useCharacterPowerStore } from "@/stores/characterPower";
 import { useShallow } from "zustand/shallow";
 import { Spinner } from "../svg/Spinner";
 import { ContainerWrapper } from "./ContainerWrapper";
+import { useNickname } from "@/hooks/useNickname";
 
 export const ChartContainer = () => {
-  const nickname = useCharacterStore((state) => state.characterAttributes?.basic.character_name);
+  const nickname = useNickname();
   const { fetchStatus, characterPower, fetchCharacterPower } = useCharacterPowerStore(
     useShallow((state) => ({
       fetchStatus: state.fetchStatus,
-      characterPower: state.characterPower,
+      characterPower: state.characterPower?.[nickname],
       fetchCharacterPower: state.fetchCharacterPower,
     }))
   );
@@ -34,21 +35,17 @@ export const ChartContainer = () => {
   }, [nickname, categories, seriesData]);
 
   useEffect(() => {
-    if (!nickname || characterPower) return;
+    if (!nickname) return;
 
     const abortController = new AbortController();
     fetchCharacterPower(nickname, abortController.signal);
-
-    return () => {
-      abortController.abort();
-    };
-  }, [nickname, characterPower, fetchCharacterPower]);
+  }, [nickname]);
 
   useEffect(() => {
     if (!characterPower) return;
 
-    setCategories((prev) => [...prev, ...Object.keys(characterPower)]);
-    setSeriesData((prev) => [...prev, ...Object.values(characterPower)]);
+    setCategories((prev) => [...prev, ...Object.keys(characterPower.data)]);
+    setSeriesData((prev) => [...prev, ...Object.values(characterPower.data)]);
   }, [characterPower]);
 
   const chartOptions: Props["options"] = {

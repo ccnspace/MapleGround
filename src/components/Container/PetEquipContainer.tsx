@@ -8,6 +8,7 @@ import { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Divider } from "../Equip/Divider";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { ContainerWrapper } from "./ContainerWrapper";
+import { useNickname } from "@/hooks/useNickname";
 
 type PetInfo = {
   name: string | null;
@@ -162,7 +163,8 @@ const PetBox = ({
 };
 
 export const PetEquipContainer = () => {
-  const petEquip = useCharacterStore((state) => state.characterAttributes?.petEquip);
+  const nickname = useNickname();
+  const petEquip = useCharacterStore((state) => state.characterAttributes?.[nickname]?.petEquip);
   const [petInfos, setPetInfos] = useState<PetInfo[]>([]);
   const [selectedPetIndex, setSelectedPetIndex] = useState<string>("");
 

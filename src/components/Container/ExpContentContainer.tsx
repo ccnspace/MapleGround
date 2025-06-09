@@ -13,6 +13,7 @@ import highIcon from "@/images/high.png";
 import anglerIcon from "@/images/angler.png";
 import monpaIcon from "@/images/monpa.png";
 import vipRestIcon from "@/images/vip.png";
+import { useNickname } from "@/hooks/useNickname";
 
 const formatExp = (exp: number) => {
   return exp.toLocaleString();
@@ -23,7 +24,8 @@ const formatExpRate = (exp: number, maxExp: number) => {
 };
 
 export const ExpContentContainer = () => {
-  const characterAttributes = useCharacterStore((state) => state.characterAttributes);
+  const nickname = useNickname();
+  const characterAttributes = useCharacterStore((state) => state.characterAttributes?.[nickname]);
   const { character_level } = characterAttributes?.basic || {};
   const [normalVoucherCount, setNormalVoucherCount] = React.useState<string>("");
   const [advancedVoucherCount, setAdvancedVoucherCount] = React.useState<string>("");

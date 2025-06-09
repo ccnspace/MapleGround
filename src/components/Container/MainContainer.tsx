@@ -10,7 +10,7 @@ import { useCharacterStore } from "@/stores/character";
 import { ExpContentContainer } from "./ExpContentContainer";
 import { useCubeStore } from "@/stores/cube";
 import { CubeContainer } from "./CubeContainer";
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import { useStarforceStore } from "@/stores/starforce";
 import { StarforceContainer } from "./StarforceContainer";
 import { useTheme } from "next-themes";
@@ -42,7 +42,7 @@ export const MainContainer = () => {
   const starforceTargetItem = useStarforceStore((state) => state.targetItem);
   const { theme } = useTheme();
 
-  if (fetchStatus === "loading" || fetchStatus === "error") {
+  if (fetchStatus !== "success") {
     return (
       <div className="w-[1280px] h-[calc(100vh-80px)] flex flex-col items-center justify-center">
         <Spinner width="6em" height="6em" color={theme === "dark" ? "white" : "#616161"} />

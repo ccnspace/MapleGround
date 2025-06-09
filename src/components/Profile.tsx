@@ -9,6 +9,7 @@ import { useShallow } from "zustand/shallow";
 import { CharacterAttributes } from "@/apis/getCharacterAttributes";
 import { useModalStore } from "@/stores/modal";
 import { useCharacterPowerStore } from "@/stores/characterPower";
+import { useNickname } from "@/hooks/useNickname";
 import { useRouter } from "next/navigation";
 
 type ProfileProps = {
@@ -19,10 +20,34 @@ const Profile = ({ characterAttributes }: ProfileProps) => {
   const { character_class, character_level, character_guild_name, character_name, character_image, character_exp_rate, world_name } =
     characterAttributes.basic;
 
-  const currentDate = new Date().toLocaleString("ko-kr", {
+  const fetchDate = new Date(characterAttributes.fetchDate);
+
+  const currentDate = fetchDate.toLocaleString("ko-kr", {
     dateStyle: "long",
     timeStyle: "short",
   });
+
+  const router = useRouter();
+
+  const handleRefresh = () => {
+    useModalStore.getState().setModal({
+      type: "confirm",
+      message: "전체 데이터를 최신화 하시겠어요?",
+      confirmCallback: () => {
+        if (!character_name) return;
+
+        const { setFetchStatus, resetCharacterData } = useCharacterStore.getState();
+        const { setFetchStatus: setCharacterPowerFetchStatus, resetCharacterPower } = useCharacterPowerStore.getState();
+
+        setFetchStatus("loading");
+        setCharacterPowerFetchStatus("loading");
+        resetCharacterData(character_name);
+        resetCharacterPower(character_name);
+
+        location.href = `/main?name=${character_name}`;
+      },
+    });
+  };
 
   return (
     <div className="flex text-base items-center flex-col gap-3">
@@ -64,8 +89,11 @@ const Profile = ({ characterAttributes }: ProfileProps) => {
         </p>
         <div style={{ width: `${character_exp_rate}%` }} className="flex bg-gradient-to-r from-cyan-500 to-blue-500 h-6 rounded-s-lg" />
       </div>
-      <div className="flex -mt-1">
-        <p className="text-slate-300 text-xs font-light">{`${currentDate} 데이터`}</p>
+      <div className="flex flex-col gap-2 -mt-1">
+        <p className="text-slate-100 text-xs font-medium">{`${currentDate} 데이터`}</p>
+        <button className="text-slate-100 bg-slate-700 px-1 py-1 rounded-md text-sm font-bold hover:bg-slate-600" onClick={handleRefresh}>
+          {`⟳ 전체 데이터 최신화`}
+        </button>
       </div>
     </div>
   );
@@ -73,28 +101,27 @@ const Profile = ({ characterAttributes }: ProfileProps) => {
 
 export const ProfileWrapper = () => {
   const router = useRouter();
+  const nickname = useNickname();
   const { fetchStatus, characterAttributes, resetCharacterData } = useCharacterStore(
     useShallow((state) => ({
       fetchStatus: state.fetchStatus,
-      characterAttributes: state.characterAttributes,
+      characterAttributes: state.characterAttributes?.[nickname],
       resetCharacterData: state.resetCharacterData,
     }))
   );
 
   const hasProfile = characterAttributes && fetchStatus === "success";
   const isSearchError = fetchStatus === "error";
-
   const bgColor = !hasProfile ? "bg-slate-800" : "bg-slate-800 border-2 border-slate-600";
 
   const resetProfile = () => {
     if (!characterAttributes) {
-      resetCharacterData();
       router.push("/");
       return;
     }
     useModalStore.getState().setModal({
       type: "confirm",
-      message: "설정된 캐릭터를 초기화 하시겠어요?",
+      message: "다른 캐릭터를 검색하시겠어요?",
       confirmCallback: () => {
         router.push("/");
       },
@@ -102,20 +129,26 @@ export const ProfileWrapper = () => {
   };
 
   return (
-    <div
-      className={`profile flex flex-col gap-3 items-center justify-center
+    <>
+      <div
+        className={`profile flex flex-col gap-3 items-center justify-center
      font-medium rounded-lg relative
-      mx-5 mt-6 mb-4 px-3 pt-2 pb-2 h-56 
+      mx-5 mt-6 mb-4 px-3 pt-2 pb-2 h-60 
      ${bgColor}`}
-    >
-      {fetchStatus === "loading" && <Spinner />}
-      {isSearchError && <p className="text-white text-base">검색결과가 없습니다.</p>}
-      {hasProfile && <Profile characterAttributes={characterAttributes} />}
-      {(hasProfile || isSearchError) && (
-        <div className="absolute right-0 top-0 px-3 pt-3 hover:cursor-pointer" onClick={resetProfile}>
-          <BackIcon />
-        </div>
-      )}
-    </div>
+      >
+        {fetchStatus === "loading" && <Spinner />}
+        {isSearchError && <p className="text-white text-base">검색결과가 없습니다.</p>}
+        {hasProfile && <Profile characterAttributes={characterAttributes} />}
+        {(hasProfile || isSearchError) && (
+          <div className="absolute right-0 top-0 px-3 pt-3 hover:cursor-pointer" onClick={resetProfile}>
+            <BackIcon />
+          </div>
+        )}
+      </div>
+      <div className="flex flex-col gap-1 bg-slate-100 dark:bg-slate-500/10 rounded-lg p-3 mx-5">
+        <p className="text-slate-800 dark:text-slate-200 text-xs font-medium">{`ⓘ 최근 데이터 조회 시간보다 30분 이상 지난 경우 데이터가 갱신됩니다.`}</p>
+        <p className="text-slate-800 dark:text-slate-200 text-xs font-medium">{`ⓘ [전체 데이터 최신화] 버튼을 누르면 모든 데이터를 현재 시각 기준으로 갱신합니다.`}</p>
+      </div>
+    </>
   );
 };

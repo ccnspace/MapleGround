@@ -1,26 +1,27 @@
 "use client";
 
 import { MainContainer } from "@/components/Container/MainContainer";
+import { useNickname } from "@/hooks/useNickname";
 import { useCharacterStore } from "@/stores/character";
-import { useSearchParams } from "next/navigation";
+import { useCharacterPowerStore } from "@/stores/characterPower";
 import { useEffect } from "react";
 
 export default function MainPage() {
-  const searchParams = useSearchParams();
-  const characterAttributes = useCharacterStore((state) => state.characterAttributes);
+  const nickname = useNickname();
   const fetchCharacterAttributes = useCharacterStore((state) => state.fetchCharacterAttributes);
-  const nickname = searchParams.get("name");
 
   useEffect(() => {
-    if (!nickname || characterAttributes) return;
+    if (!nickname) return;
 
     const abortController = new AbortController();
     fetchCharacterAttributes(nickname, abortController.signal);
 
     return () => {
       abortController.abort();
+      useCharacterStore.getState().setFetchStatus("idle");
+      useCharacterPowerStore.getState().setFetchStatus("idle");
     };
-  }, [nickname, characterAttributes, fetchCharacterAttributes]);
+  }, [nickname, fetchCharacterAttributes]);
 
   return <MainContainer />;
 }

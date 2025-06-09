@@ -11,6 +11,8 @@ import { useModalStore } from "@/stores/modal";
 import { useCharacterPowerStore } from "@/stores/characterPower";
 import { useNickname } from "@/hooks/useNickname";
 import { useRouter } from "next/navigation";
+import { getLocalStorage, setLocalStorage } from "@/utils/localStorage";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 type ProfileProps = {
   characterAttributes: CharacterAttributes;
@@ -114,6 +116,21 @@ export const ProfileWrapper = () => {
   const isSearchError = fetchStatus === "error";
   const bgColor = !hasProfile ? "bg-slate-800" : "bg-slate-800 border-2 border-slate-600";
 
+  const { value: bookmark, set: setBookmark } = useLocalStorage("bookmark");
+
+  const hasBookmarked = bookmark && !!bookmark.includes(nickname);
+  const bookmarkLabel = hasBookmarked ? "★ 북마크중" : "★ 북마크하기";
+
+  const handleChangeBookmark = () => {
+    if (!nickname) return;
+    if (hasBookmarked) {
+      const newBookmark = bookmark.filter((name) => name !== nickname);
+      setBookmark(newBookmark);
+    } else {
+      setBookmark([...(bookmark ?? []), nickname]);
+    }
+  };
+
   const resetProfile = () => {
     if (!characterAttributes) {
       router.push("/");
@@ -133,10 +150,17 @@ export const ProfileWrapper = () => {
       <div
         className={`profile flex flex-col gap-3 items-center justify-center
      font-medium rounded-lg relative
-      mx-5 mt-6 mb-4 px-3 pt-2 pb-2 h-60 
+      mx-5 mt-6 mb-4 px-3 pt-6 pb-1 h-72 
      ${bgColor}`}
       >
-        {fetchStatus === "loading" && <Spinner />}
+        <div className="absolute left-0 top-0 px-3 pt-1.5 hover:cursor-pointer" onClick={handleChangeBookmark}>
+          <span
+            className={`bg-slate-600 hover:bg-slate-500 rounded-md px-1.5 py-1
+            text-sm ${hasBookmarked ? "text-yellow-300" : "text-slate-400"}`}
+          >
+            {bookmarkLabel}
+          </span>
+        </div>
         {isSearchError && <p className="text-white text-base">검색결과가 없습니다.</p>}
         {hasProfile && <Profile characterAttributes={characterAttributes} />}
         {(hasProfile || isSearchError) && (

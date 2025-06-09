@@ -8,10 +8,12 @@ import CharacterImg from "@/images/0.png";
 import MainBg from "@/images/mainBg.jpg";
 import { useCharacterStore } from "@/stores/character";
 import { useCharacterPowerStore } from "@/stores/characterPower";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 export default function Home() {
   const [nickname, setNickname] = useState("");
   const router = useRouter();
+  const { value: bookmarks } = useLocalStorage("bookmark");
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -20,8 +22,12 @@ export default function Home() {
     }
   };
 
+  const handleBookmarkClick = (bookmarkName: string) => {
+    router.push(`/main?name=${encodeURIComponent(bookmarkName)}`);
+  };
+
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center">
+    <main className="relative flex min-h-screen flex-col items-center justify-center p-4">
       {/* 배경 이미지 */}
       <div className="absolute inset-0 w-full h-full">
         <Image src={MainBg} alt="background" fill priority className="object-cover" quality={100} />
@@ -62,6 +68,40 @@ export default function Home() {
             </button>
           </div>
         </form>
+
+        {/* 북마크 리스트 */}
+        {bookmarks && bookmarks.length > 0 && (
+          <div className="mt-8 w-full max-w-md z-10">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-sm shadow-lg" />
+              <h3 className="text-sm font-medium text-white/80">즐겨찾기</h3>
+            </div>
+            <div className="max-h-24 overflow-y-auto">
+              <div className="grid grid-cols-2 gap-2 pr-1">
+                {bookmarks.map((bookmarkName, index) => (
+                  <button
+                    key={`${bookmarkName}-${index}`}
+                    onClick={() => handleBookmarkClick(bookmarkName)}
+                    className="group relative overflow-hidden px-3 py-2 bg-slate-900/60 backdrop-blur-sm rounded-lg border border-slate-600/50
+                      hover:bg-gradient-to-r hover:from-indigo-600/20 hover:to-purple-600/20
+                      hover:border-indigo-400/50 hover:shadow-lg hover:shadow-indigo-500/10
+                      transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400/50"
+                  >
+                    <div
+                      className="absolute inset-0 bg-gradient-to-r from-indigo-600/0 to-purple-600/0 
+                      group-hover:from-indigo-600/10 group-hover:to-purple-600/10 transition-all duration-300"
+                    />
+                    <span className="relative text-sm font-medium text-white/90 group-hover:text-white truncate block">{bookmarkName}</span>
+                    <div
+                      className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-400 to-purple-400 
+                      group-hover:w-full transition-all duration-300"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

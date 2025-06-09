@@ -66,7 +66,8 @@ export const NormalContainer = ({ item, enableItemMenu = true }: Props) => {
   const canRollPotential = !!potential_option_grade && isRollableItem(item);
   const canRollAdditional = !!additional_potential_option_grade && isAdditionalRollableItem(item);
   const canRollCube = canRollPotential || canRollAdditional;
-  const canStarforcePart = !starforceDisableItem.includes(item_equipment_slot) && !item.item_name.includes("제네시스");
+  const canStarforcePart =
+    !starforceDisableItem.includes(item_equipment_slot) && !item.item_name.includes("제네시스") && !item.item_name.startsWith("타일런트");
   const canStarforce = canStarforcePart && !isAmazingForce && parseInt(item.starforce || "0") > 0;
   const canShowExceptionalOption = !!item_exceptional_option && item_exceptional_option.exceptional_upgrade > 0;
 

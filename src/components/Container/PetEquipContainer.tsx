@@ -192,17 +192,17 @@ export const PetEquipContainer = () => {
 
   return (
     <ContainerWrapper>
-      {petInfos.length > 0 ? (
-        <div className="flex flex-col justify-center">
-          <div className="flex justify-between mb-2">
-            <p
-              className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
+      <div className="flex flex-col justify-center">
+        <div className="flex justify-between mb-2">
+          <p
+            className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
               border-l-4 border-l-rose-400/80
              "
-            >
-              펫 정보
-            </p>
-          </div>
+          >
+            펫 정보
+          </p>
+        </div>
+        {petInfos.length > 0 ? (
           <div className="flex flex-row justify-around">
             {petInfos.map((petInfo, index) => (
               <PetBox
@@ -215,12 +215,12 @@ export const PetEquipContainer = () => {
               />
             ))}
           </div>
-        </div>
-      ) : (
-        <div className="flex items-center justify-center h-full">
-          <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60">펫 정보가 없습니다.</p>
-        </div>
-      )}
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60 min-h-48 items-center">펫 정보가 없습니다.</p>
+          </div>
+        )}
+      </div>
     </ContainerWrapper>
   );
 };

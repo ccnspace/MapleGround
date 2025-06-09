@@ -1,19 +1,22 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import { memo } from "react";
 import { EquipContainer } from "@/components/Container/EquipContainer";
 import { AbilityContainer } from "@/components/Container/AbilityContainer";
 import { StatContainer } from "@/components/Container/StatContainer";
 import { PetEquipContainer } from "@/components/Container/PetEquipContainer";
-import { ChartContainer } from "@/components/Container/ChartContainer";
 import { Spinner } from "../svg/Spinner";
 import { useCharacterStore } from "@/stores/character";
 import { ExpContentContainer } from "./ExpContentContainer";
 import { useCubeStore } from "@/stores/cube";
-import { CubeContainer } from "./CubeContainer";
-import { memo, useEffect } from "react";
 import { useStarforceStore } from "@/stores/starforce";
-import { StarforceContainer } from "./StarforceContainer";
 import { useTheme } from "next-themes";
+import { DimmedLayer } from "../DimmedLayer";
+
+const ChartContainer = dynamic(() => import("./ChartContainer"), { ssr: false, loading: () => <DimmedLayer spinner /> });
+const StarforceContainer = dynamic(() => import("./StarforceContainer"), { ssr: false, loading: () => <DimmedLayer spinner /> });
+const CubeContainer = dynamic(() => import("./CubeContainer"), { ssr: false, loading: () => <DimmedLayer spinner /> });
 
 const RightSideGridContainer = memo(() => (
   <div className="grid gap-4" style={{ gridRow: "span 2" }}>
@@ -26,12 +29,9 @@ const RightSideGridContainer = memo(() => (
 RightSideGridContainer.displayName = "RightSideGridContainer";
 
 const BottomGridContainer = memo(() => (
-  <>
-    <div className="col-span-2">
-      <ChartContainer />
-    </div>
-    {/* <ExpContainer /> */}
-  </>
+  <div className="col-span-2">
+    <ChartContainer />
+  </div>
 ));
 
 BottomGridContainer.displayName = "BottomGridContainer";

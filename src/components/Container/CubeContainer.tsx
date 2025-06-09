@@ -20,7 +20,7 @@ import { formatKoreanNumber } from "@/utils/formatKoreanNum";
 
 const MAX_SPEED_STEP = 5;
 
-export const CubeContainer = () => {
+const CubeContainer = () => {
   const { targetItem, cubeType, resetCube } = useCubeStore(
     useShallow((state) => ({
       targetItem: state.targetItem,
@@ -181,8 +181,8 @@ export const CubeContainer = () => {
       } else if (e.key === "Escape") resetCube();
     };
 
-    document.addEventListener("keydown", handleKeydown);
-    return () => document.removeEventListener("keydown", handleKeydown);
+    window.addEventListener("keydown", handleKeydown);
+    return () => window.removeEventListener("keydown", handleKeydown);
   }, [handleRollCubeClick]);
 
   useEffect(() => {
@@ -330,3 +330,5 @@ export const CubeContainer = () => {
     </>
   );
 };
+
+export default CubeContainer;

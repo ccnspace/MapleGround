@@ -1,28 +1,38 @@
-import { getLocalStorage, LocalStorageData, LocalStorageKey, removeLocalStorage, setLocalStorage } from "@/utils/localStorage";
+import { LocalStorageData, LocalStorageKey, removeLocalStorage, setLocalStorage } from "@/utils/localStorage";
 import { useCallback, useMemo, useSyncExternalStore } from "react";
 
 export const useLocalStorage = <T extends LocalStorageKey>(key: T) => {
   const setStorage = useCallback(
     (newValue: LocalStorageData[T]) => {
       setLocalStorage(key, newValue);
-      dispatchEvent(new StorageEvent("storage", { key: key, newValue: JSON.stringify(newValue) }));
+      if (typeof window !== "undefined") {
+        dispatchEvent(new StorageEvent("storage", { key: key, newValue: JSON.stringify(newValue) }));
+      }
     },
     [key]
   );
 
   const removeStorage = useCallback(() => {
     removeLocalStorage(key);
-    dispatchEvent(new StorageEvent("storage", { key: key }));
+    if (typeof window !== "undefined") {
+      dispatchEvent(new StorageEvent("storage", { key: key }));
+    }
   }, [key]);
 
-  const getSnapshot = () => localStorage.getItem(key);
-
-  const subscribe = (listener: () => void) => {
-    window.addEventListener("storage", listener);
-    return () => window.removeEventListener("storage", listener);
+  const getSnapshot = () => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(key);
   };
 
-  const store = useSyncExternalStore(subscribe, getSnapshot);
+  const subscribe = (listener: () => void) => {
+    if (typeof window !== "undefined") {
+      window.addEventListener("storage", listener);
+      return () => window.removeEventListener("storage", listener);
+    }
+    return () => {};
+  };
+
+  const store = useSyncExternalStore(subscribe, getSnapshot, () => null);
 
   const value = useMemo(() => {
     if (store === null) return null;

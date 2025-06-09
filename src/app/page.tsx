@@ -6,9 +6,9 @@ import { EnterIcon } from "@/components/svg/EnterIcon";
 import Image from "next/image";
 import CharacterImg from "@/images/0.png";
 import MainBg from "@/images/mainBg.jpg";
-import { useCharacterStore } from "@/stores/character";
-import { useCharacterPowerStore } from "@/stores/characterPower";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useCharacterPowerStore } from "@/stores/characterPower";
+import { useCharacterStore } from "@/stores/character";
 
 export default function Home() {
   const [nickname, setNickname] = useState("");
@@ -25,6 +25,11 @@ export default function Home() {
   const handleBookmarkClick = (bookmarkName: string) => {
     router.push(`/main?name=${encodeURIComponent(bookmarkName)}`);
   };
+
+  useEffect(() => {
+    useCharacterStore.getState().setFetchStatus("idle");
+    useCharacterPowerStore.getState().setFetchStatus("idle");
+  }, []);
 
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center p-4">
@@ -48,7 +53,7 @@ export default function Home() {
         />
         <div className="text-center">
           <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
-            MapleDot
+            메이플그라운드
           </h2>
         </div>
         <h2 className="text-sm text-white/70 mb-6">캐릭터 정보 · 잠재능력 재설정 · 스타포스 시뮬레이션</h2>

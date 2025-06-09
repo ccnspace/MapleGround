@@ -1,5 +1,3 @@
-import { useCharacterStore } from "@/stores/character";
-import { useCharacterPowerStore } from "@/stores/characterPower";
 import { useModalStore } from "@/stores/modal";
 
 export const apiFetcher = async <T>(url: string, signal?: AbortSignal): Promise<T> => {
@@ -10,7 +8,9 @@ export const apiFetcher = async <T>(url: string, signal?: AbortSignal): Promise<
       type: "alert",
       message: "서버와의 통신 중 에러가 발생하였습니다.",
       confirmCallback: () => {
-        window.location.href = "/";
+        if (typeof window !== "undefined") {
+          window.location.href = "/";
+        }
       },
     });
     throw new Error("API request failed");

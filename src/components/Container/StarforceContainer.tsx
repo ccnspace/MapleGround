@@ -43,7 +43,7 @@ export type StarforceRecord = {
   accumulatedCost: number;
 };
 
-export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
+const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
   const simulator = useMemo(() => new StarforceSimulator({ item: targetItem }), [targetItem]);
 
   const resetStarforceTarget = useStarforceStore((state) => state.resetStarforceTarget);
@@ -702,3 +702,5 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     </>
   );
 };
+
+export default StarforceContainer;

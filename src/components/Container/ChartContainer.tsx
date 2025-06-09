@@ -10,7 +10,7 @@ import { Spinner } from "../svg/Spinner";
 import { ContainerWrapper } from "./ContainerWrapper";
 import { useNickname } from "@/hooks/useNickname";
 
-export const ChartContainer = () => {
+const ChartContainer = () => {
   const nickname = useNickname();
   const { fetchStatus, characterPower, fetchCharacterPower } = useCharacterPowerStore(
     useShallow((state) => ({
@@ -36,17 +36,19 @@ export const ChartContainer = () => {
 
   useEffect(() => {
     if (!nickname) return;
+    if (categories.length || seriesData.length) return;
 
     const abortController = new AbortController();
     fetchCharacterPower(nickname, abortController.signal);
-  }, [nickname]);
+  }, [nickname, categories, seriesData]);
 
   useEffect(() => {
     if (!characterPower) return;
+    if (categories.length || seriesData.length) return;
 
     setCategories((prev) => [...prev, ...Object.keys(characterPower.data)]);
     setSeriesData((prev) => [...prev, ...Object.values(characterPower.data)]);
-  }, [characterPower]);
+  }, [characterPower, categories, seriesData]);
 
   const chartOptions: Props["options"] = {
     chart: {
@@ -137,3 +139,5 @@ export const ChartContainer = () => {
     </ContainerWrapper>
   );
 };
+
+export default ChartContainer;

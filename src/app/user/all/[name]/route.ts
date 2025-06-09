@@ -36,8 +36,9 @@ const makeRequestUrls = (ocid: string) => {
 const wait = () => new Promise((resolve) => setTimeout(resolve, 500));
 
 const fetchAllInfo = async (url: string) => {
-  console.log("Fetching: ", url);
-  await wait();
+  if (process.env.NODE_ENV === "development") {
+    await wait();
+  }
   const response = await fetch(url, commonHeader);
   const json = await response.json();
 

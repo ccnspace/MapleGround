@@ -11,7 +11,6 @@ import { useModalStore } from "@/stores/modal";
 import { useCharacterPowerStore } from "@/stores/characterPower";
 import { useNickname } from "@/hooks/useNickname";
 import { useRouter } from "next/navigation";
-import { getLocalStorage, setLocalStorage } from "@/utils/localStorage";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 type ProfileProps = {
@@ -29,8 +28,6 @@ const Profile = ({ characterAttributes }: ProfileProps) => {
     timeStyle: "short",
   });
 
-  const router = useRouter();
-
   const handleRefresh = () => {
     useModalStore.getState().setModal({
       type: "confirm",
@@ -46,7 +43,9 @@ const Profile = ({ characterAttributes }: ProfileProps) => {
         resetCharacterData(character_name);
         resetCharacterPower(character_name);
 
-        location.href = `/main?name=${character_name}`;
+        if (typeof window !== "undefined") {
+          location.href = `/main?name=${character_name}`;
+        }
       },
     });
   };
@@ -94,7 +93,7 @@ const Profile = ({ characterAttributes }: ProfileProps) => {
       <div className="flex flex-col gap-2 -mt-1">
         <p className="text-slate-100 text-xs font-medium">{`${currentDate} 데이터`}</p>
         <button className="text-slate-100 bg-slate-700 px-1 py-1 rounded-md text-sm font-bold hover:bg-slate-600" onClick={handleRefresh}>
-          {`⟳ 전체 데이터 최신화`}
+          {`⟳ 전체 데이터 갱신`}
         </button>
       </div>
     </div>
@@ -170,8 +169,8 @@ export const ProfileWrapper = () => {
         )}
       </div>
       <div className="flex flex-col gap-1 bg-slate-100 dark:bg-slate-500/10 rounded-lg p-3 mx-5">
-        <p className="text-slate-800 dark:text-slate-200 text-xs font-medium">{`ⓘ 최근 데이터 조회 시간보다 30분 이상 지난 경우 데이터가 갱신됩니다.`}</p>
-        <p className="text-slate-800 dark:text-slate-200 text-xs font-medium">{`ⓘ [전체 데이터 최신화] 버튼을 누르면 모든 데이터를 현재 시각 기준으로 갱신합니다.`}</p>
+        <p className="text-slate-800 dark:text-slate-200 text-xs font-medium">{`ⓘ 최근 데이터 조회 시간보다 30분 이상 지난 경우 데이터가 자동 갱신됩니다.`}</p>
+        <p className="text-slate-800 dark:text-slate-200 text-xs font-medium">{`ⓘ [전체 데이터 갱신] 버튼을 누르면 모든 데이터를 현재 시각 기준으로 갱신합니다.`}</p>
       </div>
     </>
   );

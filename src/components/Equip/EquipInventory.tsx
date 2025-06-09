@@ -1,3 +1,5 @@
+"use client";
+
 import { MouseEvent, useCallback, useContext } from "react";
 import { EquipActionContext, EquipContext } from "../Container/EquipContainer";
 import { NormalEquipIcon } from "./EquipIcon/NormalEquipIcon";

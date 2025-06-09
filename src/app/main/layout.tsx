@@ -1,4 +1,5 @@
 import { SideBar } from "@/components/SideBar";
+import { Suspense } from "react";
 
 export default function MainLayout({
   children,
@@ -6,9 +7,11 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="root_container flex flex-row gap-4 justify-center">
-      <SideBar />
-      {children}
-    </div>
+    <Suspense>
+      <div className="root_container flex flex-row gap-4 justify-center">
+        <SideBar />
+        {children}
+      </div>
+    </Suspense>
   );
 }

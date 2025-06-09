@@ -12,6 +12,7 @@ import expAdvanceIcon from "@/images/expAdvance.png";
 import highIcon from "@/images/high.png";
 import anglerIcon from "@/images/angler.png";
 import monpaIcon from "@/images/monpa.png";
+import vipRestIcon from "@/images/vip.png";
 
 const formatExp = (exp: number) => {
   return exp.toLocaleString();
@@ -26,6 +27,7 @@ export const ExpContentContainer = () => {
   const { character_level } = characterAttributes?.basic || {};
   const [normalVoucherCount, setNormalVoucherCount] = React.useState<string>("");
   const [advancedVoucherCount, setAdvancedVoucherCount] = React.useState<string>("");
+  const [vipRestCount, setVipRestCount] = React.useState<string>("");
 
   const currentLevel = character_level || 0;
   const LEVEL_REQUIREMENTS = {
@@ -34,6 +36,7 @@ export const ExpContentContainer = () => {
     EXTREME_MONPARK: 260,
     HIGH_MOUNTAIN: 260,
     ANGLER: 270,
+    VIP_REST: 101,
   };
 
   const characterMaxExp = getExpValue({ level: currentLevel, type: "EXP" });
@@ -43,10 +46,21 @@ export const ExpContentContainer = () => {
   const expVouchers = getExpValue({ level: currentLevel, type: "EXP_VOUCHERS" });
   const advancedExpVouchers = getExpValue({ level: currentLevel, type: "ADVANCED_EXP_VOUCHERS" });
 
+  // 5초마다 획득하는 vipRest 값임. vipRest 1개는 30분임. 30분은 1800초, 5초마다 획득하는 값은 1800 / 5 = 360임.
+  const vipRest = getExpValue({ level: currentLevel, type: "VIP_REST" });
+  const vipRestPerOneTicket = vipRest * 360;
+
   const handleVoucherCountChange = (e: React.ChangeEvent<HTMLInputElement>, setCount: React.Dispatch<React.SetStateAction<string>>) => {
     const value = e.target.value;
     if (value === "" || /^\d+$/.test(value)) {
       setCount(value);
+    }
+  };
+
+  const handleVipRestCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === "" || /^\d+$/.test(value)) {
+      setVipRestCount(value);
     }
   };
 
@@ -157,6 +171,50 @@ export const ExpContentContainer = () => {
                 </div>
               ) : (
                 <p className="text-sm text-gray-500 dark:text-gray-400">레벨 260 이상부터 사용할 수 있습니다.</p>
+              )}
+            </div>
+
+            {/* VIP REST Section */}
+            <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
+              <div className="text-md font-bold mb-2 text-violet-600 dark:text-violet-400 flex items-center gap-2">
+                <Image src={vipRestIcon} alt="VIP 사우나" width={24} height={24} />
+                VIP 사우나/MVP 리조트 <span className="text-xs font-normal">(레벨 101 이상 사용 가능)</span>
+              </div>
+              {currentLevel >= LEVEL_REQUIREMENTS.VIP_REST ? (
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">1개(30분)</span>
+                    <div className="text-right">
+                      <div className="text-md text-violet-600 dark:text-violet-400 font-bold">
+                        {formatExpRate(vipRestPerOneTicket, characterMaxExp)}%
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(vipRestPerOneTicket)}</div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">직접 입력</span>
+                      <input
+                        type="text"
+                        value={vipRestCount}
+                        onChange={handleVipRestCountChange}
+                        className="w-24 px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 
+                                 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                        placeholder="개수 입력"
+                      />
+                    </div>
+                    <div className="text-right min-w-[120px] max-w-[160px]">
+                      <div className="text-md text-violet-600 dark:text-violet-400 font-bold truncate">
+                        {calculateCustomVoucherExp(vipRestCount, vipRestPerOneTicket).rate}%
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                        {formatExp(calculateCustomVoucherExp(vipRestCount, vipRestPerOneTicket).exp)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-400">레벨 101 이상부터 사용할 수 있습니다.</p>
               )}
             </div>
 

@@ -20,32 +20,39 @@ const initialState: CharacterState = {
 };
 
 export const useCharacterStore = create<CharacterState & CharacterAction>()(
-  devtools((set, get) => ({
-    ...initialState,
-    setCharacterAttributes: (characterAttributes) => {
-      set({ characterAttributes });
-    },
-    setFetchStatus: (fetchStatus) => {
-      set({ fetchStatus });
-    },
-    resetCharacterData: () => {
-      set({ ...initialState });
-    },
-    fetchCharacterAttributes: async (nickname: string, signal?: AbortSignal) => {
-      const { setFetchStatus, setCharacterAttributes, resetCharacterData } = get();
-      try {
-        setFetchStatus("loading");
-        const response = await getCharacterAttributes(nickname, "", signal);
-        setCharacterAttributes(response);
-        setFetchStatus("success");
-      } catch (error) {
-        // AbortError는 에러 처리하지 않음
-        if (error instanceof Error && error.name === "AbortError") {
-          return;
-        }
-        resetCharacterData();
-        setFetchStatus("error");
+  devtools(
+    persist(
+      (set, get) => ({
+        ...initialState,
+        setCharacterAttributes: (characterAttributes) => {
+          set({ characterAttributes });
+        },
+        setFetchStatus: (fetchStatus) => {
+          set({ fetchStatus });
+        },
+        resetCharacterData: () => {
+          set({ ...initialState });
+        },
+        fetchCharacterAttributes: async (nickname: string, signal?: AbortSignal) => {
+          const { setFetchStatus, setCharacterAttributes, resetCharacterData } = get();
+          try {
+            setFetchStatus("loading");
+            const response = await getCharacterAttributes(nickname, "", signal);
+            setCharacterAttributes(response);
+            setFetchStatus("success");
+          } catch (error) {
+            // AbortError는 에러 처리하지 않음
+            if (error instanceof Error && error.name === "AbortError") {
+              return;
+            }
+            resetCharacterData();
+            setFetchStatus("error");
+          }
+        },
+      }),
+      {
+        name: "character-attributes",
       }
-    },
-  }))
+    )
+  )
 );

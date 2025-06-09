@@ -7,11 +7,12 @@ import { useEffect } from "react";
 
 export default function MainPage() {
   const searchParams = useSearchParams();
+  const characterAttributes = useCharacterStore((state) => state.characterAttributes);
   const fetchCharacterAttributes = useCharacterStore((state) => state.fetchCharacterAttributes);
   const nickname = searchParams.get("name");
 
   useEffect(() => {
-    if (!nickname) return;
+    if (!nickname || characterAttributes) return;
 
     const abortController = new AbortController();
     fetchCharacterAttributes(nickname, abortController.signal);
@@ -19,7 +20,7 @@ export default function MainPage() {
     return () => {
       abortController.abort();
     };
-  }, [nickname, fetchCharacterAttributes]);
+  }, [nickname, characterAttributes, fetchCharacterAttributes]);
 
   return <MainContainer />;
 }

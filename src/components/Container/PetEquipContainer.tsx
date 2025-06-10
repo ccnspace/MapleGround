@@ -107,9 +107,9 @@ const PetBox = ({
   return (
     <div
       id={index}
-      className="petbox relative flex flex-col gap-2 justify-center items-center
-     bg-slate-300/60 min-w-28 dark:bg-black/50 p-2 rounded-lg
-     hover:bg-slate-400/40 dark:hover:bg-white/5 cursor-pointer
+      className="petbox relative flex flex-col gap-1 justify-center items-center
+     bg-slate-300/60 min-w-28 dark:bg-white/5 p-2 rounded-lg
+     hover:bg-slate-400/40 dark:hover:bg-white/10 cursor-pointer
      "
       onClick={onClick}
     >
@@ -119,7 +119,7 @@ const PetBox = ({
       <div className="flex flex-col items-center">
         <p className="font-bold text-sm max-w-24 tracking-tighter truncate">{petInfo.nickname}</p>
       </div>
-      <div className="flex gap-1 flex-col">
+      {/* <div className="flex gap-1 flex-col">
         <div className="flex flex-row items-center gap-1">
           <p className="font-light text-xs text-white tracking-tighter bg-lime-600/80 rounded-md px-1">외형</p>
           <p className="font-medium max-w-16 text-xs tracking-tighter truncate">{petInfo.shapeName}</p>
@@ -128,7 +128,7 @@ const PetBox = ({
           <p className="font-light text-xs text-white tracking-tighter bg-slate-500 rounded-md px-1">실제</p>
           <p className="font-medium max-w-16 text-xs tracking-tighter truncate">{petInfo.name}</p>
         </div>
-      </div>
+      </div> */}
 
       {!!petInfo.equipment.shapeIcon && !!petInfo.equipment.shapeName && (
         <Image
@@ -145,7 +145,7 @@ const PetBox = ({
           <div className="flex flex-col items-center">
             <p className="font-bold text-xs max-w-24 tracking-tighter truncate">{petInfo.equipment.shapeName}</p>
           </div>
-          <div className="flex gap-1 flex-col">
+          {/* <div className="flex gap-1 flex-col">
             <div className="flex flex-row items-center gap-1">
               <p className="font-light text-xs text-white tracking-tighter bg-lime-600/80 rounded-md px-1">외형</p>
               <p className="font-medium max-w-16 text-xs tracking-tighter truncate">{petInfo.equipment.shapeName}</p>
@@ -154,7 +154,7 @@ const PetBox = ({
               <p className="font-light text-xs text-white tracking-tighter bg-slate-500 rounded-md px-1">실제</p>
               <p className="font-medium max-w-16 text-xs tracking-tighter truncate">{petInfo.equipment.name}</p>
             </div>
-          </div>
+          </div> */}
         </>
       )}
       {selectedPetIndex === index && <PetDetailBox petInfo={petInfo} setSelectedPetIndex={setSelectedPetIndex} />}
@@ -193,7 +193,7 @@ export const PetEquipContainer = () => {
   return (
     <ContainerWrapper>
       <div className="flex flex-col justify-center">
-        <div className="flex justify-between mb-2">
+        <div className="flex justify-between mb-1">
           <p
             className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
               border-l-4 border-l-rose-400/80

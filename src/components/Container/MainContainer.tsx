@@ -13,6 +13,7 @@ import { useCubeStore } from "@/stores/cube";
 import { useStarforceStore } from "@/stores/starforce";
 import { useTheme } from "next-themes";
 import { DimmedLayer } from "../DimmedLayer";
+import { WeaponUnlockContainer } from "./WeaponUnlockContainer";
 
 const ChartContainer = dynamic(() => import("./ChartContainer"), { ssr: false, loading: () => <DimmedLayer spinner /> });
 const StarforceContainer = dynamic(() => import("./StarforceContainer"), { ssr: false, loading: () => <DimmedLayer spinner /> });
@@ -23,6 +24,7 @@ const RightSideGridContainer = memo(() => (
     <AbilityContainer />
     <PetEquipContainer />
     <ExpContentContainer />
+    <WeaponUnlockContainer />
   </div>
 ));
 
@@ -44,7 +46,7 @@ export const MainContainer = () => {
 
   if (fetchStatus !== "success") {
     return (
-      <div className="w-[1280px] h-[calc(100vh-80px)] flex flex-col items-center justify-center">
+      <div className="w-[1366px] h-[calc(100vh-80px)] flex flex-col items-center justify-center">
         <Spinner width="6em" height="6em" color={theme === "dark" ? "white" : "#616161"} />
         <p className="text-sm text-slate-500 dark:text-slate-400 animate-pulse font-medium tracking-wide">정보를 불러오는 중입니다</p>
       </div>
@@ -52,7 +54,7 @@ export const MainContainer = () => {
   }
 
   return (
-    <div className="main_container w-[1280px] gap-4">
+    <div className="main_container w-[1366px] gap-4">
       <StatContainer />
       <EquipContainer />
       <RightSideGridContainer />

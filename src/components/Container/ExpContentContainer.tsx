@@ -75,7 +75,7 @@ export const ExpContentContainer = () => {
   };
 
   return (
-    <ContainerWrapper className="expContent_container min-h-72 overflow-y-auto">
+    <ContainerWrapper className="expContent_container h-[340px] overflow-y-auto">
       <div className="flex flex-col justify-center">
         <div className="flex justify-between mb-2">
           <p

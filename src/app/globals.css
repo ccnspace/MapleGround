@@ -52,7 +52,7 @@ abbr:where([title]) {
 
 .main_container {
   display: grid;
-  grid-template-columns: repeat(3, minmax(400px, 1fr));
+  grid-template-columns: repeat(3, minmax(420px, 1fr));
   grid-auto-flow: row;
   padding-top: 16px;
   height: fit-content;
@@ -156,14 +156,9 @@ abbr:where([title]) {
   }
 }
 
-.expContent_container {
-  grid-row: span 30;
-  max-height: 700px;
-}
-
 @media (max-width: 600px) {
   .expContent_container {
-    max-height: 500px;
+    max-height: 300px;
   }
 }
 

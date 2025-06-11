@@ -8,7 +8,7 @@ export const Header = () => {
   return (
     <header className="flex bg-white dark:bg-black/50 justify-between items-center pr-8 shadow font-bold text-lg">
       <div className="pt-3 pb-3 pl-6 pr-3 text-md cursor-pointer" onClick={() => router.push("/")}>
-        메이플<span className="text-indigo-500 dark:text-indigo-400 border-b-2 border-indigo-500 dark:border-indigo-400">그라운드</span>
+        메이플<span className="text-indigo-500 dark:text-indigo-400">그라운드</span>
       </div>
       <ThemeChanger />
     </header>

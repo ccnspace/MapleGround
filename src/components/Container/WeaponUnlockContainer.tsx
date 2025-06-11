@@ -75,7 +75,7 @@ const BossSelector: React.FC<Props> = ({ boss, config, onChange }) => {
         <span className="text-gray-600 dark:text-gray-400 whitespace-nowrap">클리어</span>
       </div>
       <div className="ml-auto flex items-center gap-1 text-gray-900 dark:text-gray-100">
-        <span className="font-medium text-indigo-600 dark:text-indigo-300">{trace.toFixed(2)}</span>
+        <span className="font-medium text-indigo-600 dark:text-indigo-300">{trace}</span>
       </div>
     </div>
   );
@@ -129,7 +129,7 @@ export const WeaponUnlockContainer = () => {
   const isAllSelectedGenesisPass = configs.filter((c) => c.isSelected).every((config) => config.isGenesisPass);
 
   return (
-    <ContainerWrapper className="expContent_container h-[460px] overflow-y-auto">
+    <ContainerWrapper className="expContent_container h-[700px] overflow-y-auto">
       <div className="flex flex-col">
         <div className="flex items-center mb-2">
           <p className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 border-l-4 border-l-purple-400/80 text-gray-900 dark:text-gray-100">

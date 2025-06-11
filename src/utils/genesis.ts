@@ -137,11 +137,13 @@ export function estimateLiberationDateWithResetDay(
     }
 
     // [3-2] 주간 보스
-    if (isFirstWeek) {
+    if (isFirstWeek && startDate.getDay() !== 4) {
       trace += calculateWeeklyTotal(bossConfigs, bossList, isFirstWeek);
       isFirstWeek = false;
     }
     trace += calculateWeeklyTotal(bossConfigs, bossList, isFirstWeek);
+
+    console.log(date, trace, requiredTrace);
 
     if (trace >= requiredTrace) break;
 

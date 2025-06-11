@@ -4,6 +4,7 @@ import { CharacterEquipments, useCharacterInfo } from "@/hooks/useCharacterInfo"
 import { createContext, useEffect, useMemo, useState } from "react";
 import { EquipInventory } from "../Equip/EquipInventory";
 import { ContainerWrapper } from "./ContainerWrapper";
+import { PetEquipContainer } from "./PetEquipContainer";
 
 type EquipContextType = {
   characterEquipments: CharacterEquipments | undefined;
@@ -89,6 +90,7 @@ export const EquipContainer = () => {
             <EquipInventory />
           </EquipActionContext.Provider>
         </EquipContext.Provider>
+        <PetEquipContainer />
       </div>
     </ContainerWrapper>
   );

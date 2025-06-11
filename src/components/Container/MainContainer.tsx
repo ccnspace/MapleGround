@@ -22,7 +22,6 @@ const CubeContainer = dynamic(() => import("./CubeContainer"), { ssr: false, loa
 const RightSideGridContainer = memo(() => (
   <div className="grid gap-4" style={{ gridRow: "span 2" }}>
     <AbilityContainer />
-    <PetEquipContainer />
     <ExpContentContainer />
     <WeaponUnlockContainer />
   </div>

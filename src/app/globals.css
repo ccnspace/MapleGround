@@ -152,7 +152,7 @@ abbr:where([title]) {
 
 @media (max-width: 600px) {
   .petbox {
-    min-width: auto;
+    min-width: 100px;
   }
 }
 

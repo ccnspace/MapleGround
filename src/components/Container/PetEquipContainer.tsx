@@ -107,7 +107,7 @@ const PetBox = ({
   return (
     <div
       id={index}
-      className="petbox relative flex flex-col gap-1 justify-center items-center
+      className="petbox flex flex-col gap-1 justify-center items-center
      bg-slate-300/60 min-w-28 dark:bg-white/5 p-2 rounded-lg
      hover:bg-slate-400/40 dark:hover:bg-white/10 cursor-pointer
      "
@@ -119,7 +119,7 @@ const PetBox = ({
       <div className="flex flex-col items-center">
         <p className="font-bold text-sm max-w-24 tracking-tighter truncate">{petInfo.nickname}</p>
       </div>
-      {/* <div className="flex gap-1 flex-col">
+      <div className="flex gap-1 flex-col">
         <div className="flex flex-row items-center gap-1">
           <p className="font-light text-xs text-white tracking-tighter bg-lime-600/80 rounded-md px-1">외형</p>
           <p className="font-medium max-w-16 text-xs tracking-tighter truncate">{petInfo.shapeName}</p>
@@ -128,7 +128,7 @@ const PetBox = ({
           <p className="font-light text-xs text-white tracking-tighter bg-slate-500 rounded-md px-1">실제</p>
           <p className="font-medium max-w-16 text-xs tracking-tighter truncate">{petInfo.name}</p>
         </div>
-      </div> */}
+      </div>
 
       {!!petInfo.equipment.shapeIcon && !!petInfo.equipment.shapeName && (
         <Image
@@ -191,36 +191,33 @@ export const PetEquipContainer = () => {
   }, [petEquip]);
 
   return (
-    <ContainerWrapper>
-      <div className="flex flex-col justify-center">
-        <div className="flex justify-between mb-1">
-          <p
-            className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
-              border-l-4 border-l-rose-400/80
+    <div className="flex flex-col gap-1 mt-5 justify-center">
+      <div className="flex justify-between mb-1">
+        <p
+          className="flex font-bold text-sm px-2 pb-1 pt-1 border-l-4 border-l-rose-400
              "
-          >
-            펫 정보
-          </p>
-        </div>
-        {petInfos.length > 0 ? (
-          <div className="flex flex-row justify-around">
-            {petInfos.map((petInfo, index) => (
-              <PetBox
-                key={index}
-                index={`${index + 1}`}
-                petInfo={petInfo}
-                selectedPetIndex={selectedPetIndex}
-                setSelectedPetIndex={setSelectedPetIndex}
-                onClick={handleClickIcon}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60 min-h-48 items-center">펫 정보가 없습니다.</p>
-          </div>
-        )}
+        >
+          펫 정보
+        </p>
       </div>
-    </ContainerWrapper>
+      {petInfos.length > 0 ? (
+        <div className="flex flex-row gap- justify-around">
+          {petInfos.map((petInfo, index) => (
+            <PetBox
+              key={index}
+              index={`${index + 1}`}
+              petInfo={petInfo}
+              selectedPetIndex={selectedPetIndex}
+              setSelectedPetIndex={setSelectedPetIndex}
+              onClick={handleClickIcon}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex items-center justify-center h-full">
+          <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60 min-h-48 items-center">펫 정보가 없습니다.</p>
+        </div>
+      )}
+    </div>
   );
 };

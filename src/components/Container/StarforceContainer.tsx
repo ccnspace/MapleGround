@@ -405,7 +405,7 @@ const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
           if (targetStarforce >= currentStarforce) {
             openModal({
               type: "alert",
-              message: `기존의 스타포스 수치보다 목표치를 높게 설정해 주세요.\n기존 스타포스 수치: ${targetItem.starforce}성\n목표 스타포스 수치: ${autoModeOption}`,
+              message: `기존의 스타포스 수치보다 목표치를 높게 설정해 주세요.\n기존 스타포스 수치: ${targetItem.starforce}성\n목표 스타포스 수치: ${autoModeOption}성`,
             });
           } else {
             simulator.setStarforce(targetStarforce);

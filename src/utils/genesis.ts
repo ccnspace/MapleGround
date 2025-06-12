@@ -221,7 +221,7 @@ export function estimateLiberationDateWithResetDay(params: {
         if (boss) {
           // 미션 클리어 보스로 currentBossConfig를 업데이트
           const missionBossConfig = missionConfigs.find((c) => c.name === currentMission.name);
-          // console.log("missionBossConfig : ", missionBossConfig);
+
           if (missionBossConfig) {
             currentMissionBossConfig.isSelected = true;
             currentMissionBossConfig.difficulty = currentMission.difficulty;
@@ -232,8 +232,6 @@ export function estimateLiberationDateWithResetDay(params: {
     }
     // [3-2] 주간 보스 누적
     trace += calculateWeeklyTotal(currentBossConfigs, bossList, isFirstWeek);
-
-    // console.log("ease : ", calculateWeeklyTotal(currentBossConfigs, bossList, isFirstWeek));
 
     // 한 주 기록 추가
     if (!tempRecords.find((record) => record.currentMissionBoss === remainingMissions[currentMissionIndex].name && record.isClearWeek)) {

@@ -62,7 +62,6 @@ export const DestinyUnlock = ({ onSave }: { onSave: (params: DestinyUnlockData) 
   };
 
   const updateMissionConfig = (updated: MissionBossConfig) => {
-    console.log("updated : ", updated);
     setMissionConfigs((prev) => prev.map((c) => (c.name === updated.name ? updated : c)));
   };
 

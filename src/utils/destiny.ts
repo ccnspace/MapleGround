@@ -141,11 +141,9 @@ export function estimateLiberationDateWithResetDay(params: {
   // [3] 반복 누적
   while (trace < requiredTrace) {
     const currentMission = remainingMissions[currentMissionIndex];
-    // console.log("현재 미션 : ", currentMission);
 
     // 현재 미션의 보스 설정 찾기
     const currentBossConfig = currentBossConfigs.find((config) => config.name === currentMission.name);
-    // console.log("현재 보스 설정 : ", currentBossConfig);
 
     // 이번 주 trace 계산 전에 이전 trace로 미션 달성 여부 확인
     if (currentBossConfig) {

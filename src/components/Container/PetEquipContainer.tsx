@@ -53,14 +53,14 @@ const getPetInfoByIndex = (petEquip: PetEquipment, index: number): PetInfo => {
 const PetDetailBox = ({ petInfo, setSelectedPetIndex }: { petInfo: PetInfo; setSelectedPetIndex: (index: string) => void }) => {
   const detailRef = useRef<HTMLDivElement>(null);
 
-  useClickOutside(detailRef, () => {
-    setSelectedPetIndex("");
-  });
+  // useClickOutside(detailRef, () => {
+  //   setSelectedPetIndex("");
+  // });
 
   return (
     <div
       ref={detailRef}
-      className="absolute z-10 top-[10px] flex flex-col gap-2 justify-center p-2 rounded-lg
+      className="absolute z-10 flex flex-col gap-2 justify-center p-2 rounded-lg
     bg-slate-950/90 dark:bg-[#121212]/90 border border-gray-700 w-[160px]
     "
     >
@@ -94,13 +94,15 @@ const PetBox = ({
   index,
   selectedPetIndex,
   setSelectedPetIndex,
-  onClick,
+  onMouseEnter,
+  onMouseLeave,
 }: {
   petInfo: PetInfo;
   index: string;
   selectedPetIndex: string;
   setSelectedPetIndex: (index: string) => void;
-  onClick: (e: MouseEvent) => void;
+  onMouseEnter: (e: MouseEvent) => void;
+  onMouseLeave: (e: MouseEvent) => void;
 }) => {
   if (!petInfo.name || !petInfo.icon) return null;
 
@@ -111,7 +113,8 @@ const PetBox = ({
      bg-slate-300/60 min-w-28 dark:bg-white/5 p-2 rounded-lg
      hover:bg-slate-400/40 dark:hover:bg-white/10 cursor-pointer
      "
-      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       {!!petInfo.shapeIcon && !!petInfo.shapeName && (
         <Image src={petInfo.shapeIcon} alt={petInfo.shapeName} unoptimized width={40} height={40} style={{ width: 40, height: 40 }} />
@@ -168,7 +171,7 @@ export const PetEquipContainer = () => {
   const [petInfos, setPetInfos] = useState<PetInfo[]>([]);
   const [selectedPetIndex, setSelectedPetIndex] = useState<string>("");
 
-  const handleClickIcon = useCallback((e: MouseEvent) => {
+  const handleMouseEnter = useCallback((e: MouseEvent) => {
     const target = e.target as Element;
     const parent = target.closest(".petbox");
     if (!parent || parent.childElementCount === 0) return;
@@ -209,7 +212,8 @@ export const PetEquipContainer = () => {
               petInfo={petInfo}
               selectedPetIndex={selectedPetIndex}
               setSelectedPetIndex={setSelectedPetIndex}
-              onClick={handleClickIcon}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={() => setSelectedPetIndex("")}
             />
           ))}
         </div>

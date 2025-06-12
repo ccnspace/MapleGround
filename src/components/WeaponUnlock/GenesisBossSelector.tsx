@@ -15,7 +15,7 @@ export const GenesisBossSelector: React.FC<Props> = ({ boss, config, onChange })
         type="checkbox"
         checked={config.isSelected}
         onChange={(e) => onChange({ ...config, isSelected: e.target.checked })}
-        className="w-3 h-3 text-indigo-600 dark:text-indigo-400 rounded 
+        className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 rounded 
             border-gray-300 dark:border-gray-600 
             focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-1
             bg-white dark:bg-gray-700"
@@ -54,7 +54,7 @@ export const GenesisBossSelector: React.FC<Props> = ({ boss, config, onChange })
           type="checkbox"
           checked={config.firstWeekCleared}
           onChange={(e) => onChange({ ...config, firstWeekCleared: e.target.checked })}
-          className="w-3 h-3 text-indigo-600 dark:text-indigo-400 rounded 
+          className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 rounded 
               border-gray-300 dark:border-gray-600 
               focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-1
               bg-white dark:bg-gray-700"
@@ -62,7 +62,7 @@ export const GenesisBossSelector: React.FC<Props> = ({ boss, config, onChange })
         <span className="text-gray-600 dark:text-gray-400 whitespace-nowrap">클리어</span>
       </div>
       <div className="ml-auto flex items-center gap-1 text-gray-900 dark:text-gray-100">
-        <span className="font-medium text-indigo-600 dark:text-indigo-300">{trace}</span>
+        <span className="font-medium text-indigo-600 dark:text-white">{trace}</span>
       </div>
     </div>
   );

@@ -76,6 +76,13 @@ abbr:where([title]) {
 
 /** 반응형 **/
 @media (max-width: 600px) {
+  .footer {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
   .main_container {
     display: flex;
     flex-direction: column;
@@ -176,15 +183,6 @@ abbr:where([title]) {
   z-index: 11000;
   left: 50%;
   transform: translate(-50%, 0);
-}
-
-@media (max-width: 600px) {
-  .modal {
-    display: flex;
-    margin: 0 auto;
-    top: auto;
-    left: auto;
-  }
 }
 
 .equip_wrapper {

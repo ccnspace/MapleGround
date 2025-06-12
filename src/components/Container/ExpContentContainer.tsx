@@ -83,7 +83,7 @@ export const ExpContentContainer = () => {
               border-l-4 border-l-fuchsia-400/80
              "
           >
-            경험치 효율
+            경험치 효율 계산
           </p>
         </div>
         <div className="flex flex-col">

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   bossList,
   calculateMonthlyTotal,
@@ -11,27 +11,34 @@ import {
 } from "@/utils/genesis";
 import { GenesisBossSelector } from "./GenesisBossSelector";
 import { GenesisMissionBossSelector } from "./GenesisMissionBossSelector";
+import { GenesisUnlockData } from "@/utils/localStorage";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useNickname } from "@/hooks/useNickname";
 
-export const GenesisUnlock = () => {
-  const [missionStep, setMissionStep] = useState(1);
-  const [startDate, setStartDate] = useState("");
-  const [baseTrace, setBaseTrace] = useState(0);
-  const [configs, setConfigs] = useState<BossConfig[]>(
-    bossList.map((boss) => ({
-      name: boss.name,
-      difficulty: boss.availableDifficulties[0],
-      partySize: 1,
-      isSelected: false,
-      isGenesisPass: false,
-      firstWeekCleared: false,
-    }))
-  );
-  const [missionConfigs, setMissionConfigs] = useState<MissionBossConfig[]>(
-    missionList.map((mission) => ({
-      name: mission.name,
-      partySize: 1,
-    }))
-  );
+const DEFAULT_BOSS_CONFIG = bossList.map((boss) => ({
+  name: boss.name,
+  difficulty: boss.availableDifficulties[0],
+  partySize: 1,
+  isSelected: false,
+  isGenesisPass: false,
+  firstWeekCleared: false,
+}));
+
+const DEFAULT_MISSION_CONFIG = missionList.map((mission) => ({
+  name: mission.name,
+  partySize: 1,
+}));
+
+export const GenesisUnlock = ({ onSave }: { onSave: (params: GenesisUnlockData) => void }) => {
+  const nickname = useNickname();
+  const { value: genesisUnlockFromLocalStorage } = useLocalStorage("genesisUnlock");
+  const genesisUnlockInfo = genesisUnlockFromLocalStorage?.[nickname];
+
+  const [missionStep, setMissionStep] = useState(genesisUnlockInfo?.missionStep || 1);
+  const [startDate, setStartDate] = useState(genesisUnlockInfo?.startDate || "");
+  const [baseTrace, setBaseTrace] = useState(genesisUnlockInfo?.baseTrace || 0);
+  const [configs, setConfigs] = useState<BossConfig[]>(genesisUnlockInfo?.bossConfig || DEFAULT_BOSS_CONFIG);
+  const [missionConfigs, setMissionConfigs] = useState<MissionBossConfig[]>(genesisUnlockInfo?.missionConfig || DEFAULT_MISSION_CONFIG);
 
   const isAllUnselected = configs.every((config) => !config.isSelected);
   const baseWeeklyTotal = calculateWeeklyTotal(configs, bossList, false);
@@ -82,13 +89,26 @@ export const GenesisUnlock = () => {
   const isAllSelected = configs.every((config) => config.isSelected);
   const isAllSelectedGenesisPass = configs.filter((c) => c.isSelected).every((config) => config.isGenesisPass);
 
+  useEffect(() => {
+    onSave({
+      startDate,
+      baseTrace,
+      missionStep,
+      bossConfig: configs,
+      missionConfig: missionConfigs,
+    });
+  }, [startDate, baseTrace, missionStep, configs, missionConfigs]);
+
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
+      <div
+        className="flex sticky top-0 justify-between items-center
+         bg-slate-300/80 dark:bg-gray-700/90 rounded-lg pt-2 pb-2 px-3"
+      >
+        <span className="text-sm font-bold text-gray-700 dark:text-gray-200 ">🗓️ 예상 해방 날짜</span>
+        <span className="font-bold text-slate-900 dark:text-white text-base">{liberationDate}</span>
+      </div>
       <div className="flex flex-col gap-2">
-        <div className="flex justify-between items-center bg-slate-300/50 dark:bg-gray-700/50 rounded-lg p-2">
-          <span className="text-sm font-bold text-gray-700 dark:text-gray-200">예상 해방 날짜</span>
-          <span className="font-bold text-slate-900 dark:text-white text-base">{liberationDate}</span>
-        </div>
         <p className="border-l-2 border-slate-500 dark:border-slate-200 pl-2 text-sm font-bold text-gray-700 dark:text-gray-300">
           주간 클리어 보스
         </p>
@@ -141,7 +161,7 @@ export const GenesisUnlock = () => {
           </div>
         </div>
 
-        <div className="flex items-center px-1">
+        <div className="flex items-center px-2 pt-1 pb-2 rounded-md">
           <label className="relative flex items-center cursor-pointer">
             <input
               type="checkbox"
@@ -154,7 +174,7 @@ export const GenesisUnlock = () => {
                 disabled:opacity-50 
                 bg-white dark:bg-gray-700"
             />
-            <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">제네시스 패스 (선택된 보스에만 적용)</span>
+            <span className="ml-2 text-sm text-gray-900 dark:text-gray-400">제네시스 패스 (선택된 보스에만 적용)</span>
           </label>
         </div>
       </div>
@@ -165,7 +185,7 @@ export const GenesisUnlock = () => {
             type="checkbox"
             checked={isAllSelected}
             onChange={(e) => toggleAllBosses(e.target.checked)}
-            className="w-3 h-3 text-indigo-600 dark:text-indigo-400 rounded 
+            className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 rounded 
               border-gray-300 dark:border-gray-600 
               focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-1
               bg-white dark:bg-gray-700"
@@ -203,16 +223,16 @@ export const GenesisUnlock = () => {
       <div className="mt-3 p-4 bg-slate-300/50 dark:bg-gray-700/50 rounded-lg space-y-3">
         <div className="pt-1 space-y-2 text-xs opacity-85">
           <div className="flex justify-between items-center">
-            <span className="font-bold text-gray-500 dark:text-gray-400">주간 총 획득량</span>
-            <span className="text-gray-700 dark:text-gray-300">{baseWeeklyTotal}</span>
+            <span className="font-bold text-gray-700 dark:text-gray-400">주간 총 획득량</span>
+            <span className="font-bold text-gray-700 dark:text-gray-300">{baseWeeklyTotal}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="font-bold text-gray-500 dark:text-gray-400">월간 총 획득량</span>
-            <span className="text-gray-700 dark:text-gray-300">{baseMonthlyTotal}</span>
+            <span className="font-bold text-gray-700 dark:text-gray-400">월간 총 획득량</span>
+            <span className="font-bold text-gray-700 dark:text-gray-300">{baseMonthlyTotal}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="font-bold text-gray-500 dark:text-gray-400">총 필요 어둠의 흔적</span>
-            <span className="text-gray-700 dark:text-gray-300">{required}</span>
+            <span className="font-bold text-gray-700 dark:text-gray-400">총 필요 어둠의 흔적</span>
+            <span className="font-bold text-gray-700 dark:text-gray-300">{required}</span>
           </div>
         </div>
       </div>

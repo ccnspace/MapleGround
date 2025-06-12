@@ -100,7 +100,7 @@ const CubeContainer = () => {
     return currentAttempt / currentGuarantee;
   }, [currentAttempt, currentGuarantee]);
 
-  const showAfterButton = prevGrade === afterGrade;
+  const showAfterButton = !!afterGrade && prevGrade === afterGrade;
 
   const mesoCostLabel = useMemo(() => {
     const formattedMesoCost = formatKoreanNumber(mesoCost);

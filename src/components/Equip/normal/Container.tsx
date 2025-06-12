@@ -11,6 +11,7 @@ import { EquipActionContext } from "@/components/Container/EquipContainer";
 import { CubeType } from "@/utils/CubeSimulator";
 import { useStarforceStore } from "@/stores/starforce";
 import { ExceptionalOptionComponent } from "./ExceptionalOption";
+import { getItemOptionPoolByType } from "@/hooks/usePotentialInfo";
 
 type Props = {
   item: ItemEquipment;
@@ -18,13 +19,23 @@ type Props = {
 };
 
 /** 잠재능력 재설정 가능 아이템 리스트트 */
-const rollableItem = ["무기", "상의"];
 const starforceDisableItem = ["엠블렘", "훈장", "뱃지", "포켓", "안드로이드"];
+
+const isRollableItem = (item: ItemEquipment) => {
+  const optionPool = getItemOptionPoolByType("potential", item.item_equipment_slot, item.item_base_option.base_equipment_level);
+  return optionPool.firstLine.length > 0;
+};
+
+const isAdditionalRollableItem = (item: ItemEquipment) => {
+  const optionPool = getItemOptionPoolByType("additional", item.item_equipment_slot, item.item_base_option.base_equipment_level);
+  return optionPool.firstLine.length > 0;
+};
 
 export const NormalContainer = ({ item, enableItemMenu = true }: Props) => {
   const {
     starforce,
     item_icon,
+    scroll_upgrade,
     item_name,
     item_equipment_slot,
     item_equipment_part,
@@ -52,10 +63,11 @@ export const NormalContainer = ({ item, enableItemMenu = true }: Props) => {
   const setCubeTargetState = useCubeStore((state) => state.setCubeTargetState);
   const setStarforceTargetState = useStarforceStore((state) => state.setTargetItem);
 
-  const canRollPotential = !!potential_option_grade && rollableItem.includes(item_equipment_slot);
-  const canRollAdditional = !!additional_potential_option_grade && rollableItem.includes(item_equipment_slot);
+  const canRollPotential = !!potential_option_grade && isRollableItem(item);
+  const canRollAdditional = !!additional_potential_option_grade && isAdditionalRollableItem(item);
   const canRollCube = canRollPotential || canRollAdditional;
-  const canStarforcePart = !starforceDisableItem.includes(item_equipment_slot) && !item.item_name.includes("제네시스");
+  const canStarforcePart =
+    !starforceDisableItem.includes(item_equipment_slot) && !item.item_name.includes("제네시스") && !item.item_name.startsWith("타일런트");
   const canStarforce = canStarforcePart && !isAmazingForce && parseInt(item.starforce || "0") > 0;
   const canShowExceptionalOption = !!item_exceptional_option && item_exceptional_option.exceptional_upgrade > 0;
 
@@ -87,7 +99,7 @@ export const NormalContainer = ({ item, enableItemMenu = true }: Props) => {
   return (
     <>
       {showStarforceBadge && <StarforceBadge isAmazingForce={isAmazingForce} starforce={starforce} />}
-      <EquipDescription item_icon={item_icon} item_name={item_name} baseLevel={base_equipment_level} />
+      <EquipDescription scroll_upgrade={scroll_upgrade} item_icon={item_icon} item_name={item_name} baseLevel={base_equipment_level} />
       {enableItemMenu && (canRollCube || canStarforce) && (
         <>
           <Divider />

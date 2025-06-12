@@ -4,7 +4,7 @@ import type { CubeType, ItemGrade } from "@/utils/CubeSimulator";
 import { useMemo, useState } from "react";
 import { NOT_SELECTED } from "@/consts/Cube";
 
-const getItemOptionPoolByType = (type: CubeType, itemType: string, itemLevel: number | undefined, grade: ItemGrade = "레전드리") => {
+export const getItemOptionPoolByType = (type: CubeType, itemType: string, itemLevel: number | undefined, grade: ItemGrade = "레전드리") => {
   const convertedItemLevel = convertItemLevel(itemLevel);
   if (type === "potential") return getItemOptionPool(itemType, grade, convertedItemLevel);
   return getAdditionalOptionPool(itemType, grade, convertedItemLevel);

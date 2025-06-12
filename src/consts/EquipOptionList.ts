@@ -10,6 +10,7 @@ export const equipOptionList: EquipOptionList = [
   { name: "dex", alias: "DEX" },
   { name: "int", alias: "INT" },
   { name: "luk", alias: "LUK" },
+  { name: "all_stat", alias: "올스탯", isPercent: true },
   { name: "max_hp_rate", alias: "최대 HP", isPercent: true },
   { name: "max_mp_rate", alias: "최대 MP", isPercent: true },
   { name: "max_hp", alias: "최대 HP" },
@@ -19,7 +20,6 @@ export const equipOptionList: EquipOptionList = [
   { name: "armor", alias: "방어력" },
   { name: "speed", alias: "이동속도" },
   { name: "jump", alias: "점프력" },
-  { name: "all_stat", alias: "올스탯", isPercent: true },
   {
     name: "boss_damage",
     alias: "보스 몬스터 공격시 데미지",

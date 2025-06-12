@@ -24,9 +24,9 @@ export const EquipDetailValue = (props: EquipValueProps) => {
 
   const element = new EquipOptionBuilder(isPercent)
     .applyBaseOption(baseValue)
-    .applyAddOption(addValue)
-    .applyEtcOption(etcValue)
     .applyStarforceOption(starforceValue)
+    .applyEtcOption(etcValue)
+    .applyAddOption(addValue)
     .build();
 
   if (element.length === 1) return null;
@@ -62,14 +62,8 @@ export const EquipDetailItem = (props: EquipDetailItemProps) => {
 
   return (
     <p className="flex whitespace-pre text-white font-medium">
-      <span
-        className={`${isAddedOptions ? "text-cyan-400" : "text-white"}`}
-      >{`${alias} : ${sign}${totalOption[name]}${percent}`}</span>
-      <EquipDetailValue
-        equipData={equipData}
-        name={name}
-        isPercent={isPercent}
-      />
+      <span className="text-white">{`${alias} : ${sign}${totalOption[name]}${percent}`}</span>
+      <EquipDetailValue equipData={equipData} name={name} isPercent={isPercent} />
     </p>
   );
 };

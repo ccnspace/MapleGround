@@ -1,20 +1,20 @@
 "use client";
 
 import Chart, { type Props } from "react-apexcharts";
-import { useCharacterStore } from "@/stores/character";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { useCharacterPowerStore } from "@/stores/characterPower";
 import { useShallow } from "zustand/shallow";
 import { Spinner } from "../svg/Spinner";
 import { ContainerWrapper } from "./ContainerWrapper";
+import { useNickname } from "@/hooks/useNickname";
 
-export const ChartContainer = () => {
-  const nickname = useCharacterStore((state) => state.characterAttributes?.basic.character_name);
+const ChartContainer = () => {
+  const nickname = useNickname();
   const { fetchStatus, characterPower, fetchCharacterPower } = useCharacterPowerStore(
     useShallow((state) => ({
       fetchStatus: state.fetchStatus,
-      characterPower: state.characterPower,
+      characterPower: state.characterPower?.[nickname],
       fetchCharacterPower: state.fetchCharacterPower,
     }))
   );
@@ -34,17 +34,20 @@ export const ChartContainer = () => {
   }, [nickname, categories, seriesData]);
 
   useEffect(() => {
-    if (!nickname || characterPower) return;
+    if (!nickname) return;
+    if (categories.length || seriesData.length) return;
 
-    fetchCharacterPower(nickname);
-  }, [nickname, characterPower]);
+    const abortController = new AbortController();
+    fetchCharacterPower(nickname, abortController.signal);
+  }, [nickname, categories, seriesData]);
 
   useEffect(() => {
     if (!characterPower) return;
+    if (categories.length || seriesData.length) return;
 
-    setCategories((prev) => [...prev, ...Object.keys(characterPower)]);
-    setSeriesData((prev) => [...prev, ...Object.values(characterPower)]);
-  }, [characterPower]);
+    setCategories((prev) => [...prev, ...Object.keys(characterPower.data)]);
+    setSeriesData((prev) => [...prev, ...Object.values(characterPower.data)]);
+  }, [characterPower, categories, seriesData]);
 
   const chartOptions: Props["options"] = {
     chart: {
@@ -107,17 +110,17 @@ export const ChartContainer = () => {
   ];
 
   return (
-    <ContainerWrapper className="w-full min-h-[400px] gap-0.5 justify-center">
-      <div className="flex flex-col h-32 justify-center">
+    <ContainerWrapper className="w-full min-h-[400px] gap-0.5">
+      <p
+        className="flex font-extrabold text-base px-2 pt-0.5
+          border-l-4 border-l-indigo-400
+         "
+      >
+        전투력 추이
+      </p>
+      <div className="flex flex-col h-[360px] justify-center">
         {canShowChart && (
           <>
-            <p
-              className="flex font-extrabold text-base mb-auto px-2 pt-0.5
-                border-l-4 border-l-indigo-400
-               "
-            >
-              전투력 추이
-            </p>
             <Chart options={chartOptions} series={series} type="line" height="310" />
           </>
         )}
@@ -135,3 +138,5 @@ export const ChartContainer = () => {
     </ContainerWrapper>
   );
 };
+
+export default ChartContainer;

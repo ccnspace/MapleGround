@@ -27,8 +27,7 @@ export const useVersusInfo = () => {
     const { firstPersonDate, secondPersonDate } = useVersusStore.getState();
     if (firstPersonDate >= secondPersonDate) {
       openModal({
-        message:
-          "첫 번째 캐릭터의 날짜를 \n두 번째 캐릭터보다 과거로 설정해 주세요.",
+        message: "첫 번째 캐릭터의 날짜를 \n두 번째 캐릭터보다 과거로 설정해 주세요.",
       });
       return false;
     }
@@ -41,15 +40,10 @@ export const useVersusInfo = () => {
     return true;
   };
 
-  const requestPersonData = async () => {
-    const { characterAttributes } = useCharacterStore.getState();
-    if (!characterAttributes) return;
-
+  const requestPersonData = async (nickname: string) => {
     setLoading(true);
 
-    const nickname = characterAttributes.basic.character_name;
-    const { firstPersonDate, secondPersonDate, setPersonInfo } =
-      useVersusStore.getState();
+    const { firstPersonDate, secondPersonDate, setPersonInfo } = useVersusStore.getState();
 
     const [firstPersonResponse, secondePersonResponse] = await Promise.all([
       getCharacterAttributes(nickname, firstPersonDate),

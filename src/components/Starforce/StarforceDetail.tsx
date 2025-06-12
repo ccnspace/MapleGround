@@ -1,17 +1,22 @@
 import { StarforceProbability } from "@/utils/starforceUtils";
-import { Divider } from "../Equip/Divider";
 
 interface Props {
   isMaxStarforce: boolean;
   starforce: number;
   currentProbabilities: StarforceProbability;
   starforceUpgradeOptions: string;
+  prevStarforce: number;
 }
 
-export const StarforceDetail = ({ isMaxStarforce, starforce, currentProbabilities, starforceUpgradeOptions }: Props) => {
+export const StarforceDetail = ({ isMaxStarforce, starforce, currentProbabilities, starforceUpgradeOptions, prevStarforce }: Props) => {
+  const isNewStar = (idx: number) => {
+    const result = prevStarforce < starforce && idx + 1 === starforce;
+    return result;
+  };
+
   // 아래 확률을 소수점 둘째자리까지 보여 주게 변경
   const successRate = `${(currentProbabilities.success * 100).toFixed(2)}%`;
-  const failRate = `${(currentProbabilities.fail * 100).toFixed(2)}%`;
+  const failRate = currentProbabilities.fail ? `${(currentProbabilities.fail * 100).toFixed(2)}%` : null;
   const destroyRate = currentProbabilities.destroy ? `${(currentProbabilities.destroy * 100).toFixed(2)}%` : null;
 
   const totalStars = 30; // 전체 별 개수
@@ -24,7 +29,7 @@ export const StarforceDetail = ({ isMaxStarforce, starforce, currentProbabilitie
     return Array.from({ length: starsPerRow }, (_, j) => {
       const idx = start + j;
       return idx < starforce ? (
-        <span key={idx} className="text-yellow-300">
+        <span key={idx} className={`text-yellow-300 ${isNewStar(idx) ? "animate-starBlink" : ""}`}>
           ★
         </span>
       ) : (
@@ -67,7 +72,7 @@ export const StarforceDetail = ({ isMaxStarforce, starforce, currentProbabilitie
         ) : (
           <>
             <p>{`성공확률: ${successRate}`}</p>
-            <p>{`실패(유지)확률: ${failRate}`}</p>
+            {failRate && <p>{`실패(유지)확률: ${failRate}`}</p>}
             {destroyRate && <p>{`파괴확률: ${destroyRate}`}</p>}
 
             {starforceUpgradeOptions && <p className="mt-5">{`${starforceUpgradeOptions}`}</p>}

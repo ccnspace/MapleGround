@@ -8,6 +8,7 @@ import { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Divider } from "../Equip/Divider";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { ContainerWrapper } from "./ContainerWrapper";
+import { useNickname } from "@/hooks/useNickname";
 
 type PetInfo = {
   name: string | null;
@@ -52,14 +53,14 @@ const getPetInfoByIndex = (petEquip: PetEquipment, index: number): PetInfo => {
 const PetDetailBox = ({ petInfo, setSelectedPetIndex }: { petInfo: PetInfo; setSelectedPetIndex: (index: string) => void }) => {
   const detailRef = useRef<HTMLDivElement>(null);
 
-  useClickOutside(detailRef, () => {
-    setSelectedPetIndex("");
-  });
+  // useClickOutside(detailRef, () => {
+  //   setSelectedPetIndex("");
+  // });
 
   return (
     <div
       ref={detailRef}
-      className="absolute z-10 top-[10px] flex flex-col gap-2 justify-center p-2 rounded-lg
+      className="absolute z-10 flex flex-col gap-2 justify-center p-2 rounded-lg
     bg-slate-950/90 dark:bg-[#121212]/90 border border-gray-700 w-[160px]
     "
     >
@@ -93,24 +94,27 @@ const PetBox = ({
   index,
   selectedPetIndex,
   setSelectedPetIndex,
-  onClick,
+  onMouseEnter,
+  onMouseLeave,
 }: {
   petInfo: PetInfo;
   index: string;
   selectedPetIndex: string;
   setSelectedPetIndex: (index: string) => void;
-  onClick: (e: MouseEvent) => void;
+  onMouseEnter: (e: MouseEvent) => void;
+  onMouseLeave: (e: MouseEvent) => void;
 }) => {
   if (!petInfo.name || !petInfo.icon) return null;
 
   return (
     <div
       id={index}
-      className="petbox relative flex flex-col gap-2 justify-center items-center
-     bg-slate-300/60 min-w-28 dark:bg-black/50 p-2 rounded-lg
-     hover:bg-slate-400/40 dark:hover:bg-white/5 cursor-pointer
+      className="petbox flex flex-col gap-1 justify-center items-center
+     bg-slate-300/60 min-w-28 dark:bg-white/5 p-2 rounded-lg
+     hover:bg-slate-400/40 dark:hover:bg-white/10 cursor-pointer
      "
-      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       {!!petInfo.shapeIcon && !!petInfo.shapeName && (
         <Image src={petInfo.shapeIcon} alt={petInfo.shapeName} unoptimized width={40} height={40} style={{ width: 40, height: 40 }} />
@@ -144,7 +148,7 @@ const PetBox = ({
           <div className="flex flex-col items-center">
             <p className="font-bold text-xs max-w-24 tracking-tighter truncate">{petInfo.equipment.shapeName}</p>
           </div>
-          <div className="flex gap-1 flex-col">
+          {/* <div className="flex gap-1 flex-col">
             <div className="flex flex-row items-center gap-1">
               <p className="font-light text-xs text-white tracking-tighter bg-lime-600/80 rounded-md px-1">외형</p>
               <p className="font-medium max-w-16 text-xs tracking-tighter truncate">{petInfo.equipment.shapeName}</p>
@@ -153,7 +157,7 @@ const PetBox = ({
               <p className="font-light text-xs text-white tracking-tighter bg-slate-500 rounded-md px-1">실제</p>
               <p className="font-medium max-w-16 text-xs tracking-tighter truncate">{petInfo.equipment.name}</p>
             </div>
-          </div>
+          </div> */}
         </>
       )}
       {selectedPetIndex === index && <PetDetailBox petInfo={petInfo} setSelectedPetIndex={setSelectedPetIndex} />}
@@ -162,11 +166,12 @@ const PetBox = ({
 };
 
 export const PetEquipContainer = () => {
-  const petEquip = useCharacterStore((state) => state.characterAttributes?.petEquip);
+  const nickname = useNickname();
+  const petEquip = useCharacterStore((state) => state.characterAttributes?.[nickname]?.petEquip);
   const [petInfos, setPetInfos] = useState<PetInfo[]>([]);
   const [selectedPetIndex, setSelectedPetIndex] = useState<string>("");
 
-  const handleClickIcon = useCallback((e: MouseEvent) => {
+  const handleMouseEnter = useCallback((e: MouseEvent) => {
     const target = e.target as Element;
     const parent = target.closest(".petbox");
     if (!parent || parent.childElementCount === 0) return;
@@ -189,36 +194,34 @@ export const PetEquipContainer = () => {
   }, [petEquip]);
 
   return (
-    <ContainerWrapper>
-      {petInfos.length > 0 ? (
-        <div className="flex flex-col justify-center">
-          <div className="flex justify-between mb-2">
-            <p
-              className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
-              border-l-4 border-l-rose-400/80
+    <div className="flex flex-col gap-1 mt-5 justify-center">
+      <div className="flex justify-between mb-1">
+        <p
+          className="flex font-bold text-sm px-2 pb-1 pt-1 border-l-4 border-l-rose-400
              "
-            >
-              펫 정보
-            </p>
-          </div>
-          <div className="flex flex-row justify-around">
-            {petInfos.map((petInfo, index) => (
-              <PetBox
-                key={index}
-                index={`${index + 1}`}
-                petInfo={petInfo}
-                selectedPetIndex={selectedPetIndex}
-                setSelectedPetIndex={setSelectedPetIndex}
-                onClick={handleClickIcon}
-              />
-            ))}
-          </div>
+        >
+          펫 정보
+        </p>
+      </div>
+      {petInfos.length > 0 ? (
+        <div className="flex flex-row gap- justify-around">
+          {petInfos.map((petInfo, index) => (
+            <PetBox
+              key={index}
+              index={`${index + 1}`}
+              petInfo={petInfo}
+              selectedPetIndex={selectedPetIndex}
+              setSelectedPetIndex={setSelectedPetIndex}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={() => setSelectedPetIndex("")}
+            />
+          ))}
         </div>
       ) : (
         <div className="flex items-center justify-center h-full">
-          <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60">펫 정보가 없습니다.</p>
+          <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60 min-h-48 items-center">펫 정보가 없습니다.</p>
         </div>
       )}
-    </ContainerWrapper>
+    </div>
   );
 };

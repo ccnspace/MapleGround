@@ -43,13 +43,14 @@ export type StarforceRecord = {
   accumulatedCost: number;
 };
 
-export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
+const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
   const simulator = useMemo(() => new StarforceSimulator({ item: targetItem }), [targetItem]);
 
   const resetStarforceTarget = useStarforceStore((state) => state.resetStarforceTarget);
 
   const [currentTarget, setCurrentTarget] = useState<ItemEquipment | null>(null);
   const [currentStarforce, setCurrentStarforce] = useState(0);
+  const [prevStarforce, setPrevStarforce] = useState(0);
   const [currentCost, setCurrentCost] = useState(0);
   const [currentProbabilities, setCurrentProbabilities] = useState<StarforceProbability | null>(null);
   const [accumulatedCost, setAccumulatedCost] = useState(0);
@@ -84,6 +85,8 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   const [isShiningStarforceChecked, setIsShiningStarforceChecked] = useState(false);
   // 파괴방지
   const [isDestroyProtectionChecked, setIsDestroyProtectionChecked] = useState(false);
+  // 5-10-15성에서 강화 시도 100%
+  const [isStarforceCatch100Checked, setIsStarforceCatch100Checked] = useState(false);
   // 썬데이
   const [isSundayChecked, setIsSundayChecked] = useState(false);
   // PC방 할인
@@ -122,8 +125,9 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
   };
 
   const updateStarforceState = useCallback(() => {
-    const { item, cost, probabilities } = simulator.getState();
+    const { item, cost, probabilities, prevStarforce } = simulator.getState();
     setCurrentStarforce(parseInt(item.starforce));
+    setPrevStarforce(prevStarforce);
     setCurrentCost(cost);
     setCurrentProbabilities(probabilities);
   }, [simulator]);
@@ -154,6 +158,12 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     simulator.setDestroyProtection(isDestroyProtectionChecked);
     updateStarforceState();
   }, [isDestroyProtectionChecked, updateStarforceState]);
+
+  // 5-10-15성에서 강화 시도 100%
+  useEffect(() => {
+    simulator.setStarforceCatch100(isStarforceCatch100Checked);
+    updateStarforceState();
+  }, [isStarforceCatch100Checked, updateStarforceState]);
 
   // 할인 적용
   useEffect(() => {
@@ -269,8 +279,10 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
 
   const doStarforce = useCallback(() => {
     simulator.simulate();
-    const { item, cost, probabilities, result, accumulatedCost, attempts, destroyCount, discountRatio } = simulator.getState();
+    const { item, cost, probabilities, result, accumulatedCost, attempts, destroyCount, discountRatio, prevStarforce } =
+      simulator.getState();
 
+    setPrevStarforce(prevStarforce);
     setCurrentStarforce(parseInt(item.starforce));
     setCurrentCost(cost);
     setCurrentProbabilities(probabilities);
@@ -393,13 +405,14 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
           if (targetStarforce >= currentStarforce) {
             openModal({
               type: "alert",
-              message: `기존의 스타포스 수치보다 목표치를 높게 설정해 주세요.\n기존 스타포스 수치: ${targetItem.starforce}성\n목표 스타포스 수치: ${autoModeOption}성`,
+              message: `기존의 스타포스 수치보다 목표치를 높게 설정해 주세요.\n기존 스타포스 수치: ${targetItem.starforce}성\n목표 스타포스 수치: ${autoModeOption}`,
             });
           } else {
             simulator.setStarforce(targetStarforce);
 
             const { item } = simulator.getState();
             setCurrentStarforce(parseInt(item.starforce));
+            setPrevStarforce(parseInt(item.starforce));
             setIsAutoModePlaying(true);
           }
         }, 500);
@@ -473,6 +486,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                   <StarforceDetail
                     isMaxStarforce={isMaxStarforce}
                     starforce={currentStarforce}
+                    prevStarforce={prevStarforce}
                     currentProbabilities={currentProbabilities}
                     starforceUpgradeOptions={starforceUpgradeOptions}
                   />
@@ -485,7 +499,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                 <div style={{ display: isOptionFolded ? "none" : "block" }}>
                   {/** 확률 메뉴 */}
                   <div className="flex flex-row flew-grow w-full bg-white/10 rounded-md">
-                    <div className="flex text-white m-1 w-[30%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
+                    <div className="flex text-white m-1 w-[50%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
                       <CheckBox
                         checked={isStarforceCatchChecked}
                         disabled={isAutoModePlaying}
@@ -493,7 +507,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                         onChange={() => setIsStarforceCatchChecked((prev) => !prev)}
                       />
                     </div>
-                    <div className="flex text-white m-1 w-[30%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
+                    <div className="flex text-white m-1 w-[50%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
                       <CheckBox
                         labelStyle={{ fontWeight: "bold" }}
                         checked={isDestroyProtectionChecked}
@@ -502,13 +516,25 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                         onChange={() => setIsDestroyProtectionChecked((prev) => !prev)}
                       />
                     </div>
-                    <div className="flex text-white m-1 w-[40%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
+                  </div>
+                  {/** 확률 메뉴 2*/}
+                  <div className="flex flex-row flew-grow w-full bg-white/10 rounded-md">
+                    <div className="flex text-white m-1 w-[50%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
                       <CheckBox
                         labelStyle={{ fontWeight: "bold" }}
                         checked={isShiningStarforceChecked}
                         disabled={isAutoModePlaying}
-                        label="샤타포스(파괴 30%↓)"
+                        label="21성 이하 파괴 30%↓"
                         onChange={() => setIsShiningStarforceChecked((prev) => !prev)}
+                      />
+                    </div>
+                    <div className="flex text-white m-1 w-[50%] bg-gradient-to-b from-slate-800/60 to-black/50 rounded-md p-2">
+                      <CheckBox
+                        labelStyle={{ fontWeight: "bold" }}
+                        checked={isStarforceCatch100Checked}
+                        disabled={isAutoModePlaying}
+                        label="5-10-15성에서 강화 시도 100%"
+                        onChange={() => setIsStarforceCatch100Checked((prev) => !prev)}
                       />
                     </div>
                   </div>
@@ -519,7 +545,7 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                         labelStyle={{ fontWeight: "bold" }}
                         checked={isSundayChecked}
                         disabled={isAutoModePlaying}
-                        label="썬데이(메소 30%↓)"
+                        label="메소 30%↓"
                         onChange={() => setIsSundayChecked((prev) => !prev)}
                       />
                     </div>
@@ -552,13 +578,13 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
                       <div className="text-white">
                         <CheckBox
                           labelStyle={{ fontWeight: "bold" }}
-                          label="자동 모드"
+                          label="자동 모드⚡"
                           disabled={isAutoModePlaying}
                           checked={isAutoModeChecked}
                           onChange={() => setIsAutoModeChecked((prev) => !prev)}
                         />
                       </div>
-                      <div className="flex flex-col gap-2 ml-[60px]">
+                      <div className="flex flex-col gap-2 ml-[40px]">
                         <div className="flex items-center">
                           <SelectBox
                             style={{ maxWidth: "160px" }}
@@ -676,3 +702,5 @@ export const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }
     </>
   );
 };
+
+export default StarforceContainer;

@@ -7,11 +7,11 @@ import completeSound from "@/app/sound/AchievmentComplete.mp3";
 const AUDIO_CONFIG = {
   rollCube: {
     src: rollCubeSound,
-    volume: 0.15,
+    volume: 0.05,
   },
   gradeUp: {
     src: completeSound,
-    volume: 0.1,
+    volume: 0.03,
   },
 } as const;
 

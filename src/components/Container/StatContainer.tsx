@@ -36,7 +36,10 @@ const getCombatDescription = (combatPower: number) => {
   if (combatPower < 500_000_000) {
     return "그란디스 사도들이 무서워하는 자";
   }
-  return "💗초 극강의 메이플러버💗";
+  if (combatPower < 800_000_000) {
+    return "극한의 메이플러버";
+  }
+  return "💗메이플의 전설 그 자체💗";
 };
 
 const getUnit = (statName: string) => {
@@ -83,11 +86,12 @@ const importantStats: Record<string, string[]> = {
     "아델",
     "제로",
     "바이퍼",
-    "캐논슈터",
+    "캐논마스터",
     "스트라이커",
     "은월",
     "아크",
     "제논",
+    "렌",
   ],
   DEX: ["보우마스터", "신궁", "메카닉", "패스파인더", "윈드브레이커", "와일드헌터", "카인", "메르세데스", "캡틴", "제논", "엔젤릭버스터"],
   INT: ["아크메이지(불,독)", "아크메이지(썬,콜)", "비숍", "플레임위자드", "배틀메이지", "루미너스", "에반", "일리움", "라라", "키네시스"],
@@ -107,7 +111,7 @@ const importantStats: Record<string, string[]> = {
     "아델",
     "제로",
     "바이퍼",
-    "캐논슈터",
+    "캐논마스터",
     "스트라이커",
     "은월",
     "아크",
@@ -132,6 +136,7 @@ const importantStats: Record<string, string[]> = {
     "카데나",
     "칼리",
     "호영",
+    "렌",
   ],
   마력: ["아크메이지(불,독)", "아크메이지(썬,콜)", "비숍", "플레임위자드", "배틀메이지", "루미너스", "에반", "일리움", "라라", "키네시스"],
 };
@@ -202,7 +207,9 @@ export const StatContainer = () => {
               <p className="font-bold text-lg text-white">전투력</p>
               <p className="font-extrabold text-3xl text-white [text-shadow:_1px_2px_4px_rgb(0_0_0/_0.4)]">{formattedCombatPower}</p>
             </div>
-            {!!combatDescription && <p className="flex justify-center pt-1 font-bold text-sm text-gray-600">{combatDescription}</p>}
+            {!!combatDescription && (
+              <p className="flex justify-center pt-1 font-bold text-sm text-gray-600 dark:text-gray-300">{combatDescription}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 rounded-md px-2 pt-2 pb-3 gap-2 text-sm">

@@ -25,10 +25,10 @@ type AndroidCashItem = {
 
 export type AndroidEquipment = {
   date: string | null;
-  android_name: string | null;
-  android_nickname: string | null;
-  android_icon: string | null;
-  android_description: string | null;
+  android_name: string;
+  android_nickname: string;
+  android_icon: string;
+  android_description: string;
   android_hair: {
     hair_name: string | null;
     base_color: string | null;

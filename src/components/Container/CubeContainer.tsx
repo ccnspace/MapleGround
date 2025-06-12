@@ -219,7 +219,12 @@ const CubeContainer = () => {
 
   return (
     <>
-      <div style={{ zIndex: 1002 }} className="cube_container flex fixed top-[25%] left-[35%]">
+      <div
+        style={{ zIndex: 1002 }}
+        className="cube_container flex fixed top-[25%] left-[35%]
+      max-[600px]:top-[-9%] max-[600px]:left-0 max-[600px]:w-full max-[600px]:h-full
+      "
+      >
         <div
           className={`flex p-1 flex-col items-center gap-2 text-white rounded-lg
              bg-[#293541]/80 border ${isMiracleChecked ? "border-lime-300/70" : "border-white/20"} p-2 align-center 

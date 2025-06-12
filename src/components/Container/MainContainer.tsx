@@ -45,7 +45,7 @@ export const MainContainer = () => {
 
   if (fetchStatus !== "success") {
     return (
-      <div className="w-[1366px] h-[calc(100vh-80px)] flex flex-col items-center justify-center">
+      <div className="main_loading w-[1366px] h-[calc(100vh-80px)] flex flex-col items-center justify-center">
         <Spinner width="6em" height="6em" color={theme === "dark" ? "white" : "#616161"} />
         <p className="text-sm text-slate-500 dark:text-slate-400 animate-pulse font-medium tracking-wide">정보를 불러오는 중입니다</p>
       </div>

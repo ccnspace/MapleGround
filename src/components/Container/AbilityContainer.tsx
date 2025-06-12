@@ -65,6 +65,7 @@ export const AbilityContainer = () => {
             <p
               className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
               border-l-4 border-l-green-400/80
+              max-[600px]:text-sm items-center
              "
             >
               어빌리티

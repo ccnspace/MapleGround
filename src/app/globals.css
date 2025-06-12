@@ -79,6 +79,14 @@ abbr:where([title]) {
   .footer {
     display: flex;
     flex-direction: column;
+    font-size: 12px;
+    gap: 1px;
+  }
+}
+
+@media (max-width: 600px) {
+  .main_loading {
+    width: 100%;
   }
 }
 
@@ -104,14 +112,12 @@ abbr:where([title]) {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    width: 100%;
-    top: -2em;
-    left: 0;
-    transform: scale(0.85);
+    transform: scale(0.8);
   }
 
   .starforce_records {
     max-width: 400px;
+    max-height: 240px;
   }
 
   .starforce_guide {
@@ -122,18 +128,14 @@ abbr:where([title]) {
 @media (max-width: 600px) {
   .cube_container {
     display: flex;
-    justify-content: center;
     align-items: center;
     flex-direction: column;
-    top: -2em;
-    left: 0;
-    margin: 0 auto;
-    width: 100%;
-    transform: scale(0.85);
+    transform: scale(0.8);
   }
 
   .cube_records {
-    width: 100%;
+    max-width: 400px;
+    max-height: 240px;
   }
 
   .cube_guide {
@@ -165,7 +167,7 @@ abbr:where([title]) {
 
 @media (max-width: 600px) {
   .expContent_container {
-    max-height: 300px;
+    max-height: 360px;
   }
 }
 
@@ -195,8 +197,24 @@ abbr:where([title]) {
   top: 10px;
   left: 10px;
 }
+
+.symbol_detail_card {
+  position: absolute;
+  z-index: 1000;
+  top: 10px;
+  left: 10px;
+}
+
 @media (max-width: 600px) {
   .equip_detail_card {
+    position: fixed;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    left: 0;
+    top: 0;
+  }
+  .symbol_detail_card {
     position: fixed;
     display: flex;
     width: 100%;

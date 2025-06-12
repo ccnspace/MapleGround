@@ -83,8 +83,12 @@ export const WeaponUnlockContainer = () => {
     <ContainerWrapper className="expContent_container h-[700px] overflow-y-auto">
       <div className="flex flex-col">
         <div className="flex items-center mb-2 justify-between">
-          <p className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 gap-2 border-l-4 border-l-purple-400/80 text-gray-900 dark:text-gray-100">
-            무기 해방 날짜 계산
+          <p
+            className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 gap-2
+          border-l-4 border-l-purple-400/80 text-gray-900 dark:text-gray-100
+          max-[600px]:text-sm items-center"
+          >
+            해방 날짜 계산
             <button
               title="설정값 저장"
               onClick={saveConfig}
@@ -102,7 +106,7 @@ export const WeaponUnlockContainer = () => {
           </p>
           <div className="flex items-center mb-2 gap-2">
             <button
-              className={`px-2 py-1.5 text-xs rounded-md ${
+              className={`px-2 py-1.5 text-xs rounded-md max-[600px]:px-1 ${
                 tab === "genesis"
                   ? "bg-gradient-to-b from-rose-900/90 to-rose-500/70 hover:bg-rose-900/90 font-bold text-white"
                   : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
@@ -112,7 +116,7 @@ export const WeaponUnlockContainer = () => {
               제네시스
             </button>
             <button
-              className={`px-2 py-1.5 text-xs rounded-md ${
+              className={`px-2 py-1.5 text-xs rounded-md max-[600px]:px-1 ${
                 tab === "destiny"
                   ? "bg-gradient-to-b from-blue-900/90 to-sky-500/70 hover:bg-sky-900/90 font-bold text-white"
                   : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"

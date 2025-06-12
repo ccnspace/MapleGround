@@ -433,7 +433,12 @@ const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
 
   return (
     <>
-      <div style={{ zIndex: 1002 }} className="starforce_container flex fixed top-[15%] left-[30%]">
+      <div
+        style={{ zIndex: 1002 }}
+        className="starforce_container flex fixed top-[15%] left-[30%]
+      max-[600px]:top-0 max-[600px]:left-0 max-[600px]:w-full max-[600px]:h-full
+      "
+      >
         <div
           className={`flex flex-col items-center gap-1 rounded-lg
              bg-[#293541]/80 p-2 border border-white/20 align-center 

@@ -1,4 +1,5 @@
 "use client";
+
 import { useTheme } from "next-themes";
 import { DarkIcon } from "./svg/DarkIcon";
 import { LightIcon } from "./svg/LightIcon";
@@ -12,10 +13,6 @@ export const ThemeChanger = () => {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <div>

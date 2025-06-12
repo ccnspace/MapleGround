@@ -10,7 +10,6 @@ const MaxBadge = () => (
     {"MAX"}
   </div>
 );
-const commonDetailStyle = { position: "absolute", zIndex: 1000, top: 10, left: 10 } as CSSProperties;
 
 export const SymbolEquipIcon = memo(
   ({
@@ -63,7 +62,7 @@ export const SymbolEquipIcon = memo(
           </div>
         )}
         {isSelected && (
-          <div ref={equipDetailRef} style={commonDetailStyle}>
+          <div ref={equipDetailRef} className="symbol_detail_card">
             <EquipDetailCard equipName={symbol.symbol_name} />
           </div>
         )}

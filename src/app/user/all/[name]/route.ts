@@ -39,9 +39,6 @@ const fetchAllInfo = async (url: string) => {
   if (process.env.NODE_ENV === "development") {
     await wait();
   }
-  if (process.env.NODE_ENV === "production") {
-    console.log("in prod");
-  }
   const response = await fetch(url, commonHeader);
   const json = await response.json();
 

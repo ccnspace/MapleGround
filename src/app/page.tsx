@@ -9,7 +9,7 @@ import MainBg from "@/images/mainBg.jpg";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useCharacterPowerStore } from "@/stores/characterPower";
 import { useCharacterStore } from "@/stores/character";
-import Logo from "@/images/groundLogo.png";
+import Logo from "@/images/groundLogo_dark.png";
 
 export default function Home() {
   const [nickname, setNickname] = useState("");

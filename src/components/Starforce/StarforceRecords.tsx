@@ -74,7 +74,7 @@ bg-black/70 border border-white/30 w-[300px]`}
         </div>
         <div
           className="starforce_guide flex flex-col min-w-[192px] gap-1.5 text-[13px]
-        bg-gradient-to-br from-slate-500 to-slate-600 rounded-md p-1.5"
+        bg-slate-300/10 rounded-md p-1.5"
         >
           <p>
             · <span className="bg-slate-700 rounded-md p-1">스타캐치</span>는 성공 확률을{" "}

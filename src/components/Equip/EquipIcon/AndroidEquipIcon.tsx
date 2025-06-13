@@ -24,7 +24,7 @@ export const AndroidEquipIcon = memo(({ equipData, isSelected }: { equipData: An
     <div id={"안드로이드"} className={`${commonEquipStyle}`}>
       {equipData?.android_icon && <AndroidImage icon={equipData.android_icon} />}
       {isSelected && (
-        <div ref={equipDetailRef} style={commonDetailStyle}>
+        <div ref={equipDetailRef} className="equip_detail_card">
           <EquipDetailCard equipName={"안드로이드"} />
         </div>
       )}

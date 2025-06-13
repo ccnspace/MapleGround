@@ -435,9 +435,8 @@ const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
     <>
       <div
         style={{ zIndex: 1002 }}
-        className="starforce_container flex fixed top-[15%] left-[30%]
-      max-[600px]:top-0 max-[600px]:left-0 max-[600px]:w-full max-[600px]:h-full
-      "
+        className="starforce_container max-[600px]:scale-[0.75] flex fixed top-[5%] left-[35%]
+      max-[600px]:top-[-120px] max-[600px]:left-0 max-[600px]:w-full"
       >
         <div
           className={`flex flex-col items-center gap-1 rounded-lg
@@ -454,7 +453,7 @@ const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
               닫기
             </button>
           </div>
-          <div className="relative flex flex-col p-1 w-full rounded-lg gap-1">
+          <div className="relative flex flex-col p-0.5 w-full rounded-lg gap-1">
             <div className="flex flex-col p-1 w-full rounded-lg bg-[#293541]/80 gap-1">
               <div className="flex flex-col gap-2  m-1 ">
                 <div
@@ -636,7 +635,7 @@ const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
                   border border-white/20
                   enabled:bg-gradient-to-b from-slate-700/50 to-cyan-400/50
                   hover:from-slate-700/70 hover:to-cyan-400/70
-                rounded-md p-1 m-1 w-[120px] justify-center text-md font-bold"
+                rounded-md p-0.5 m-1 w-[120px] justify-center text-md font-bold"
                 >
                   {starforceButtonLabel}
                 </button>
@@ -645,7 +644,7 @@ const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
                   className="flex items-center disabled:bg-gray-600/70 disabled:text-white/20
                   enabled:bg-gradient-to-b from-[#b6b6b6] to-[#868686]
                   enabled:hover:bg-gradient-to-b hover:from-[#979797] hover:to-[#6b6b6b]
-                rounded-md p-1 m-1 w-[120px] justify-center text-md font-bold"
+                rounded-md p-0.5 m-1 w-[120px] justify-center text-md font-bold"
                   onClick={initializeStarforce}
                 >
                   {"↻ 초기화"}
@@ -655,7 +654,7 @@ const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
                   className="flex items-center disabled:bg-gray-600/70 disabled:text-white/20
                   enabled:bg-gradient-to-b from-[#b6b6b6] to-[#868686]
                   enabled:hover:bg-gradient-to-b hover:from-[#979797] hover:to-[#6b6b6b]
-                rounded-md p-1 m-1 w-[120px] justify-center text-md font-bold"
+                rounded-md p-0.5 m-1 w-[120px] justify-center text-md font-bold"
                   onClick={() => {
                     openModal({
                       type: "confirm",
@@ -671,14 +670,14 @@ const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
                 <button
                   className="flex items-center bg-gradient-to-b from-[#b6b6b6] to-[#868686]
                   hover:bg-gradient-to-b hover:from-[#979797] hover:to-[#6b6b6b]
-                rounded-md p-1 m-1 w-[120px] justify-center text-md font-bold"
+                rounded-md p-0.5 m-1 w-[120px] justify-center text-md font-bold"
                   onClick={resetStarforceTarget}
                 >
                   {"X 닫기"}
                 </button>
               </div>
               <p className="flex mt-1 mb-1 border-b-2 border-dotted border-b-white/20" />
-              <div className="flex flex-row flex-grow gap-2 m-1">
+              <div className="flex flex-row flex-grow gap-2 m-0.5">
                 <div className="flex bg-slate-900/70 w-[65%] rounded-md p-1">
                   <p className="text-xs p-1 text-white">🪙 누적 메소: {formatKoreanNumber(accumulatedCost)}</p>
                 </div>

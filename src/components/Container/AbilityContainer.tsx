@@ -58,7 +58,7 @@ export const AbilityContainer = () => {
   }, [preset, ability]);
 
   return (
-    <ContainerWrapper>
+    <ContainerWrapper className="justify-center">
       {!!currentAbility ? (
         <div className="flex flex-col justify-center">
           <div className="flex justify-between mb-2">

@@ -221,8 +221,8 @@ const CubeContainer = () => {
     <>
       <div
         style={{ zIndex: 1002 }}
-        className="cube_container flex fixed top-[25%] left-[35%]
-      max-[600px]:top-[-9%] max-[600px]:left-0 max-[600px]:w-full max-[600px]:h-full
+        className="cube_container flex fixed top-[20%] left-[36%]
+      max-[600px]:top-[-90px] max-[600px]:left-0 max-[600px]:w-full
       "
       >
         <div

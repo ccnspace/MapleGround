@@ -109,10 +109,8 @@ abbr:where([title]) {
 @media (max-width: 600px) {
   .starforce_container {
     display: flex;
-    justify-content: center;
     align-items: center;
     flex-direction: column;
-    transform: scale(0.8);
   }
 
   .starforce_records {
@@ -134,8 +132,7 @@ abbr:where([title]) {
   }
 
   .cube_records {
-    max-width: 400px;
-    max-height: 240px;
+    overflow-y: auto;
   }
 
   .cube_guide {

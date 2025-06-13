@@ -9,6 +9,7 @@ import MainBg from "@/images/mainBg.jpg";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useCharacterPowerStore } from "@/stores/characterPower";
 import { useCharacterStore } from "@/stores/character";
+import Logo from "@/images/groundLogo.png";
 
 export default function Home() {
   const [nickname, setNickname] = useState("");
@@ -57,7 +58,7 @@ export default function Home() {
           />
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
-              메이플그라운드
+              <Image src={Logo} alt="logo" width={300} height={100} className="mb-2" />
             </h2>
           </div>
           <h2 className="text-sm text-white/70 mb-6 max-[600px]:text-xs">캐릭터 정보 · 잠재능력 재설정 · 스타포스 시뮬레이션</h2>

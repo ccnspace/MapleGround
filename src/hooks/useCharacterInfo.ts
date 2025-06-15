@@ -132,5 +132,5 @@ export const useCharacterInfo = (preset?: number) => {
     ability,
   ]);
 
-  return { characterInfo, stat, ability };
+  return { characterInfo, defaultNormalEquipPresetNo: normalEquip?.preset_no, stat, ability };
 };

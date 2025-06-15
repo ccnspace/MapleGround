@@ -20,7 +20,7 @@ const StarforceContainer = dynamic(() => import("./StarforceContainer"), { ssr: 
 const CubeContainer = dynamic(() => import("./CubeContainer"), { ssr: false, loading: () => <DimmedLayer spinner /> });
 
 const RightSideGridContainer = memo(() => (
-  <div className="grid gap-4" style={{ gridRow: "span 2" }}>
+  <div className="grid gap-4">
     <AbilityContainer />
     <ExpContentContainer />
     <WeaponUnlockContainer />

@@ -2,7 +2,7 @@
 
 import { useCharacterInfo } from "@/hooks/useCharacterInfo";
 import { Ability } from "@/types/Ability";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ContainerWrapper } from "./ContainerWrapper";
 
 const getGradeBgColor = (grade: string | null) => {
@@ -25,9 +25,8 @@ type CurrentAbility = {
 };
 
 export const AbilityContainer = () => {
-  const [currentAbility, setCurrentAbility] = useState<CurrentAbility>();
   const { ability } = useCharacterInfo();
-  const [preset, setPreset] = useState<number>();
+  const [preset, setPreset] = useState<number>(1);
 
   const getActivePresetStyle = (_preset: number) => {
     if (preset === _preset)
@@ -43,22 +42,17 @@ export const AbilityContainer = () => {
     setPreset(ability?.preset_no);
   }, [ability?.preset_no]);
 
-  useEffect(() => {
-    if (!ability || !preset || !ability.ability_info.length) {
-      setCurrentAbility(undefined);
-      return;
-    }
-
+  const currentAbility = useMemo(() => {
+    if (!ability || !preset || !ability.ability_info.length) return undefined;
     const _ability = getAbility(ability, preset);
-    setCurrentAbility((prev) => ({
-      ...prev,
+    return {
       grade: _ability.ability_preset_grade,
       info: _ability.ability_info,
-    }));
+    };
   }, [preset, ability]);
 
   return (
-    <ContainerWrapper className="justify-center">
+    <ContainerWrapper className="h-[240px]">
       <div className="flex justify-between mb-2">
         <p
           className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
@@ -98,7 +92,7 @@ export const AbilityContainer = () => {
           </button>
         </div>
       </div>
-      {!!currentAbility ? (
+      {!!currentAbility && (
         <div className="flex flex-col justify-center">
           <div className={`flex flex-col rounded-md px-1 pt-1 pb-1`}>
             <span className="font-bold text-sm">{`${currentAbility.grade} 어빌리티`}</span>
@@ -114,7 +108,8 @@ export const AbilityContainer = () => {
             ))}
           </div>
         </div>
-      ) : (
+      )}
+      {!!ability && !ability.ability_info.length && (
         <div className="flex items-center justify-center h-full">
           <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60">설정된 어빌리티가 없습니다.</p>
         </div>

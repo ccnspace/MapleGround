@@ -402,10 +402,7 @@ const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
     } else {
       if (!isAutoModePlaying && hasAccomplished.current) {
         restartTimer.current = setTimeout(() => {
-          // console.log("targetItem : ", targetItem.starforce);
           const targetStarforce = autoModeRestartOption === "toZero" ? 0 : parseInt(targetItem.starforce);
-
-          // console.log("targetStarforce", targetStarforce, "autoModeOption", autoModeOption);
 
           if (targetStarforce >= parseInt(autoModeOption)) {
             openModal({

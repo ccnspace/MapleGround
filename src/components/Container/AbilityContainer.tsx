@@ -44,7 +44,7 @@ export const AbilityContainer = () => {
   }, [ability?.preset_no]);
 
   useEffect(() => {
-    if (!ability || !preset) {
+    if (!ability || !preset || !ability.ability_info.length) {
       setCurrentAbility(undefined);
       return;
     }
@@ -59,47 +59,47 @@ export const AbilityContainer = () => {
 
   return (
     <ContainerWrapper className="justify-center">
+      <div className="flex justify-between mb-2">
+        <p
+          className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
+        border-l-4 border-l-green-400/80
+        max-[600px]:text-sm items-center
+       "
+        >
+          어빌리티
+        </p>
+        <div
+          className="flex font-bold flex-row gap-3 text-sm mb-2 px-1 pb-1 pt-1
+      rounded-md bg-slate-200 dark:bg-[#121212]/60"
+        >
+          <button
+            onClick={() => {
+              setPreset(1);
+            }}
+            className={`flex text-xs px-1 pt-0.5 pb-0.5 ${getActivePresetStyle(1)}`}
+          >
+            1번 프리셋
+          </button>
+          <button
+            onClick={() => {
+              setPreset(2);
+            }}
+            className={`flex rounded-md text-xs px-1 pt-0.5 pb-0.5 ${getActivePresetStyle(2)}`}
+          >
+            2번 프리셋
+          </button>
+          <button
+            onClick={() => {
+              setPreset(3);
+            }}
+            className={`flex rounded-md text-xs px-1 pt-0.5 pb-0.5 text-slate-500 ${getActivePresetStyle(3)}`}
+          >
+            3번 프리셋
+          </button>
+        </div>
+      </div>
       {!!currentAbility ? (
         <div className="flex flex-col justify-center">
-          <div className="flex justify-between mb-2">
-            <p
-              className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
-              border-l-4 border-l-green-400/80
-              max-[600px]:text-sm items-center
-             "
-            >
-              어빌리티
-            </p>
-            <div
-              className="flex font-bold flex-row gap-3 text-sm mb-2 px-1 pb-1 pt-1
-            rounded-md bg-slate-200 dark:bg-[#121212]/60"
-            >
-              <button
-                onClick={() => {
-                  setPreset(1);
-                }}
-                className={`flex text-xs px-1 pt-0.5 pb-0.5 ${getActivePresetStyle(1)}`}
-              >
-                1번 프리셋
-              </button>
-              <button
-                onClick={() => {
-                  setPreset(2);
-                }}
-                className={`flex rounded-md text-xs px-1 pt-0.5 pb-0.5 ${getActivePresetStyle(2)}`}
-              >
-                2번 프리셋
-              </button>
-              <button
-                onClick={() => {
-                  setPreset(3);
-                }}
-                className={`flex rounded-md text-xs px-1 pt-0.5 pb-0.5 text-slate-500 ${getActivePresetStyle(3)}`}
-              >
-                3번 프리셋
-              </button>
-            </div>
-          </div>
           <div className={`flex flex-col rounded-md px-1 pt-1 pb-1`}>
             <span className="font-bold text-sm">{`${currentAbility.grade} 어빌리티`}</span>
           </div>
@@ -116,7 +116,7 @@ export const AbilityContainer = () => {
         </div>
       ) : (
         <div className="flex items-center justify-center h-full">
-          <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60">여기에 어빌리티 정보가 표시됩니다.</p>
+          <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60">설정된 어빌리티가 없습니다.</p>
         </div>
       )}
     </ContainerWrapper>

@@ -110,7 +110,7 @@ const ChartContainer = () => {
   ];
 
   return (
-    <ContainerWrapper className="w-full min-h-[400px] gap-0.5">
+    <ContainerWrapper className="w-full h-[400px] gap-0.5">
       <p
         className="flex font-extrabold text-base px-2 pt-0.5
           border-l-4 border-l-indigo-400
@@ -126,7 +126,7 @@ const ChartContainer = () => {
         )}
         {fetchStatus === "idle" && (
           <div className="flex items-center justify-center">
-            <p className="font-bold text-sm text-slate-950/50 dark:text-white/60">여기에 캐릭터의 전투력 추이가 표시됩니다.</p>
+            <Spinner width="3em" height="3em" color={spinnerColor} />
           </div>
         )}
         {fetchStatus === "loading" && (

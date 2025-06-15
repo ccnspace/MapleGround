@@ -4,7 +4,7 @@ import { useCharacterStore } from "@/stores/character";
 import { CashItemOption } from "@/types/CashEquipment";
 import { PetEquipment } from "@/types/PetEquipment";
 import Image from "next/image";
-import { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
+import { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Divider } from "../Equip/Divider";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { ContainerWrapper } from "./ContainerWrapper";
@@ -168,7 +168,7 @@ const PetBox = ({
 export const PetEquipContainer = () => {
   const nickname = useNickname();
   const petEquip = useCharacterStore((state) => state.characterAttributes?.[nickname]?.petEquip);
-  const [petInfos, setPetInfos] = useState<PetInfo[]>([]);
+  // const [petInfos, setPetInfos] = useState<PetInfo[]>([]);
   const [selectedPetIndex, setSelectedPetIndex] = useState<string>("");
 
   const handleMouseEnter = useCallback((e: MouseEvent) => {
@@ -179,18 +179,10 @@ export const PetEquipContainer = () => {
     setSelectedPetIndex(parent.id);
   }, []);
 
-  useEffect(() => {
-    if (!petEquip) {
-      setPetInfos([]);
-      return;
-    }
+  const petInfos = useMemo(() => {
+    if (!petEquip) return [];
 
-    for (let i = 1; i <= MAX_PET_COUNT; i++) {
-      const _petInfo = getPetInfoByIndex(petEquip, i);
-      if (!_petInfo.name) continue;
-
-      setPetInfos((prev) => [...prev, _petInfo]);
-    }
+    return Array.from({ length: MAX_PET_COUNT }, (_, i) => getPetInfoByIndex(petEquip, i + 1));
   }, [petEquip]);
 
   return (

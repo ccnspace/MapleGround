@@ -14,13 +14,27 @@ import { useStarforceStore } from "@/stores/starforce";
 import { useTheme } from "next-themes";
 import { DimmedLayer } from "../DimmedLayer";
 import { WeaponUnlockContainer } from "./WeaponUnlockContainer";
+import { ContainerWrapper } from "./ContainerWrapper";
 
-const ChartContainer = dynamic(() => import("./ChartContainer"), { ssr: false, loading: () => <DimmedLayer spinner /> });
+const ChartContainer = dynamic(() => import("./ChartContainer"), {
+  ssr: false,
+  loading: () => (
+    <ContainerWrapper className="w-full h-[400px] gap-0.5">
+      <p
+        className="flex font-extrabold text-base px-2 pt-0.5
+      border-l-4 border-l-indigo-400
+     "
+      >
+        전투력 추이
+      </p>
+    </ContainerWrapper>
+  ),
+});
 const StarforceContainer = dynamic(() => import("./StarforceContainer"), { ssr: false, loading: () => <DimmedLayer spinner /> });
 const CubeContainer = dynamic(() => import("./CubeContainer"), { ssr: false, loading: () => <DimmedLayer spinner /> });
 
 const RightSideGridContainer = memo(() => (
-  <div className="grid gap-4">
+  <div className="right_sideBar grid">
     <AbilityContainer />
     <ExpContentContainer />
     <WeaponUnlockContainer />

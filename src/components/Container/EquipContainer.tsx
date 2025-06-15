@@ -6,6 +6,7 @@ import { EquipInventory } from "../Equip/EquipInventory";
 import { ContainerWrapper } from "./ContainerWrapper";
 import { PetEquipContainer } from "./PetEquipContainer";
 import { useCharacterStore } from "@/stores/character";
+import { useNickname } from "@/hooks/useNickname";
 
 type EquipContextType = {
   characterEquipments: CharacterEquipments | undefined;
@@ -17,8 +18,10 @@ export const EquipActionContext = createContext((_name: string) => {});
 
 export const EquipContainer = () => {
   const [selectedEquipName, setSelectedEquipName] = useState("");
-  const [preset, setPreset] = useState(0);
-  const { characterInfo, defaultNormalEquipPresetNo } = useCharacterInfo(preset);
+  const nickname = useNickname();
+  const defaultPresetNo = useCharacterStore((state) => state.characterAttributes?.[nickname]?.normalEquip?.preset_no);
+  const [preset, setPreset] = useState(defaultPresetNo ?? 0);
+  const { characterInfo } = useCharacterInfo(preset);
 
   const getActivePresetStyle = (_preset: number) => {
     if (preset === _preset)
@@ -34,9 +37,7 @@ export const EquipContainer = () => {
   }, [preset]);
 
   useEffect(() => {
-    if (characterInfo) {
-      setPreset(defaultNormalEquipPresetNo ?? 0);
-    } else {
+    if (!characterInfo) {
       setSelectedEquipName("");
       setPreset(0);
     }

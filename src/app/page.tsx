@@ -126,8 +126,15 @@ export default function Home() {
           <p className="text-sm font-bold text-white">📢 업데이트 내역</p>
           <ul className="flex flex-col gap-2 items-baseline w-full">
             <li className="flex flex-col gap-1">
+              <p className="text-xs text-white/70 rounded-md px-1 py-0.5 bg-slate-400/40 w-fit">2025.06.15</p>
+              <p className="text-xs text-white/70">
+                - 스타포스 시뮬레이터 자동 모드 체크 해제 시에도 종료되도록 수정됩니다.
+                <br />- 스타포스 시뮬레이터 자동 모드에서 성공했는데도 가끔 Success 라벨이 나오지 않는 이슈를 수정했습니다.
+              </p>
+            </li>
+            <li className="flex flex-col gap-1">
               <p className="text-xs text-white/70 rounded-md px-1 py-0.5 bg-slate-400/40 w-fit">2025.06.13</p>
-              <p className="text-xs text-white/70">모바일에서 시뮬레이터가 제대로 보이지 않는 이슈를 수정했습니다.</p>
+              <p className="text-xs text-white/70">- 모바일에서 시뮬레이터가 제대로 보이지 않는 이슈를 수정했습니다.</p>
             </li>
           </ul>
         </div>

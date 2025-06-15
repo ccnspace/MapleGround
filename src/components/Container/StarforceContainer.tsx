@@ -70,7 +70,7 @@ const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
   // 자동 모드
   const [isAutoModePlaying, setIsAutoModePlaying] = useState(false);
   const [isAutoModeChecked, setIsAutoModeChecked] = useState(false);
-  const [autoModeOption, setAutoModeOption] = useState<string>(autoModeOptions[0]);
+  const [autoModeOption, setAutoModeOption] = useState<string>(autoModeOptions[0].split("성")[0]);
   const hasAccomplished = useRef(false);
   const initialStarforce = useRef<number>(0);
   const [autoModeRestartOption, setAutoModeRestartOption] = useState<"stop" | "toZero" | "toOriginal">("stop");
@@ -278,6 +278,8 @@ const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
   };
 
   const doStarforce = useCallback(() => {
+    if (isAutoModePlaying && hasAccomplished.current) return;
+
     simulator.simulate();
     const { item, cost, probabilities, result, accumulatedCost, attempts, destroyCount, discountRatio, prevStarforce } =
       simulator.getState();
@@ -326,16 +328,16 @@ const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
   }, [simulator, isAutoModePlaying, autoModeOption, isMaxStarforce]);
 
   const handleClickStarforceButton = () => {
+    if (isAutoModePlaying) {
+      setIsAutoModePlaying(false);
+      return;
+    }
+
     if (isMaxStarforce) {
       openModal({
         type: "confirm",
         message: `이미 최대 스타포스 수치입니다.`,
       });
-      return;
-    }
-
-    if (isAutoModePlaying) {
-      setIsAutoModePlaying(false);
       return;
     }
 
@@ -395,14 +397,17 @@ const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
   }, [isAutoModePlaying, doStarforce]);
 
   useEffect(() => {
-    if (autoModeRestartOption === "stop") {
+    if (autoModeRestartOption === "stop" || !isAutoModeChecked) {
       clearTimeout(restartTimer.current);
     } else {
       if (!isAutoModePlaying && hasAccomplished.current) {
         restartTimer.current = setTimeout(() => {
+          // console.log("targetItem : ", targetItem.starforce);
           const targetStarforce = autoModeRestartOption === "toZero" ? 0 : parseInt(targetItem.starforce);
 
-          if (targetStarforce >= currentStarforce) {
+          // console.log("targetStarforce", targetStarforce, "autoModeOption", autoModeOption);
+
+          if (targetStarforce >= parseInt(autoModeOption)) {
             openModal({
               type: "alert",
               message: `기존의 스타포스 수치보다 목표치를 높게 설정해 주세요.\n기존 스타포스 수치: ${targetItem.starforce}성\n목표 스타포스 수치: ${autoModeOption}성`,
@@ -415,12 +420,12 @@ const StarforceContainer = ({ targetItem }: { targetItem: ItemEquipment }) => {
             setPrevStarforce(parseInt(item.starforce));
             setIsAutoModePlaying(true);
           }
-        }, 500);
+        }, 600);
       }
     }
     hasAccomplished.current = false;
     return () => clearTimeout(restartTimer.current);
-  }, [autoModeRestartOption, currentStarforce, autoModeOption, targetItem.starforce, isAutoModePlaying]);
+  }, [autoModeRestartOption, currentStarforce, autoModeOption, targetItem.starforce, isAutoModePlaying, isAutoModeChecked]);
 
   useEffect(() => {
     // 자동 모드 옵션이 변경되면 유저의 모든 스타포스 상태를 초기화

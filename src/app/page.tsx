@@ -58,7 +58,7 @@ export default function Home() {
           />
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
-              <Image src={Logo} alt="logo" width={300} height={100} className="mb-2" />
+              <Image src={Logo} alt="logo" width={240} height={100} className="mb-3" />
             </h2>
           </div>
           <h2 className="text-sm text-white/70 mb-6 max-[600px]:text-xs">캐릭터 정보 · 잠재능력 재설정 · 스타포스 시뮬레이션</h2>
@@ -71,7 +71,7 @@ export default function Home() {
                 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)]"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
-                placeholder="캐릭터명을 입력하세요"
+                placeholder="캐릭터명 입력 후 엔터"
               />
               <button type="submit" className="absolute right-3 focus:outline-none">
                 <EnterIcon />
@@ -82,9 +82,8 @@ export default function Home() {
           {/* 북마크 리스트 */}
           {bookmarks && bookmarks.length > 0 && (
             <div className="mt-8 w-full max-w-md z-10">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-sm shadow-lg" />
-                <h3 className="text-sm font-medium text-white/80">즐겨찾기</h3>
+              <div className="flex items-center gap-1 mb-4">
+                ⭐<h3 className="text-sm font-medium text-white/80">즐겨찾기</h3>
               </div>
               <div className="max-h-24 overflow-y-auto">
                 <div className="grid grid-cols-2 gap-2 pr-1">
@@ -118,7 +117,7 @@ export default function Home() {
 
         {/* 간단 공지 카드 */}
         <div
-          className="relative flex flex-col items-center w-[240px] py-4 px-2 gap-2
+          className="relative flex flex-col items-center w-[260px] py-4 px-2 gap-2
          bg-slate-700/70 backdrop-blur-xs rounded-lg shadow-2xl border border-slate-600/60
          max-h-[160px] overflow-y-auto
          "

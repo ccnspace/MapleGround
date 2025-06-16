@@ -10,6 +10,10 @@ export const metadata: Metadata = {
   title: "MapleGround: 메이플그라운드",
   description:
     "메이플 캐릭터 정보, 경험치 효율 비교, 잠재능력 시뮬레이션, 스타포스 시뮬레이션, 제네시스 해방 날짜 계산, 데스티니 해방 날짜 계산",
+  openGraph: {
+    title: "MapleGround: 메이플그라운드",
+    description: "메이플 캐릭터 정보, 잠재능력-스타포스 시뮬레이션, 경험치 효율 비교, 제네시스-데스티니 해방 날짜 계산",
+  },
 };
 
 export const viewport: Viewport = {
@@ -27,6 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <meta name="naver-site-verification" content="101f51f334f08a591bbe05f2cabd51ae4bd382d1" />
       <body className={`${pretendard.variable} font-pretendard bg-white dark:bg-[#131313] min-h-screen flex flex-col`}>
         <ThemeProvider attribute="class" defaultTheme="dark">
           <Header />

@@ -11,9 +11,9 @@ export const Header = () => {
 
   return (
     <header className="header flex bg-white dark:bg-black/50 justify-between items-center pr-8 shadow font-bold text-lg">
-      <div className="pt-3 pb-3 pl-6 pr-3 text-md cursor-pointer" onClick={() => router.push("/")}>
-        <Image src={Logo_dark} alt="logo" width={120} height={100} className="hidden dark:block" />
-        <Image src={Logo} alt="logo" width={120} height={100} className="block dark:hidden" />
+      <div className="pt-3 pb-3 pl-6 pr-3 text-md cursor-pointer flex items-center" onClick={() => router.push("/")}>
+        <Image src={Logo_dark} alt="logo" width={120} height={100} className="hidden dark:flex" />
+        <Image src={Logo} alt="logo" width={120} height={100} className="dark:hidden flex" />
       </div>
       <ThemeChanger />
     </header>

@@ -116,9 +116,7 @@ const PetBox = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      {!!petInfo.shapeIcon && !!petInfo.shapeName && (
-        <Image src={petInfo.shapeIcon} alt={petInfo.shapeName} unoptimized width={40} height={40} style={{ width: 40, height: 40 }} />
-      )}
+      {!!petInfo.shapeIcon && !!petInfo.shapeName && <Image src={petInfo.shapeIcon} alt={petInfo.shapeName} width={30} height={30} />}
       <div className="flex flex-col items-center">
         <p className="font-bold text-sm max-w-24 tracking-tighter truncate">{petInfo.nickname}</p>
       </div>
@@ -134,14 +132,7 @@ const PetBox = ({
       </div>
 
       {!!petInfo.equipment.shapeIcon && !!petInfo.equipment.shapeName && (
-        <Image
-          src={petInfo.equipment.shapeIcon}
-          alt={petInfo.equipment.shapeName}
-          unoptimized
-          width={40}
-          height={40}
-          style={{ width: 40, height: 40 }}
-        />
+        <Image src={petInfo.equipment.shapeIcon} alt={petInfo.equipment.shapeName} width={30} height={30} />
       )}
       {!!petInfo.equipment.name && (
         <>

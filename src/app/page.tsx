@@ -125,6 +125,10 @@ export default function Home() {
           <p className="text-sm font-bold text-white">📢 업데이트 내역</p>
           <ul className="flex flex-col gap-2 items-baseline w-full">
             <li className="flex flex-col gap-1">
+              <p className="text-xs text-white/70 rounded-md px-1 py-0.5 bg-slate-400/40 w-fit">2025.06.20</p>
+              <p className="text-xs text-white/70">- 엠블렘 잠재능력 데이터를 업데이트했습니다. 잠재능력 시뮬레이터에서 즐겨 주세요!</p>
+            </li>
+            <li className="flex flex-col gap-1">
               <p className="text-xs text-white/70 rounded-md px-1 py-0.5 bg-slate-400/40 w-fit">2025.06.15</p>
               <p className="text-xs text-white/70">
                 - 스타포스 시뮬레이터 자동 모드 체크 해제 시에도 종료되도록 수정됩니다.

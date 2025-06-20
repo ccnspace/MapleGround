@@ -1413,7 +1413,7 @@ export function getItemOptionPool(itemType: string, itemGrade: ItemGrade, itemLe
     },
     엠블렘: {
       레어: {
-        "120": {
+        "100": {
           firstLine: [
             { name: "STR +12", probability: 0.061224 },
             { name: "DEX +12", probability: 0.061224 },
@@ -1517,7 +1517,7 @@ export function getItemOptionPool(itemType: string, itemGrade: ItemGrade, itemLe
         },
       },
       에픽: {
-        "120": {
+        "100": {
           firstLine: [
             { name: "STR +6%", probability: 0.108696 },
             { name: "DEX +6%", probability: 0.108696 },
@@ -1621,7 +1621,7 @@ export function getItemOptionPool(itemType: string, itemGrade: ItemGrade, itemLe
         },
       },
       유니크: {
-        "120": {
+        "100": {
           firstLine: [
             { name: "STR +9%", probability: 0.125 },
             { name: "DEX +9%", probability: 0.125 },
@@ -1689,7 +1689,7 @@ export function getItemOptionPool(itemType: string, itemGrade: ItemGrade, itemLe
         },
       },
       레전드리: {
-        "120": {
+        "100": {
           firstLine: [
             { name: "STR +12%", probability: 0.114286 },
             { name: "DEX +12%", probability: 0.114286 },
@@ -2675,7 +2675,7 @@ export function getAdditionalOptionPool(itemType: string, itemGrade: ItemGrade, 
     },
     엠블렘: {
       레어: {
-        "120": {
+        "100": {
           firstLine: [
             { name: "최대 HP +100", probability: 0.058824 },
             { name: "최대 MP +100", probability: 0.058824 },
@@ -2773,7 +2773,7 @@ export function getAdditionalOptionPool(itemType: string, itemGrade: ItemGrade, 
         },
       },
       에픽: {
-        "120": {
+        "100": {
           firstLine: [
             { name: "최대 HP +5%", probability: 0.088235 },
             { name: "최대 MP +5%", probability: 0.088235 },
@@ -2869,7 +2869,7 @@ export function getAdditionalOptionPool(itemType: string, itemGrade: ItemGrade, 
         },
       },
       유니크: {
-        "120": {
+        "100": {
           firstLine: [
             { name: "최대 HP +8%", probability: 0.071429 },
             { name: "최대 MP +8%", probability: 0.071429 },
@@ -2961,7 +2961,7 @@ export function getAdditionalOptionPool(itemType: string, itemGrade: ItemGrade, 
         },
       },
       레전드리: {
-        "120": {
+        "100": {
           firstLine: [
             { name: "최대 HP +11%", probability: 0.078947 },
             { name: "최대 MP +11%", probability: 0.078947 },

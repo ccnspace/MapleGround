@@ -150,7 +150,8 @@ export const GenesisUnlock = ({ onSave }: { onSave: (params: GenesisUnlockData) 
               onChange={(e) => {
                 const value = e.target.value;
                 if (value === "" || /^\d+$/.test(value)) {
-                  setBaseTrace(parseInt(value));
+                  const numValue = parseInt(value) > 0 ? parseInt(value) : 0;
+                  setBaseTrace(numValue);
                 }
               }}
               className="block w-full h-[24px] px-1 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 

@@ -271,16 +271,16 @@ export const ExpContentContainer = () => {
                     </div>
                   </div>
                   <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">4배</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">5배(1단계)</span>
                     <div className="text-right">
                       <div className="text-md text-lime-600 dark:text-lime-400 font-bold">
-                        {formatExpRate(highMountain * 4, characterMaxExp)}%
+                        {formatExpRate(highMountain * 5, characterMaxExp)}%
                       </div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(highMountain * 4)}</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(highMountain * 5)}</div>
                     </div>
                   </div>
                   <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">9배</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">9배(2단계)</span>
                     <div className="text-right">
                       <div className="text-md text-lime-600 dark:text-lime-400 font-bold">
                         {formatExpRate(highMountain * 9, characterMaxExp)}%
@@ -312,12 +312,12 @@ export const ExpContentContainer = () => {
                     </div>
                   </div>
                   <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">4배</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">5배(1단계)</span>
                     <div className="text-right">
                       <div className="text-md text-indigo-600 dark:text-indigo-400 font-bold">
-                        {formatExpRate(anglerCompany * 4, characterMaxExp)}%
+                        {formatExpRate(anglerCompany * 5, characterMaxExp)}%
                       </div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(anglerCompany * 4)}</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(anglerCompany * 5)}</div>
                     </div>
                   </div>
                   <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">

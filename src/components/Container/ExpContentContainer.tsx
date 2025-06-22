@@ -321,7 +321,7 @@ export const ExpContentContainer = () => {
                     </div>
                   </div>
                   <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">9배</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">9배(2단계)</span>
                     <div className="text-right">
                       <div className="text-md text-indigo-600 dark:text-indigo-400 font-bold">
                         {formatExpRate(anglerCompany * 9, characterMaxExp)}%

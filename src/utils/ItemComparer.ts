@@ -53,6 +53,11 @@ export interface ItemComparisonResult {
   score: number;
 }
 
+export interface SortedComparisonResults {
+  positiveScores: ItemComparisonResult[]; // 양수 점수, 내림차순 정렬
+  negativeScores: ItemComparisonResult[]; // 음수 점수, 오름차순 정렬
+}
+
 export class ItemComparer {
   private character_class: string;
   private firstPersonItem: ItemEquipment[];
@@ -67,8 +72,8 @@ export class ItemComparer {
   /**
    * 같은 item_equipment_slot을 가진 아이템들을 비교하여 차이값을 반환합니다.
    */
-  compareItems(): ItemComparisonResult[] {
-    const results: ItemComparisonResult[] = [];
+  compareItems(): SortedComparisonResults {
+    const allResults: ItemComparisonResult[] = [];
 
     // 첫 번째 사람의 아이템을 기준으로 순회
     this.firstPersonItem.forEach((firstItem) => {
@@ -91,11 +96,19 @@ export class ItemComparer {
           score: this.calculateScore(comparison),
         };
 
-        results.push(comparisonResult);
+        allResults.push(comparisonResult);
       }
     });
 
-    return results;
+    // 양수 점수와 음수 점수 분리 및 정렬
+    const positiveScores = allResults.filter((result) => result.score > 0).sort((a, b) => b.score - a.score); // 내림차순 정렬 (높은 점수 우선)
+
+    const negativeScores = allResults.filter((result) => result.score < 0).sort((a, b) => a.score - b.score); // 오름차순 정렬 (낮은 점수 우선)
+
+    return {
+      positiveScores,
+      negativeScores,
+    };
   }
 
   /**

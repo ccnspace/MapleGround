@@ -2,9 +2,9 @@ import { getCharacterAttributes } from "@/apis/getCharacterAttributes";
 import { importantStats } from "@/components/Container/StatContainer";
 import { useCharacterStore } from "@/stores/character";
 import { useVersusStore } from "@/stores/versus";
-import { ItemComparer } from "@/utils/ItemComparer";
+import { ItemComparer, ItemComparisonResult } from "@/utils/ItemComparer";
 import { openModal } from "@/utils/openModal";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useShallow } from "zustand/shallow";
 
 const getWinner = (a: string, b: string) => {
@@ -22,14 +22,14 @@ type VersusSimpleItem = {
 
 /** 전, 후 비교하여 수치가 가장 많이 바뀐 아이템 정보 */
 type VersusDetailItem = {
-  beforeItem: string;
-  afterItem: string;
-  isWinner: "first" | "second" | "draw";
+  positiveScores: ItemComparisonResult[];
+  negativeScores: ItemComparisonResult[];
 };
 
 export const useVersusInfo = () => {
   const [isLoading, setLoading] = useState(false);
   const [versusSimpleReport, setVersusSimpleReport] = useState<VersusSimpleItem[]>([]);
+  const [versusDetailReport, setVersusDetailReport] = useState<VersusDetailItem>();
   const { firstPersonInfo, secondPersonInfo } = useVersusStore(
     useShallow((state) => ({
       firstPersonInfo: state.firstPersonInfo,
@@ -79,6 +79,7 @@ export const useVersusInfo = () => {
     setLoading(false);
 
     compareCharacterInfo();
+    getDetailReport();
   };
 
   const resetPersonData = useCallback(() => {
@@ -86,6 +87,7 @@ export const useVersusInfo = () => {
     setPersonInfo("first", null);
     setPersonInfo("second", null);
     setVersusSimpleReport([]);
+    setVersusDetailReport(undefined);
   }, []);
 
   const compareCharacterInfo = () => {
@@ -214,8 +216,20 @@ export const useVersusInfo = () => {
     ]);
   };
 
-  const resetVersusSimpleReport = () => {
+  const resetVersusReport = () => {
     setVersusSimpleReport([]);
+    setVersusDetailReport(undefined);
+  };
+
+  const getDetailReport = () => {
+    const { firstPersonInfo, secondPersonInfo } = useVersusStore.getState();
+    if (firstPersonInfo && secondPersonInfo) {
+      const { positiveScores, negativeScores } = new ItemComparer(firstPersonInfo, secondPersonInfo).compareItems();
+      setVersusDetailReport({
+        positiveScores,
+        negativeScores,
+      });
+    }
   };
 
   return {
@@ -225,7 +239,8 @@ export const useVersusInfo = () => {
     secondPersonInfo,
     isLoading,
     resetPersonData,
+    resetVersusReport,
     versusSimpleReport,
-    resetVersusSimpleReport,
+    versusDetailReport,
   };
 };

@@ -73,6 +73,18 @@ export const useVersusInfo = () => {
       getCharacterAttributes(nickname, secondPersonDate),
     ]);
 
+    if (firstPersonResponse.basic.character_name === null) {
+      openModal({ message: "첫 번째 캐릭터 정보를 조회할 수 없습니다.\n날짜를 2023.12.21 이후로 다시 설정해 주세요." });
+      setLoading(false);
+      return;
+    }
+
+    if (secondePersonResponse.basic.character_name === null) {
+      openModal({ message: "두 번째 캐릭터 정보를 조회할 수 없습니다.\n날짜를 2023.12.21 이후로 다시 설정해 주세요." });
+      setLoading(false);
+      return;
+    }
+
     setPersonInfo("first", firstPersonResponse);
     setPersonInfo("second", secondePersonResponse);
 
@@ -111,8 +123,8 @@ export const useVersusInfo = () => {
     ]);
 
     // (2) 레벨 비교
-    const firstPersonLevel = firstBasic.character_level.toString() ?? "0";
-    const secondPersonLevel = secondBasic.character_level.toString() ?? "0";
+    const firstPersonLevel = firstBasic.character_level?.toString() ?? "0";
+    const secondPersonLevel = secondBasic.character_level?.toString() ?? "0";
     setVersusSimpleReport((prev) => [
       ...prev,
       {

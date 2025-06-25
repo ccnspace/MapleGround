@@ -112,12 +112,12 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
         {/* 비교 리포트 */}
         <div
           className="w-full max-w-7xl min-w-[1280px] grid grid-cols-3 gap-6 mt-4 
-          max-[600px]:min-w-0 max-[600px]:grid-cols-1 max-[600px]:gap-4 max-[600px]:px-2"
+          max-[600px]:min-w-0 max-[600px]:grid-cols-1 max-[600px]:gap-4 max-[600px]:px-0.5"
         >
           {/* 간단 비교 리포트 */}
           {versusSimpleReport.length > 0 && (
             <div className="w-full">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700 h-[500px] max-[600px]:h-[400px] overflow-y-auto">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 max-[600px]:p-3 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700 h-[500px] max-[600px]:h-[400px] overflow-y-auto">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-3 h-8 bg-gradient-to-b from-blue-400 to-indigo-500 rounded-full"></div>
                   <h4 className="text-lg font-bold text-slate-700 dark:text-slate-200">간단 비교 리포트</h4>
@@ -182,7 +182,7 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
               {/* 많이 성장시킨 아이템 */}
               {versusDetailReport.positiveScores.length > 0 && (
                 <div className="w-full">
-                  <div className="h-[500px] bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700">
+                  <div className="h-[500px] bg-white dark:bg-slate-800 rounded-2xl p-5 max-[600px]:p-2 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-3 h-8 bg-gradient-to-b from-emerald-400 to-teal-500 rounded-full"></div>
                       <h4 className="text-lg font-bold text-slate-700 dark:text-slate-200">나를 성장시킨 아이템</h4>
@@ -277,7 +277,7 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
               {/* 전투력을 떨어트린 아이템 */}
               {versusDetailReport.negativeScores.length > 0 && (
                 <div className="w-full">
-                  <div className="h-[500px] bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700">
+                  <div className="h-[500px] bg-white dark:bg-slate-800 rounded-2xl p-5 max-[600px]:p-2 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-3 h-8 bg-gradient-to-b from-rose-400 to-pink-500 rounded-full"></div>
                       <h4 className="text-lg font-bold text-slate-700 dark:text-slate-200">전투력을 떨어트린 아이템</h4>

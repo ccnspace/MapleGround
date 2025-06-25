@@ -36,7 +36,7 @@ export default function Page() {
   }
 
   return (
-    <div className="flex pt-8 px-2 w-[1366px] flex-col max-[600px]:w-full max-[600px]:px-4">
+    <div className="flex pt-8 px-2 w-[1366px] flex-col max-[600px]:w-full max-[600px]:px-0.5">
       <div className="flex flex-col gap-4">
         <p className="text-3xl font-bold flex items-center gap-2 flex-wrap max-[600px]:text-2xl">
           ⚔️ 과거 vs 현재 대결

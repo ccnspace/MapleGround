@@ -177,7 +177,7 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
           )}
 
           {/* 상세 비교 리포트 */}
-          {versusDetailReport && (versusDetailReport.positiveScores.length > 0 || versusDetailReport.negativeScores.length > 0) && (
+          {versusDetailReport && (
             <>
               {/* 많이 성장시킨 아이템 */}
 

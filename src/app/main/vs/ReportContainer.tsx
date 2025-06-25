@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useModalStore } from "@/stores/modal";
 import { STAT_LABELS, STAT_DISPLAY_ORDER } from "@/consts/statLabels";
 import { ComparisonStats } from "@/types/Equipment";
+import Image from "next/image";
 
 export const ReportContainer = ({ nickname }: { nickname: string }) => {
   const {
@@ -56,10 +57,10 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
 
   return (
     <>
-      <div className="flex flex-col items-center gap-3 mt-8 mb-8 px-6 min-w-[1280px]">
+      <div className="flex flex-col items-center gap-3 mt-8 mb-8 px-6 min-w-[1280px] max-[600px]:min-w-0 max-[600px]:px-2">
         {/* 캐릭터 카드 컨테이너 */}
-        <div className="flex flex-row items-center gap-6 w-full min-w-[800px] max-w-4xl">
-          <div className="w-[360px] flex-shrink-0">
+        <div className="flex flex-row items-center justify-center gap-6 w-full min-w-[800px] max-w-4xl max-[600px]:min-w-0 max-[600px]:flex-col">
+          <div className="w-[360px] flex-shrink-0 max-[600px]:w-full">
             <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4 text-center">과거 캐릭터</h3>
             <CharacterCard
               type="first"
@@ -71,13 +72,13 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
           </div>
 
           {/* VS 배너 - 중앙에 위치 */}
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center max-[600px]:my-4">
             <div className="text-6xl font-black bg-gradient-to-r from-red-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
               VS
             </div>
           </div>
 
-          <div className="w-[360px] flex-shrink-0">
+          <div className="w-[360px] flex-shrink-0 max-[600px]:w-full">
             <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4 text-center">현재 캐릭터</h3>
             <CharacterCard
               type="second"
@@ -90,34 +91,33 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
         </div>
 
         {/* 비교 버튼 */}
-        <div className="mt-3 w-full max-w-md">
-          <button
-            onClick={handleClick}
-            className="w-full py-4 px-2 rounded-2xl text-xl font-bold text-white
-              bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500
-              hover:from-blue-600 hover:via-indigo-600 hover:to-purple-600
-              transform hover:scale-105 transition-all duration-300
-              shadow-[0_8px_25px_rgba(99,102,241,0.25)] hover:shadow-[0_12px_35px_rgba(99,102,241,0.35)]
-              active:scale-95 relative overflow-hidden group"
-          >
-            {/* 배경 애니메이션 효과 */}
-            <div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent 
-              -translate-x-full group-hover:translate-x-full transition-transform duration-700"
-            ></div>
-
-            <span className="flex items-center justify-center gap-2 relative z-10">
-              <span className="font-extrabold text-2xl text-white drop-shadow-sm">비교하기!</span>
-            </span>
-          </button>
-        </div>
+        <button
+          onClick={handleClick}
+          className="w-[280px] px-8 py-2.5 rounded-xl text-base font-semibold text-white
+            bg-gradient-to-r from-indigo-500 to-purple-500
+            hover:from-indigo-600 hover:to-purple-600
+            transform transition-all duration-200
+            shadow-[0_2px_12px_rgba(99,102,241,0.3)]
+            active:scale-95 relative overflow-hidden
+            max-[600px]:w-[240px] max-[600px]:text-sm max-[600px]:py-2"
+        >
+          <span className="flex items-center justify-center gap-2 font-bold text-lg">
+            <span>비교하기</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </span>
+        </button>
 
         {/* 비교 리포트 */}
-        <div className="w-full max-w-7xl min-w-[1280px] grid grid-cols-3 gap-6 mt-4">
+        <div
+          className="w-full max-w-7xl min-w-[1280px] grid grid-cols-3 gap-6 mt-4 
+          max-[600px]:min-w-0 max-[600px]:grid-cols-1 max-[600px]:gap-4 max-[600px]:px-2"
+        >
           {/* 간단 비교 리포트 */}
           {versusSimpleReport.length > 0 && (
             <div className="w-full">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700 h-[500px]">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700 h-[500px] max-[600px]:h-[400px] overflow-y-auto">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-3 h-8 bg-gradient-to-b from-blue-400 to-indigo-500 rounded-full"></div>
                   <h4 className="text-lg font-bold text-slate-700 dark:text-slate-200">간단 비교 리포트</h4>
@@ -201,22 +201,28 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
 
                             {/* 아이템 아이콘들 */}
                             <div className="flex items-center gap-3 flex-1">
-                              <img
+                              <Image
                                 src={item.firstPersonItemIcon}
                                 alt="과거 아이템"
-                                className="w-12 h-12 rounded-lg border-2 border-slate-200 dark:border-slate-600"
+                                width={48}
+                                height={48}
+                                unoptimized
+                                style={{ width: "auto", height: "auto" }}
+                                className="rounded-lg"
                               />
-                              <div className="flex items-center gap-2">
-                                <div className="w-6 h-0.5 bg-gradient-to-r from-slate-300 to-slate-400"></div>
+                              <div className="flex items-center">
                                 <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                 </svg>
-                                <div className="w-6 h-0.5 bg-gradient-to-r from-slate-400 to-slate-300"></div>
                               </div>
-                              <img
+                              <Image
                                 src={item.secondPersonItemIcon}
                                 alt="현재 아이템"
-                                className="w-12 h-12 rounded-lg border-2 border-emerald-200 dark:border-emerald-600"
+                                width={48}
+                                height={48}
+                                unoptimized
+                                style={{ width: "auto", height: "auto" }}
+                                className="rounded-lg"
                               />
                             </div>
 
@@ -290,22 +296,28 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
 
                             {/* 아이템 아이콘들 */}
                             <div className="flex items-center gap-3 flex-1">
-                              <img
+                              <Image
                                 src={item.firstPersonItemIcon}
                                 alt="과거 아이템"
-                                className="w-12 h-12 rounded-lg border-2 border-rose-200 dark:border-rose-600"
+                                width={48}
+                                height={48}
+                                unoptimized
+                                style={{ width: "auto", height: "auto" }}
+                                className="rounded-lg"
                               />
-                              <div className="flex items-center gap-2">
-                                <div className="w-6 h-0.5 bg-gradient-to-r from-slate-300 to-slate-400"></div>
+                              <div className="flex items-center">
                                 <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                 </svg>
-                                <div className="w-6 h-0.5 bg-gradient-to-r from-slate-400 to-slate-300"></div>
                               </div>
-                              <img
+                              <Image
                                 src={item.secondPersonItemIcon}
                                 alt="현재 아이템"
-                                className="w-12 h-12 rounded-lg border-2 border-slate-200 dark:border-slate-600"
+                                width={48}
+                                height={48}
+                                unoptimized
+                                style={{ width: "auto", height: "auto" }}
+                                className="rounded-lg"
                               />
                             </div>
 

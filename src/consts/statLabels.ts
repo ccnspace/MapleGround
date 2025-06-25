@@ -16,9 +16,9 @@ export const STAT_LABELS: Record<string, string> = {
   attack_power_rate: "공격력 %",
 
   // 전투 관련 스탯
-  ignore_monster_armor: "방어율 무시",
+  ignore_monster_armor: "방어율 무시 %",
   critical_damage_rate: "크리티컬 데미지",
-  boss_damage_rate: "보스 데미지",
+  boss_damage_rate: "보스 데미지 %",
   magic_power: "마력",
   attack_power: "공격력",
   starforce: "스타포스",

@@ -169,7 +169,7 @@ export const useVersusInfo = () => {
     setVersusSimpleReport((prev) => [
       ...prev,
       {
-        name: "공격력",
+        name: mainPower(firstBasic.character_class),
         firstPerson: parseInt(firstPersonPower).toLocaleString(),
         secondPerson: parseInt(secondPersonPower).toLocaleString(),
         isWinner: getWinner(firstPersonPower, secondPersonPower),

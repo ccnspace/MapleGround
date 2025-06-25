@@ -72,7 +72,7 @@ const getUnit = (statName: string) => {
 };
 
 // TODO: 직업별로 강조할 스탯 배경색 지정
-const importantStats: Record<string, string[]> = {
+export const importantStats: Record<string, string[]> = {
   STR: [
     "히어로",
     "팔라딘",

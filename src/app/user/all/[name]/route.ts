@@ -1,4 +1,5 @@
 import { fetchOcid } from "@/utils/fetchOcid";
+import dayjs from "dayjs";
 import { NextRequest } from "next/server";
 
 const API_KEY = process.env.API_KEY;
@@ -24,10 +25,14 @@ const endpoints = [
   "android-equipment",
 ] as const;
 
-const makeRequestUrls = (ocid: string) => {
+const makeRequestUrls = (ocid: string, date: string | null) => {
   return endpoints.map((endpoint) => {
     const url = new URL(`${NEXON_API_DOMAIN}/character/${endpoint}`);
+    const currentDate = dayjs().format("YYYY-MM-DD");
     url.searchParams.append("ocid", ocid);
+    if (date && new Date(date) < new Date(currentDate)) {
+      url.searchParams.append("date", date);
+    }
     return url.toString();
   });
 };
@@ -59,8 +64,9 @@ const fetchAllInfo = async (url: string) => {
 export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest, { params }: { params: { name: string } }) {
   try {
+    const date = request.nextUrl.searchParams.get("date") ?? null;
     const ocid = await fetchOcid({ username: params.name, apiDomain: NEXON_API_DOMAIN || "", commonHeader });
-    const requestUrls = makeRequestUrls(ocid);
+    const requestUrls = makeRequestUrls(ocid, date);
 
     const responses = [] as { name: string; data: unknown }[];
     for (let i = 0; i < requestUrls.length; i++) {

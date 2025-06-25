@@ -3,12 +3,10 @@
 import { MainContainer } from "@/components/Container/MainContainer";
 import { useNickname } from "@/hooks/useNickname";
 import { useCharacterStore } from "@/stores/character";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function Page() {
   const nickname = useNickname();
-  const router = useRouter();
   const fetchCharacterAttributes = useCharacterStore((state) => state.fetchCharacterAttributes);
 
   useEffect(() => {
@@ -20,7 +18,7 @@ export default function Page() {
     return () => {
       abortController.abort();
     };
-  }, [nickname, fetchCharacterAttributes, router]);
+  }, [nickname, fetchCharacterAttributes]);
 
   return <MainContainer />;
 }

@@ -131,3 +131,25 @@ export type EquipmentInfo = {
   dragon_equipment: [];
   mechanic_equipment: [];
 };
+
+export interface ComparisonStats {
+  starforce: number;
+  ignore_monster_armor: number;
+  critical_damage_rate: number;
+  boss_damage_rate: number;
+  str?: number;
+  dex?: number;
+  int?: number;
+  luk?: number;
+  max_hp?: number;
+  max_hp_rate?: number;
+  magic_power?: number;
+  attack_power?: number;
+  str_rate?: number;
+  dex_rate?: number;
+  int_rate?: number;
+  luk_rate?: number;
+  magic_power_rate?: number;
+  attack_power_rate?: number;
+  [key: string]: number | undefined;
+}

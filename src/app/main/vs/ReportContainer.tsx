@@ -6,6 +6,8 @@ import { useVersusInfo } from "@/hooks/useVersusInfo";
 import { DimmedLayer } from "@/components/DimmedLayer";
 import { useCallback, useEffect, useState } from "react";
 import { useModalStore } from "@/stores/modal";
+import { STAT_LABELS, STAT_DISPLAY_ORDER } from "@/consts/statLabels";
+import { ComparisonStats } from "@/types/Equipment";
 
 export const ReportContainer = ({ nickname }: { nickname: string }) => {
   const {
@@ -54,7 +56,7 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
 
   return (
     <>
-      <div className="flex flex-col items-center gap-3 mt-8 mb-8 px-6">
+      <div className="flex flex-col items-center gap-3 mt-8 mb-8 px-6 min-w-[1280px]">
         {/* 캐릭터 카드 컨테이너 */}
         <div className="flex flex-row items-center gap-6 w-full min-w-[800px] max-w-4xl">
           <div className="w-[360px] flex-shrink-0">
@@ -111,7 +113,7 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
         </div>
 
         {/* 비교 리포트 */}
-        <div className="w-full max-w-7xl grid grid-cols-3 gap-6">
+        <div className="w-full max-w-7xl min-w-[1280px] grid grid-cols-3 gap-6 mt-4">
           {/* 간단 비교 리포트 */}
           {versusSimpleReport.length > 0 && (
             <div className="w-full">
@@ -233,86 +235,29 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
                               index < 2 ? "top-full mt-2" : "bottom-full mb-2"
                             } bg-white dark:bg-slate-800 rounded-lg p-4 shadow-xl border border-slate-200 dark:border-slate-600 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 w-80`}
                           >
-                            <div className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3">상세 비교 정보</div>
-                            <div className="grid grid-cols-2 gap-3 text-xs">
-                              {Object.entries(item.comparison).map(([key, value]) => {
-                                if (
-                                  key === "starforce" ||
-                                  key === "ignore_monster_armor" ||
-                                  key === "critical_damage_rate" ||
-                                  key === "boss_damage_rate"
-                                ) {
-                                  return (
-                                    <div key={key} className="flex justify-between">
-                                      <span className="text-slate-600 dark:text-slate-400 capitalize">
-                                        {key === "ignore_monster_armor"
-                                          ? "방어율 무시"
-                                          : key === "critical_damage_rate"
-                                          ? "크리티컬 데미지"
-                                          : key === "boss_damage_rate"
-                                          ? "보스 데미지"
-                                          : key}
-                                      </span>
-                                      <span
-                                        className={`font-semibold ${
-                                          value > 0
-                                            ? "text-emerald-600 dark:text-emerald-400"
-                                            : value < 0
-                                            ? "text-red-600 dark:text-red-400"
-                                            : "text-slate-500 dark:text-slate-400"
-                                        }`}
-                                      >
-                                        {value > 0 ? "+" : ""}
-                                        {value}
-                                      </span>
-                                    </div>
-                                  );
-                                }
-                                return null;
-                              })}
-                              {Object.entries(item.comparison).map(([key, value]) => {
-                                if (
-                                  key !== "starforce" &&
-                                  key !== "ignore_monster_armor" &&
-                                  key !== "critical_damage_rate" &&
-                                  key !== "boss_damage_rate" &&
-                                  value !== undefined
-                                ) {
-                                  return (
-                                    <div key={key} className="flex justify-between">
-                                      <span className="text-slate-600 dark:text-slate-400 capitalize">
-                                        {key === "str_rate"
-                                          ? "STR %"
-                                          : key === "dex_rate"
-                                          ? "DEX %"
-                                          : key === "int_rate"
-                                          ? "INT %"
-                                          : key === "luk_rate"
-                                          ? "LUK %"
-                                          : key === "magic_power_rate"
-                                          ? "마력 %"
-                                          : key === "attack_power_rate"
-                                          ? "공격력 %"
-                                          : key === "max_hp_rate"
-                                          ? "HP %"
-                                          : key.toUpperCase()}
-                                      </span>
-                                      <span
-                                        className={`font-semibold ${
-                                          value > 0
-                                            ? "text-emerald-600 dark:text-emerald-400"
-                                            : value < 0
-                                            ? "text-red-600 dark:text-red-400"
-                                            : "text-slate-500 dark:text-slate-400"
-                                        }`}
-                                      >
-                                        {value > 0 ? "+" : ""}
-                                        {value}
-                                      </span>
-                                    </div>
-                                  );
-                                }
-                                return null;
+                            <div className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-2">상세 비교 정보</div>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              {STAT_DISPLAY_ORDER.map((key) => {
+                                const value = (item.comparison as ComparisonStats)[key];
+                                if (value === undefined) return null;
+
+                                return (
+                                  <div key={key} className="flex justify-between">
+                                    <span className="text-slate-600 dark:text-slate-400">{STAT_LABELS[key]}</span>
+                                    <span
+                                      className={`font-semibold ${
+                                        value > 0
+                                          ? "text-emerald-600 dark:text-emerald-400"
+                                          : value < 0
+                                          ? "text-red-600 dark:text-red-400"
+                                          : "text-slate-500 dark:text-slate-400"
+                                      }`}
+                                    >
+                                      {value > 0 ? "+" : ""}
+                                      {value}
+                                    </span>
+                                  </div>
+                                );
                               })}
                             </div>
                           </div>
@@ -379,86 +324,29 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
                               index < 2 ? "top-full mt-2" : "bottom-full mb-2"
                             } bg-white dark:bg-slate-800 rounded-lg p-4 shadow-xl border border-slate-200 dark:border-slate-600 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 w-80`}
                           >
-                            <div className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3">상세 비교 정보</div>
-                            <div className="grid grid-cols-2 gap-3 text-xs">
-                              {Object.entries(item.comparison).map(([key, value]) => {
-                                if (
-                                  key === "starforce" ||
-                                  key === "ignore_monster_armor" ||
-                                  key === "critical_damage_rate" ||
-                                  key === "boss_damage_rate"
-                                ) {
-                                  return (
-                                    <div key={key} className="flex justify-between">
-                                      <span className="text-slate-600 dark:text-slate-400 capitalize">
-                                        {key === "ignore_monster_armor"
-                                          ? "방어율 무시"
-                                          : key === "critical_damage_rate"
-                                          ? "크리티컬 데미지"
-                                          : key === "boss_damage_rate"
-                                          ? "보스 데미지"
-                                          : key}
-                                      </span>
-                                      <span
-                                        className={`font-semibold ${
-                                          value > 0
-                                            ? "text-emerald-600 dark:text-emerald-400"
-                                            : value < 0
-                                            ? "text-red-600 dark:text-red-400"
-                                            : "text-slate-500 dark:text-slate-400"
-                                        }`}
-                                      >
-                                        {value > 0 ? "+" : ""}
-                                        {value}
-                                      </span>
-                                    </div>
-                                  );
-                                }
-                                return null;
-                              })}
-                              {Object.entries(item.comparison).map(([key, value]) => {
-                                if (
-                                  key !== "starforce" &&
-                                  key !== "ignore_monster_armor" &&
-                                  key !== "critical_damage_rate" &&
-                                  key !== "boss_damage_rate" &&
-                                  value !== undefined
-                                ) {
-                                  return (
-                                    <div key={key} className="flex justify-between">
-                                      <span className="text-slate-600 dark:text-slate-400 capitalize">
-                                        {key === "str_rate"
-                                          ? "STR %"
-                                          : key === "dex_rate"
-                                          ? "DEX %"
-                                          : key === "int_rate"
-                                          ? "INT %"
-                                          : key === "luk_rate"
-                                          ? "LUK %"
-                                          : key === "magic_power_rate"
-                                          ? "마력 %"
-                                          : key === "attack_power_rate"
-                                          ? "공격력 %"
-                                          : key === "max_hp_rate"
-                                          ? "HP %"
-                                          : key.toUpperCase()}
-                                      </span>
-                                      <span
-                                        className={`font-semibold ${
-                                          value > 0
-                                            ? "text-emerald-600 dark:text-emerald-400"
-                                            : value < 0
-                                            ? "text-red-600 dark:text-red-400"
-                                            : "text-slate-500 dark:text-slate-400"
-                                        }`}
-                                      >
-                                        {value > 0 ? "+" : ""}
-                                        {value}
-                                      </span>
-                                    </div>
-                                  );
-                                }
-                                return null;
+                            <div className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-2">상세 비교 정보</div>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              {STAT_DISPLAY_ORDER.map((key) => {
+                                const value = (item.comparison as ComparisonStats)[key];
+                                if (value === undefined) return null;
+
+                                return (
+                                  <div key={key} className="flex justify-between">
+                                    <span className="text-slate-600 dark:text-slate-400">{STAT_LABELS[key]}</span>
+                                    <span
+                                      className={`font-semibold ${
+                                        value > 0
+                                          ? "text-emerald-600 dark:text-emerald-400"
+                                          : value < 0
+                                          ? "text-red-600 dark:text-red-400"
+                                          : "text-slate-500 dark:text-slate-400"
+                                      }`}
+                                    >
+                                      {value > 0 ? "+" : ""}
+                                      {value}
+                                    </span>
+                                  </div>
+                                );
                               })}
                             </div>
                           </div>

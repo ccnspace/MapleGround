@@ -360,40 +360,40 @@ export class ItemComparer {
     let score = 0;
 
     // 공통 필드들 (모든 직업에 중요)
-    score += comparison.boss_damage_rate * 0.6;
-    score += comparison.critical_damage_rate * 6;
-    score += comparison.ignore_monster_armor * 0.4;
+    score += comparison.boss_damage_rate * 1;
+    score += comparison.critical_damage_rate * 3.5;
+    score += comparison.ignore_monster_armor * 0.5;
     score += comparison.starforce * 5;
 
     // mainStat에 따른 가중치 적용
     switch (jobStat.mainStat) {
       case "str":
         score += (comparison.str || 0) * 0.7;
-        score += (comparison.str_rate || 0) * 1.5;
+        score += (comparison.str_rate || 0) * 1.3;
         break;
       case "dex":
         score += (comparison.dex || 0) * 0.7;
-        score += (comparison.dex_rate || 0) * 1.5;
+        score += (comparison.dex_rate || 0) * 1.3;
         break;
       case "int":
-        score += (comparison.int || 0) * 0.5;
-        score += (comparison.int_rate || 0) * 2;
+        score += (comparison.int || 0) * 0.7;
+        score += (comparison.int_rate || 0) * 1.3;
         break;
       case "luk":
         score += (comparison.luk || 0) * 0.7;
-        score += (comparison.luk_rate || 0) * 1.5;
+        score += (comparison.luk_rate || 0) * 1.3;
         break;
       case "hp":
         score += (comparison.max_hp || 0) * 0.7;
-        score += (comparison.max_hp_rate || 0) * 1.5;
+        score += (comparison.max_hp_rate || 0) * 1.3;
         break;
       case "str+dex+luk":
         score += (comparison.str || 0) * 0.7;
         score += (comparison.dex || 0) * 0.7;
         score += (comparison.luk || 0) * 0.7;
-        score += (comparison.str_rate || 0) * 1.5;
-        score += (comparison.dex_rate || 0) * 1.5;
-        score += (comparison.luk_rate || 0) * 1.5;
+        score += (comparison.str_rate || 0) * 1.3;
+        score += (comparison.dex_rate || 0) * 1.3;
+        score += (comparison.luk_rate || 0) * 1.3;
         break;
     }
 
@@ -401,11 +401,11 @@ export class ItemComparer {
     switch (jobStat.mainPower) {
       case "공격력":
         score += (comparison.attack_power || 0) * 0.7;
-        score += (comparison.attack_power_rate || 0) * 6;
+        score += (comparison.attack_power_rate || 0) * 3.3;
         break;
       case "마력":
         score += (comparison.magic_power || 0) * 0.7;
-        score += (comparison.magic_power_rate || 0) * 6;
+        score += (comparison.magic_power_rate || 0) * 3.3;
         break;
     }
 

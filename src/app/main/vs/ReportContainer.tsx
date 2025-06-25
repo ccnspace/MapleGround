@@ -60,8 +60,8 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
       <div className="flex flex-col items-center gap-3 mt-8 mb-8 px-6 min-w-[1280px] max-[600px]:min-w-0 max-[600px]:px-2">
         {/* 캐릭터 카드 컨테이너 */}
         <div className="flex flex-row items-center justify-center gap-6 w-full min-w-[800px] max-w-4xl max-[600px]:min-w-0 max-[600px]:flex-col">
-          <div className="w-[360px] flex-shrink-0 max-[600px]:w-full">
-            <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4 text-center">과거 캐릭터</h3>
+          <div className="w-[360px] flex-shrink-0 max-[600px]:w-[320px]">
+            <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4 text-center ">첫 번째 캐릭터</h3>
             <CharacterCard
               type="first"
               direction="left"
@@ -78,8 +78,8 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
             </div>
           </div>
 
-          <div className="w-[360px] flex-shrink-0 max-[600px]:w-full">
-            <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4 text-center">현재 캐릭터</h3>
+          <div className="w-[360px] flex-shrink-0 max-[600px]:w-[320px]">
+            <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4 text-center">두 번째 캐릭터</h3>
             <CharacterCard
               type="second"
               direction="right"
@@ -180,13 +180,14 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
           {versusDetailReport && (versusDetailReport.positiveScores.length > 0 || versusDetailReport.negativeScores.length > 0) && (
             <>
               {/* 많이 성장시킨 아이템 */}
-              {versusDetailReport.positiveScores.length > 0 && (
-                <div className="w-full">
-                  <div className="h-[500px] bg-white dark:bg-slate-800 rounded-2xl p-5 max-[600px]:p-2 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-3 h-8 bg-gradient-to-b from-emerald-400 to-teal-500 rounded-full"></div>
-                      <h4 className="text-lg font-bold text-slate-700 dark:text-slate-200">나를 성장시킨 아이템</h4>
-                    </div>
+
+              <div className="w-full">
+                <div className="h-[500px] bg-white dark:bg-slate-800 rounded-2xl p-5 max-[600px]:p-2 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-3 h-8 bg-gradient-to-b from-emerald-400 to-teal-500 rounded-full"></div>
+                    <h4 className="text-lg font-bold text-slate-700 dark:text-slate-200">나를 성장시킨 아이템</h4>
+                  </div>
+                  {versusDetailReport.positiveScores.length > 0 && (
                     <div className="space-y-3 h-[calc(100%-3.5rem)] overflow-y-auto px-1">
                       {versusDetailReport.positiveScores.map((item, index) => (
                         <div
@@ -270,18 +271,23 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  )}
+                  {versusDetailReport.positiveScores.length === 0 && (
+                    <div className="flex items-center justify-center h-[calc(100%-3.5rem)]">
+                      <p className="text-slate-500 dark:text-slate-400">나를 성장시킨 아이템이 없습니다.</p>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
 
               {/* 전투력을 떨어트린 아이템 */}
-              {versusDetailReport.negativeScores.length > 0 && (
-                <div className="w-full">
-                  <div className="h-[500px] bg-white dark:bg-slate-800 rounded-2xl p-5 max-[600px]:p-2 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-3 h-8 bg-gradient-to-b from-rose-400 to-pink-500 rounded-full"></div>
-                      <h4 className="text-lg font-bold text-slate-700 dark:text-slate-200">전투력을 떨어트린 아이템</h4>
-                    </div>
+              <div className="w-full">
+                <div className="h-[500px] bg-white dark:bg-slate-800 rounded-2xl p-5 max-[600px]:p-2 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-3 h-8 bg-gradient-to-b from-rose-400 to-pink-500 rounded-full"></div>
+                    <h4 className="text-lg font-bold text-slate-700 dark:text-slate-200">성장을 방해한 아이템</h4>
+                  </div>
+                  {versusDetailReport.negativeScores.length > 0 && (
                     <div className="space-y-3 h-[calc(100%-3.5rem)] overflow-y-auto px-1">
                       {versusDetailReport.negativeScores.map((item, index) => (
                         <div
@@ -365,9 +371,14 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  )}
+                  {versusDetailReport.negativeScores.length === 0 && (
+                    <div className="flex items-center justify-center h-[calc(100%-3.5rem)]">
+                      <p className="text-slate-500 dark:text-slate-400">성장을 방해한 아이템이 없습니다.</p>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </>
           )}
         </div>

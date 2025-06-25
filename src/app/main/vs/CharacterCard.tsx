@@ -52,7 +52,7 @@ export const CharacterCard = ({ type, direction, characterImageUrl, nickname, re
 
   return (
     <div
-      className="relative w-full h-full min-h-[368px] rounded-2xl overflow-hidden
+      className="relative w-full h-full min-h-[368px] max-[600px]:min-h-[320px] rounded-2xl overflow-hidden
       bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 
       dark:from-slate-800 dark:via-slate-700 dark:to-slate-600
       border border-white/10
@@ -103,7 +103,7 @@ export const CharacterCard = ({ type, direction, characterImageUrl, nickname, re
 
           <div className="relative z-10 p-2 rounded-xl backdrop-blur-sm">
             <Image
-              className="flex"
+              className="flex max-[600px]:w-[180px]"
               style={{
                 imageRendering: "pixelated",
                 ...(direction === "left" ? { transform: "scale(-1, 1)" } : {}),

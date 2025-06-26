@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import { Header } from "@/components/Header";
 import { pretendard } from "./fonts/pretendard";
@@ -52,6 +53,7 @@ export default function RootLayout({
             </div>
           </footer>
         </ThemeProvider>
+        <Analytics />
         <Script src="https://openapi.nexon.com/js/analytics.js?app_id=208681" />
       </body>
     </html>

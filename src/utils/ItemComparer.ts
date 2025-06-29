@@ -375,8 +375,11 @@ export class ItemComparer {
 
     let score = 0;
 
+    // 기준값
+    // 주스탯10=주스탯1%=데미지3%=공격력4%
+
     // 공통 필드들 (모든 직업에 중요)
-    score += comparison.boss_damage_rate * 1.2;
+    score += comparison.boss_damage_rate * 6;
     score += comparison.critical_damage_rate * 3.5;
     score += comparison.ignore_monster_armor * 0.5;
     score += comparison.starforce * 4;
@@ -422,11 +425,11 @@ export class ItemComparer {
     switch (jobStat.mainPower) {
       case "공격력":
         score += (comparison.attack_power || 0) * 1.6;
-        score += (comparison.attack_power_rate || 0) * 15;
+        score += (comparison.attack_power_rate || 0) * 16.5;
         break;
       case "마력":
         score += (comparison.magic_power || 0) * 1.6;
-        score += (comparison.magic_power_rate || 0) * 15;
+        score += (comparison.magic_power_rate || 0) * 16.5;
         break;
     }
     return Math.round(score * 100) / 100; // 소수점 둘째 자리까지 반올림

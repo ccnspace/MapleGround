@@ -17,6 +17,7 @@ export interface RefinedItemData {
   dex_rate: string;
   int_rate: string;
   luk_rate: string;
+  allstat_rate: string;
   ignore_monster_armor: string;
   magic_power_rate: string;
   attack_power_rate: string;
@@ -47,6 +48,7 @@ export interface ItemComparisonResult {
     dex_rate?: number;
     int_rate?: number;
     luk_rate?: number;
+    allstat_rate?: number;
     magic_power_rate?: number;
     attack_power_rate?: number;
   };
@@ -134,6 +136,7 @@ export class ItemComparer {
       dex_rate: parseInt(second.dex_rate) - parseInt(first.dex_rate),
       int_rate: parseInt(second.int_rate) - parseInt(first.int_rate),
       luk_rate: parseInt(second.luk_rate) - parseInt(first.luk_rate),
+      allstat_rate: parseInt(second.allstat_rate) - parseInt(first.allstat_rate),
       ignore_monster_armor: parseInt(second.ignore_monster_armor) - parseInt(first.ignore_monster_armor),
       magic_power_rate: parseInt(second.magic_power_rate) - parseInt(first.magic_power_rate),
       attack_power_rate: parseInt(second.attack_power_rate) - parseInt(first.attack_power_rate),
@@ -172,6 +175,10 @@ export class ItemComparer {
       filteredComparison.str_rate = fullComparison.str_rate;
       filteredComparison.dex_rate = fullComparison.dex_rate;
       filteredComparison.luk_rate = fullComparison.luk_rate;
+    }
+
+    if (jobStat.mainStat !== "hp") {
+      filteredComparison.allstat_rate = fullComparison.allstat_rate;
     }
 
     // 직업별 mainPower에 따른 필드 추가
@@ -214,6 +221,7 @@ export class ItemComparer {
       dex_rate: "0",
       int_rate: "0",
       luk_rate: "0",
+      allstat_rate: item.item_total_option.all_stat,
       ignore_monster_armor: item.item_total_option.ignore_monster_armor,
       magic_power_rate: "0",
       attack_power_rate: "0",
@@ -269,6 +277,14 @@ export class ItemComparer {
         const currentValue = parseInt(refinedData.luk_rate) || 0;
         const newValue = parseInt(lukRateMatch[1]) || 0;
         refinedData.luk_rate = (currentValue + newValue).toString();
+      }
+
+      // 모든 스탯 +*%
+      const allstatRateMatch = option.match(/올스탯 \+(\d+)%/);
+      if (allstatRateMatch) {
+        const currentValue = parseInt(refinedData.allstat_rate) || 0;
+        const newValue = parseInt(allstatRateMatch[1]) || 0;
+        refinedData.allstat_rate = (currentValue + newValue).toString();
       }
 
       // 몬스터 방어율 무시 +*%
@@ -360,55 +376,59 @@ export class ItemComparer {
     let score = 0;
 
     // 공통 필드들 (모든 직업에 중요)
-    score += comparison.boss_damage_rate * 1;
+    score += comparison.boss_damage_rate * 1.2;
     score += comparison.critical_damage_rate * 3.5;
     score += comparison.ignore_monster_armor * 0.5;
-    score += comparison.starforce * 5;
+    score += comparison.starforce * 4;
 
     // mainStat에 따른 가중치 적용
     switch (jobStat.mainStat) {
       case "str":
-        score += (comparison.str || 0) * 0.7;
-        score += (comparison.str_rate || 0) * 1.3;
+        score += (comparison.str || 0) * 0.5; // 주스탯 1
+        score += (comparison.str_rate || 0) * 4.5; // 주스탯 1% = 주스탯 1 * 10
         break;
       case "dex":
-        score += (comparison.dex || 0) * 0.7;
-        score += (comparison.dex_rate || 0) * 1.3;
+        score += (comparison.dex || 0) * 0.5;
+        score += (comparison.dex_rate || 0) * 4.5;
         break;
       case "int":
-        score += (comparison.int || 0) * 0.7;
-        score += (comparison.int_rate || 0) * 1.3;
+        score += (comparison.int || 0) * 0.5;
+        score += (comparison.int_rate || 0) * 4.5;
         break;
       case "luk":
-        score += (comparison.luk || 0) * 0.7;
-        score += (comparison.luk_rate || 0) * 1.3;
+        score += (comparison.luk || 0) * 0.5;
+        score += (comparison.luk_rate || 0) * 4.5;
         break;
       case "hp":
-        score += (comparison.max_hp || 0) * 0.7;
-        score += (comparison.max_hp_rate || 0) * 1.3;
+        score += (comparison.max_hp || 0) * 0.5;
+        score += (comparison.max_hp_rate || 0) * 4.5;
         break;
       case "str+dex+luk":
-        score += (comparison.str || 0) * 0.7;
-        score += (comparison.dex || 0) * 0.7;
-        score += (comparison.luk || 0) * 0.7;
-        score += (comparison.str_rate || 0) * 1.3;
-        score += (comparison.dex_rate || 0) * 1.3;
-        score += (comparison.luk_rate || 0) * 1.3;
+        score += (comparison.str || 0) * 0.5;
+        score += (comparison.dex || 0) * 0.5;
+        score += (comparison.luk || 0) * 0.5;
+        score += (comparison.str_rate || 0) * 3.5;
+        score += (comparison.dex_rate || 0) * 3.5;
+        score += (comparison.luk_rate || 0) * 3.5;
         break;
+    }
+
+    // 올스탯은 hp가 mainStat인 직업을 제외하고 모두 더한다.
+    if (jobStat.mainStat !== "hp") {
+      score += (comparison.allstat_rate || 0) * 4.7;
     }
 
     // mainPower에 따른 가중치 적용
     switch (jobStat.mainPower) {
       case "공격력":
-        score += (comparison.attack_power || 0) * 0.7;
-        score += (comparison.attack_power_rate || 0) * 3.3;
+        score += (comparison.attack_power || 0) * 1.6;
+        score += (comparison.attack_power_rate || 0) * 15;
         break;
       case "마력":
-        score += (comparison.magic_power || 0) * 0.7;
-        score += (comparison.magic_power_rate || 0) * 3.3;
+        score += (comparison.magic_power || 0) * 1.6;
+        score += (comparison.magic_power_rate || 0) * 15;
         break;
     }
-
     return Math.round(score * 100) / 100; // 소수점 둘째 자리까지 반올림
   }
 }

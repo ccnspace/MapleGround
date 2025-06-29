@@ -12,6 +12,7 @@ export const STAT_LABELS: Record<string, string> = {
   int_rate: "INT %",
   luk_rate: "LUK %",
   max_hp_rate: "HP %",
+  allstat_rate: "올스탯 %",
   magic_power_rate: "마력 %",
   attack_power_rate: "공격력 %",
 
@@ -41,6 +42,7 @@ export const STAT_DISPLAY_ORDER: string[] = [
   "dex_rate",
   "int_rate",
   "luk_rate",
+  "allstat_rate",
   "max_hp_rate",
   "magic_power_rate",
   "attack_power_rate",

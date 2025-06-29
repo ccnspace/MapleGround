@@ -117,7 +117,7 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
           {/* 간단 비교 리포트 */}
           {versusSimpleReport.length > 0 && (
             <div className="w-full">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 max-[600px]:p-3 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700 h-[500px] max-[600px]:h-[400px] overflow-y-auto">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 max-[600px]:p-2 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700 h-[500px] max-[600px]:h-[400px] overflow-y-auto">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-3 h-8 bg-gradient-to-b from-blue-400 to-indigo-500 rounded-full"></div>
                   <h4 className="text-lg font-bold text-slate-700 dark:text-slate-200">간단 비교 리포트</h4>

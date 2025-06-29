@@ -11,7 +11,7 @@ export const useNickname = () => {
     // throw new Error("Nickname is required");
     openModal({
       type: "alert",
-      message: "설정된 닉네임이 없습니다.\n메인으로 돌아갑니다.",
+      message: "설정된 닉네임이 없습니다.\n홈으로 돌아갑니다.",
       confirmCallback: () => router.push("/"),
     });
   }

@@ -125,6 +125,13 @@ export default function Home() {
           <p className="text-sm font-bold text-white">📢 업데이트 내역</p>
           <ul className="flex flex-col gap-2 items-baseline w-full">
             <li className="flex flex-col gap-1">
+              <p className="text-xs text-white/70 rounded-md px-1 py-0.5 bg-slate-400/40 w-fit">2025.10.09</p>
+              <p className="text-xs text-white/70">
+                - 적용 중인 세트 효과를 보여주는 영역이 추가되었습니다.
+                <br />- 경험치 효율 계산기와 무기 해방 날짜 계산기를 페이지로 분리하였습니다. 사이드바에서 만나보세요!
+              </p>
+            </li>
+            <li className="flex flex-col gap-1">
               <p className="text-xs text-white/70 rounded-md px-1 py-0.5 bg-slate-400/40 w-fit">2025.10.08</p>
               <p className="text-xs text-white/70">- 캐릭터 이미지 크기가 전반적으로 어색하게 출력되는 문제를 수정했습니다.</p>
             </li>

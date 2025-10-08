@@ -89,14 +89,14 @@ export const WeaponUnlockContainer = () => {
             <button
               title="설정값 저장"
               onClick={saveConfig}
-              className="p-1 text-sm rounded-md bg-slate-200 dark:bg-gray-700 hover:bg-slate-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+              className="p-1 pr-2 text-sm rounded-md bg-slate-200 dark:bg-gray-700 hover:bg-slate-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
             >
               💾 설정값 저장
             </button>
             <button
               title="설정값 삭제"
               onClick={resetConfig}
-              className="p-1 text-sm rounded-md bg-slate-200 dark:bg-gray-700 hover:bg-slate-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+              className="p-1 pr-2 text-sm rounded-md bg-slate-200 dark:bg-gray-700 hover:bg-slate-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
             >
               ⛔ 설정값 삭제
             </button>

@@ -176,7 +176,7 @@ export const DestinyUnlock = ({ onSave }: { onSave: (params: DestinyUnlockData) 
         })}
 
         <p className="mt-3 border-l-2 border-slate-500 dark:border-slate-200 pl-2 text-sm font-bold text-gray-700 dark:text-gray-300">
-          미션 클리어 보스
+          미션 클리어 당시 파티 인원
         </p>
         <div className="grid grid-cols-2 gap-2">
           {missionList.map((mission) => {

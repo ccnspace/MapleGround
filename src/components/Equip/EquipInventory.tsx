@@ -64,16 +64,16 @@ export const EquipInventory = () => {
         <AndroidEquipIcon equipData={android} isSelected={selectedEquipName === "안드로이드"} />
         <NormalEquipIcon name="기계 심장" equipData={normal} isSelected={selectedEquipName === "기계 심장"} />
       </div>
-      {hasSymbol && (
-        <>
-          <div className="flex mr-auto mt-3">
-            <p
-              className="flex font-bold text-sm px-2 pb-1 pt-1
+      <div className="flex mr-auto mt-3">
+        <p
+          className="flex font-bold text-sm px-2 pb-1 pt-1
          border-l-4 border-l-purple-300"
-            >
-              심볼 아이템
-            </p>
-          </div>
+        >
+          심볼 아이템
+        </p>
+      </div>
+      {hasSymbol ? (
+        <>
           <div className="flex flex-col mt-3 items-start gap-2">
             <div className="grid grid-cols-6 grid-flow-row gap-1.5">
               {Object.values(arcaneSymbol)?.map((item) => (
@@ -99,6 +99,10 @@ export const EquipInventory = () => {
             </div>
           </div>
         </>
+      ) : (
+        <div className="flex items-center justify-center h-full">
+          <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60 min-h-48 items-center">심볼 아이템이 없습니다</p>
+        </div>
       )}
     </div>
   );

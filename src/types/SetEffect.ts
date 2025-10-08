@@ -6,7 +6,7 @@ export type SetEffectItem = {
   set_name: string;
   total_set_count: number;
   set_effect_info: SetEffectInfoOption[];
-  set_effect_full: SetEffectInfoOption[];
+  set_option_full: SetEffectInfoOption[];
 };
 
 type SetEffectInfoOption = {

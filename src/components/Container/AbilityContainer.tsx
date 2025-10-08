@@ -19,11 +19,6 @@ const getAbility = (ability: Ability, preset: number) => {
   return ability.ability_preset_3;
 };
 
-type CurrentAbility = {
-  grade: string | null;
-  info: Ability["ability_info"];
-};
-
 export const AbilityContainer = () => {
   const { ability } = useCharacterInfo();
   const [preset, setPreset] = useState<number>(1);
@@ -56,7 +51,7 @@ export const AbilityContainer = () => {
       <div className="flex justify-between mb-2">
         <p
           className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
-        border-l-4 border-l-green-400/80
+        border-l-4 border-l-yellow-400/80
         max-[600px]:text-sm items-center
        "
         >

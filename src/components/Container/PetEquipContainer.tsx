@@ -173,7 +173,7 @@ export const PetEquipContainer = () => {
   const petInfos = useMemo(() => {
     if (!petEquip) return [];
 
-    return Array.from({ length: MAX_PET_COUNT }, (_, i) => getPetInfoByIndex(petEquip, i + 1));
+    return Array.from({ length: MAX_PET_COUNT }, (_, i) => getPetInfoByIndex(petEquip, i + 1)).filter((petInfo) => petInfo.name !== null);
   }, [petEquip]);
 
   return (
@@ -202,7 +202,7 @@ export const PetEquipContainer = () => {
         </div>
       ) : (
         <div className="flex items-center justify-center h-full">
-          <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60 min-h-48 items-center">펫 정보가 없습니다.</p>
+          <p className="flex font-bold text-sm text-slate-950/50 dark:text-white/60 min-h-48 items-center">장착한 펫이 없습니다</p>
         </div>
       )}
     </div>

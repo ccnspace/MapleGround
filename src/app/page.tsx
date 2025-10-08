@@ -125,6 +125,10 @@ export default function Home() {
           <p className="text-sm font-bold text-white">📢 업데이트 내역</p>
           <ul className="flex flex-col gap-2 items-baseline w-full">
             <li className="flex flex-col gap-1">
+              <p className="text-xs text-white/70 rounded-md px-1 py-0.5 bg-slate-400/40 w-fit">2025.10.08</p>
+              <p className="text-xs text-white/70">- 캐릭터 이미지 크기가 전반적으로 어색하게 출력되는 문제를 수정했습니다.</p>
+            </li>
+            <li className="flex flex-col gap-1">
               <p className="text-xs text-white/70 rounded-md px-1 py-0.5 bg-slate-400/40 w-fit">2025.06.29</p>
               <p className="text-xs text-white/70">- 과거 vs 현재 비교 시 아이템 옵션 가중치가 잘못 적용되는 문제를 수정했습니다.</p>
             </li>

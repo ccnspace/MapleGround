@@ -2,7 +2,7 @@
 
 import { CalendarIcon } from "@/components/svg/CalendarIcon";
 import Image from "next/image";
-import pesronShadow from "@/images/1.png";
+import personShadow from "@/images/1.png";
 import { useState, useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import { useVersusStore } from "@/stores/versus";
@@ -99,22 +99,36 @@ export const CharacterCard = ({ type, direction, characterImageUrl, nickname, re
           <div
             className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent 
             dark:from-white/30 rounded-xl"
-          ></div>
-
-          <div className="relative z-10 p-2 rounded-xl backdrop-blur-sm">
-            <Image
-              className="flex max-[600px]:w-[180px]"
-              style={{
-                imageRendering: "pixelated",
-                ...(direction === "left" ? { transform: "scale(-1, 1)" } : {}),
-                ...(characterImageUrl ? { scale: 2.0 } : {}),
-              }}
-              src={characterImageUrl ?? pesronShadow}
-              alt="person"
-              unoptimized
-              width={characterImageUrl ? 300 : 240}
-              height={300}
-            />
+          />
+          <div className="flex relative z-10 p-2 rounded-xl backdrop-blur-sm">
+            {!characterImageUrl && (
+              <Image
+                className="flex max-[600px]:w-[200px] mt-20 mb-10"
+                style={{
+                  imageRendering: "pixelated",
+                  ...(direction === "left" ? { transform: "scale(-1, 1)" } : {}),
+                }}
+                src={personShadow}
+                alt="person"
+                unoptimized
+                width={130}
+                height={300}
+              />
+            )}
+            {characterImageUrl && (
+              <div
+                style={{
+                  backgroundImage: `url(${characterImageUrl})`,
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                  width: 300,
+                  height: 300,
+                  backgroundSize: "600px",
+                  imageRendering: "pixelated",
+                  ...(direction === "left" ? { transform: "scale(-1, 1)" } : {}),
+                }}
+              />
+            )}
           </div>
           {nickname && (
             <div

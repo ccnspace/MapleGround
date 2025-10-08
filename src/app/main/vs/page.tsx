@@ -38,10 +38,7 @@ export default function Page() {
   return (
     <div className="flex pt-8 px-2 w-[1366px] flex-col max-[600px]:w-full max-[600px]:px-0.5">
       <div className="flex flex-col gap-4">
-        <p className="text-3xl font-bold flex items-center gap-2 flex-wrap max-[600px]:hidden">
-          ⚔️ 과거 vs 현재 대결
-          <span className="px-2 py-0.5 text-xs font-bold text-white bg-red-500 rounded-full">UPDATED</span>
-        </p>
+        <p className="text-3xl font-bold flex items-center gap-2 flex-wrap max-[600px]:hidden">⚔️ 과거 vs 현재 대결</p>
         <PlainBox>
           <div className="flex flex-col gap-2">
             <p className="flex gap-1 items-center font-medium text-slate-700 dark:text-white max-[600px]:text-sm">

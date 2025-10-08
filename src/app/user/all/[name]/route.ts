@@ -23,6 +23,7 @@ const endpoints = [
   "cashitem-equipment",
   "pet-equipment",
   "android-equipment",
+  "set-effect",
 ] as const;
 
 const makeRequestUrls = (ocid: string, date: string | null) => {
@@ -82,6 +83,7 @@ export async function GET(request: NextRequest, { params }: { params: { name: st
     const cashEquip = responses.find((res) => res.name === "cashitem-equipment")?.data;
     const petEquip = responses.find((res) => res.name === "pet-equipment")?.data;
     const androidEquip = responses.find((res) => res.name === "android-equipment")?.data;
+    const setEffect = responses.find((res) => res.name === "set-effect")?.data;
 
     return Response.json({
       basic,
@@ -92,6 +94,7 @@ export async function GET(request: NextRequest, { params }: { params: { name: st
       cashEquip,
       petEquip,
       androidEquip,
+      setEffect,
     });
   } catch (e) {
     if (e instanceof Error) {

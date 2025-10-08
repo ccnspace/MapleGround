@@ -8,12 +8,12 @@ import { StatContainer } from "@/components/Container/StatContainer";
 import { PetEquipContainer } from "@/components/Container/PetEquipContainer";
 import { Spinner } from "../svg/Spinner";
 import { useCharacterStore } from "@/stores/character";
-import { ExpContentContainer } from "./ExpContentContainer";
 import { useCubeStore } from "@/stores/cube";
 import { useStarforceStore } from "@/stores/starforce";
 import { useTheme } from "next-themes";
 import { DimmedLayer } from "../DimmedLayer";
 import { WeaponUnlockContainer } from "./WeaponUnlockContainer";
+import { SetEffectContainer } from "./SetEffectContainer";
 import { ContainerWrapper } from "./ContainerWrapper";
 
 const ChartContainer = dynamic(() => import("./ChartContainer"), {
@@ -36,7 +36,7 @@ const CubeContainer = dynamic(() => import("./CubeContainer"), { ssr: false, loa
 const RightSideGridContainer = memo(() => (
   <div className="right_sideBar grid">
     <AbilityContainer />
-    <ExpContentContainer />
+    <SetEffectContainer />
     <WeaponUnlockContainer />
   </div>
 ));

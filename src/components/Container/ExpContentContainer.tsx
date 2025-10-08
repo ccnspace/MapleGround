@@ -1,7 +1,6 @@
 "use client";
 
 import { getExpValue } from "@/utils/expUtils";
-import { ContainerWrapper } from "./ContainerWrapper";
 import { useCharacterStore } from "@/stores/character";
 import React from "react";
 import Image from "next/image";
@@ -75,20 +74,10 @@ export const ExpContentContainer = () => {
   };
 
   return (
-    <ContainerWrapper className="expContent_container h-[460px] overflow-y-auto">
+    <div className="w-full">
       <div className="flex flex-col justify-center">
-        <div className="flex justify-between mb-2">
-          <p
-            className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
-              border-l-4 border-l-fuchsia-400/80
-              max-[600px]:text-sm items-center
-             "
-          >
-            경험치 효율 계산
-          </p>
-        </div>
         <div className="flex flex-col">
-          <div className="flex flex-col space-y-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Normal EXP Voucher Section */}
             <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
               <div className="text-md font-bold mb-2 text-sky-500 dark:text-sky-300 flex items-center gap-2">
@@ -337,6 +326,6 @@ export const ExpContentContainer = () => {
           </div>
         </div>
       </div>
-    </ContainerWrapper>
+    </div>
   );
 };

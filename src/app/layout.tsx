@@ -44,12 +44,6 @@ export default function RootLayout({
               <p className="text-sky-600 dark:text-sky-500">
                 Data based on <span className="font-bold">NEXON Open API</span>
               </p>
-              <p className="flex gap-1">
-                건의사항 및 버그 신고
-                <a href="mailto:ccngithub@gmail.com" className="font-bold hover:underline">
-                  ccngithub@gmail.com
-                </a>
-              </p>
             </div>
           </footer>
         </ThemeProvider>

@@ -53,7 +53,15 @@ const Profile = ({ characterAttributes }: ProfileProps) => {
   return (
     <div className="flex text-base items-center flex-col gap-3">
       <div className="flex flex-row gap-2">
-        <Image src={character_image} alt="character" unoptimized width={120} height={120} style={{ width: 120, height: 120 }} />
+        <div
+          style={{
+            backgroundImage: `url(${character_image})`,
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            width: 120,
+            height: 120,
+          }}
+        />
         <div className="flex flex-col gap-1.5 justify-center min-w-[100px]">
           <p className="text-slate-100 text-sm">
             <Badge bgColor="lime" text={"이름"} />

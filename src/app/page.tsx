@@ -44,28 +44,32 @@ export default function Home() {
       <div className="flex flex-col items-center gap-8">
         {/* 검색 카드 */}
         <div
-          className="relative flex flex-col items-center justify-center p-10 bg-slate-800/90 backdrop-blur-xs rounded-lg shadow-2xl
-        border border-slate-300/30"
+          className="relative flex flex-col items-center justify-center
+          p-12 max-[600px]:p-8 bg-slate-800/80
+        backdrop-blur-sm rounded-xl shadow-2xl border border-white/20"
         >
           <Image
             src={CharacterImg}
             alt=""
-            width={90}
-            height={160}
+            width={100}
+            height={170}
             priority
-            className="absolute opacity-20 -z-0"
-            style={{ width: 90, height: 150 }}
+            className="absolute opacity-20 z-0"
+            style={{ width: 100, height: 170, imageRendering: "pixelated" }}
           />
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
-              <Image src={Logo} alt="logo" width={240} height={100} className="mb-3" />
+              <Image src={Logo} alt="logo" width={300} height={100} className="mb-3" />
             </h2>
           </div>
-          <h2 className="text-sm text-white/70 mb-6 max-[600px]:text-xs">캐릭터 정보 · 잠재능력 재설정 · 스타포스 시뮬레이션</h2>
+          <h2 className="text-md text-white/80 mb-6 max-[600px]:text-xs">캐릭터 정보 · 잠재능력 재설정 · 스타포스 시뮬레이션</h2>
           <form className="flex flex-col items-center gap-4 z-10" onSubmit={handleSubmit}>
-            <div className="relative flex items-center rounded-lg w-64">
+            <div
+              className="relative flex items-center rounded-lg w-64
+            border-2 border-slate-300/80"
+            >
               <input
-                className="w-full px-3 py-2 font-normal text-white bg-slate-900 rounded-lg outline-none placeholder:text-slate-400
+                className="w-full px-3 py-2 font-normal text-white bg-slate-900 rounded-lg outline-none placeholder:text-slate-300
                 focus:ring-2 focus:ring-indigo-500/80 focus:ring-offset-0
                 transition-all duration-300 shadow-lg
                 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)]"
@@ -78,7 +82,6 @@ export default function Home() {
               </button>
             </div>
           </form>
-
           {/* 북마크 리스트 */}
           {bookmarks && bookmarks.length > 0 && (
             <div className="mt-8 w-full max-w-md z-10">
@@ -117,8 +120,8 @@ export default function Home() {
 
         {/* 간단 공지 카드 */}
         <div
-          className="relative flex flex-col items-center w-[260px] py-4 px-2 gap-2
-         bg-slate-700/70 backdrop-blur-xs rounded-lg shadow-2xl border border-slate-600/60
+          className="relative flex flex-col items-center w-[300px] py-4 px-2 gap-2
+         bg-slate-700/70 backdrop-blur-xs rounded-lg shadow-2xl 
          max-h-[160px] overflow-y-auto
          "
         >

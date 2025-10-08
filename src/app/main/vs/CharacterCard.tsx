@@ -107,7 +107,7 @@ export const CharacterCard = ({ type, direction, characterImageUrl, nickname, re
               style={{
                 imageRendering: "pixelated",
                 ...(direction === "left" ? { transform: "scale(-1, 1)" } : {}),
-                scale: 2.0,
+                ...(characterImageUrl ? { scale: 2.0 } : {}),
               }}
               src={characterImageUrl ?? pesronShadow}
               alt="person"

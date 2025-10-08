@@ -12,7 +12,6 @@ import { useCubeStore } from "@/stores/cube";
 import { useStarforceStore } from "@/stores/starforce";
 import { useTheme } from "next-themes";
 import { DimmedLayer } from "../DimmedLayer";
-import { WeaponUnlockContainer } from "./WeaponUnlockContainer";
 import { SetEffectContainer } from "./SetEffectContainer";
 import { ContainerWrapper } from "./ContainerWrapper";
 
@@ -37,7 +36,6 @@ const RightSideGridContainer = memo(() => (
   <div className="right_sideBar grid">
     <AbilityContainer />
     <SetEffectContainer />
-    <WeaponUnlockContainer />
   </div>
 ));
 

@@ -1,13 +1,13 @@
 "use client";
 
-import { ExpContentContainer } from "@/components/Container/ExpContentContainer";
+import { WeaponUnlockContainer } from "@/components/Container/WeaponUnlockContainer";
 import { useNickname } from "@/hooks/useNickname";
 import { useCharacterStore } from "@/stores/character";
 import { useEffect } from "react";
 import { Spinner } from "@/components/svg/Spinner";
 import { useTheme } from "next-themes";
 
-export default function ExpPage() {
+export default function WeaponPage() {
   const nickname = useNickname();
   const fetchCharacterAttributes = useCharacterStore((state) => state.fetchCharacterAttributes);
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
@@ -37,10 +37,10 @@ export default function ExpPage() {
     <div className="flex max-[600px]:pt-0.5 pt-8 px-2 w-[1366px] flex-col max-[600px]:w-full max-[600px]:px-0.5 gap-5">
       <div className="flex flex-col gap-4">
         <p className="text-3xl font-bold flex items-center gap-2 flex-wrap max-[600px]:hidden">
-          📊 경험치 효율 계산<span className="px-2 py-0.5 text-xs font-bold text-white bg-red-500 rounded-full">UPDATED</span>
+          ⚔️ 무기 해방 날짜 계산<span className="px-2 py-0.5 text-xs font-bold text-white bg-red-500 rounded-full">UPDATED</span>
         </p>
       </div>
-      <ExpContentContainer />
+      <WeaponUnlockContainer />
     </div>
   );
 }

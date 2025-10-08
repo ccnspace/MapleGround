@@ -1,5 +1,3 @@
-import { type BossConfig as GenesisBossConfig, type MissionBossConfig as GenesisMissionBossConfig } from "@/utils/genesis";
-import { type BossConfig as DestinyBossConfig, type MissionBossConfig as DestinyMissionBossConfig } from "@/utils/destiny";
 import { ContainerWrapper } from "./ContainerWrapper";
 import { useState } from "react";
 import { GenesisUnlock } from "../WeaponUnlock/GenesisUnlock";
@@ -80,28 +78,27 @@ export const WeaponUnlockContainer = () => {
   };
 
   return (
-    <ContainerWrapper className="expContent_container h-[700px] overflow-y-auto">
-      <div className="flex flex-col">
-        <div className="flex items-center mb-2 justify-between">
+    <ContainerWrapper className="w-full mb-3 flex items-center bg-transparent dark:bg-transparent">
+      <div className="flex flex-col items-center p-3 rounded-lg bg-slate-100 dark:bg-[#1f2024] w-fit">
+        <div className="flex mb-2 justify-between w-full">
           <p
-            className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 gap-2
-          border-l-4 border-l-purple-400/80 text-gray-900 dark:text-gray-100
-          max-[600px]:text-sm items-center"
+            className="flex font-bold text-base mb-2 pb-0.5 pt-0.5 gap-2
+    text-gray-900 dark:text-gray-100
+    max-[600px]:text-sm items-center"
           >
-            해방 날짜 계산
             <button
               title="설정값 저장"
               onClick={saveConfig}
-              className="px-1 py-0.5 text-sm rounded-md bg-slate-300 dark:bg-gray-700 hover:bg-slate-400 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+              className="p-1 text-sm rounded-md bg-slate-200 dark:bg-gray-700 hover:bg-slate-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
             >
-              💾
+              💾 설정값 저장
             </button>
             <button
               title="설정값 삭제"
               onClick={resetConfig}
-              className="px-1 py-0.5 text-sm rounded-md bg-slate-300 dark:bg-gray-700 hover:bg-slate-400 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+              className="p-1 text-sm rounded-md bg-slate-200 dark:bg-gray-700 hover:bg-slate-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
             >
-              ⛔
+              ⛔ 설정값 삭제
             </button>
           </p>
           <div className="flex items-center mb-2 gap-2">

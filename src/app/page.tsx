@@ -91,14 +91,17 @@ export default function Home() {
           </form>
           {/* 북마크 리스트 */}
           {bookmarks && bookmarks.length > 0 && (
-            <div className="mt-8 w-full max-w-md z-10">
-              <div className="flex items-center gap-1 mb-3">
+            <div className="mt-8 w-full max-w-md z-10 rounded-lg bg-white/30 p-1">
+              <div className="flex items-center gap-1 mb-2">
                 <h3
-                  className="flex gap-2 items-center text-xs font-bold text-black/80 
-                bg-white/30 rounded-lg p-0.5"
+                  className="flex w-full justify-between gap-2 items-center font-extrabold text-black/80 
+                "
                 >
-                  ⭐ 즐겨찾기한 캐릭터
-                  <button onClick={handleRemoveAllClick} className="font-bold text-white/80 bg-black/20 hover:bg-black/30 p-1 rounded-md">
+                  <span className="text-[14px]">⭐ 즐겨찾기한 캐릭터</span>
+                  <button
+                    onClick={handleRemoveAllClick}
+                    className="text-xs font-extrabold text-white/80 bg-black/30 hover:bg-black/50 p-1 rounded-md"
+                  >
                     모두 제거
                   </button>
                 </h3>

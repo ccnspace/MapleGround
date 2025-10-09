@@ -81,7 +81,7 @@ export const ExpContentContainer = () => {
             {/* Normal EXP Voucher Section */}
             <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
               <div className="text-md font-bold mb-2 text-sky-500 dark:text-sky-300 flex items-center gap-2">
-                <Image src={expIcon} alt="EXP 쿠폰" width={24} height={24} />
+                <Image src={expIcon} alt="EXP 쿠폰" width={32} height={32} unoptimized style={{ imageRendering: "pixelated" }} />
                 일반 EXP 쿠폰 <span className="text-xs font-normal">(레벨 200 이상 사용 가능)</span>
               </div>
               {currentLevel >= LEVEL_REQUIREMENTS.NORMAL_EXP ? (
@@ -125,7 +125,14 @@ export const ExpContentContainer = () => {
             {/* Advanced EXP Voucher Section */}
             <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
               <div className="text-md font-bold mb-2 text-blue-600 dark:text-blue-400 flex items-center gap-2">
-                <Image src={expAdvanceIcon} alt="상급 EXP 쿠폰" width={24} height={24} />
+                <Image
+                  src={expAdvanceIcon}
+                  alt="상급 EXP 쿠폰"
+                  width={32}
+                  height={32}
+                  unoptimized
+                  style={{ imageRendering: "pixelated" }}
+                />
                 상급 EXP 쿠폰 <span className="text-xs font-normal">(레벨 260 이상 사용 가능)</span>
               </div>
               {currentLevel >= LEVEL_REQUIREMENTS.ADVANCED_EXP ? (
@@ -169,7 +176,7 @@ export const ExpContentContainer = () => {
             {/* VIP REST Section */}
             <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
               <div className="text-md font-bold mb-2 text-violet-600 dark:text-violet-400 flex items-center gap-2">
-                <Image src={vipRestIcon} alt="VIP 사우나" width={24} height={24} />
+                <Image src={vipRestIcon} alt="VIP 사우나" width={32} height={32} unoptimized style={{ imageRendering: "pixelated" }} />
                 VIP 사우나/MVP 리조트 <span className="text-xs font-normal">(레벨 101 이상 사용 가능)</span>
               </div>
               {currentLevel >= LEVEL_REQUIREMENTS.VIP_REST ? (
@@ -213,7 +220,14 @@ export const ExpContentContainer = () => {
             {/* Extreme Monster Park Section */}
             <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
               <div className="text-md font-semibold mb-2 text-teal-600 dark:text-teal-400 flex items-center gap-2">
-                <Image src={monpaIcon} alt="익스트림 몬스터파크" width={24} height={24} />
+                <Image
+                  src={monpaIcon}
+                  alt="익스트림 몬스터파크"
+                  width={32}
+                  height={32}
+                  unoptimized
+                  style={{ imageRendering: "pixelated" }}
+                />
                 익스트림 몬스터파크 <span className="text-xs font-normal">(레벨 260 이상 참여 가능)</span>
               </div>
               {currentLevel >= LEVEL_REQUIREMENTS.EXTREME_MONPARK ? (
@@ -245,7 +259,7 @@ export const ExpContentContainer = () => {
             {/* High Mountain Section */}
             <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
               <div className="text-md font-semibold mb-2 text-lime-600 dark:text-lime-400 flex items-center gap-2">
-                <Image src={highIcon} alt="하이 마운틴" width={24} height={24} />
+                <Image src={highIcon} alt="하이 마운틴" width={32} height={32} unoptimized style={{ imageRendering: "pixelated" }} />
                 하이 마운틴 <span className="text-xs font-normal">(레벨 260 이상 참여 가능)</span>
               </div>
               {currentLevel >= LEVEL_REQUIREMENTS.HIGH_MOUNTAIN ? (
@@ -286,7 +300,7 @@ export const ExpContentContainer = () => {
             {/* Angler Company Section */}
             <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
               <div className="text-md font-semibold mb-2 text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-                <Image src={anglerIcon} alt="앵글러 컴퍼니" width={24} height={24} />
+                <Image src={anglerIcon} alt="앵글러 컴퍼니" width={32} height={32} unoptimized style={{ imageRendering: "pixelated" }} />
                 앵글러 컴퍼니 <span className="text-xs font-normal">(레벨 270 이상 참여 가능)</span>
               </div>
               {currentLevel >= LEVEL_REQUIREMENTS.ANGLER ? (

@@ -110,7 +110,7 @@ const ChartContainer = () => {
   ];
 
   return (
-    <ContainerWrapper className="w-full h-[400px] gap-0.5">
+    <ContainerWrapper className="w-full h-[430px] gap-0.5">
       <p
         className="flex font-extrabold text-base px-2 pt-0.5
           border-l-4 border-l-indigo-400

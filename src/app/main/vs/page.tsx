@@ -8,6 +8,8 @@ import { useEffect } from "react";
 import { useNickname } from "@/hooks/useNickname";
 import { Spinner } from "@/components/svg/Spinner";
 import { useTheme } from "next-themes";
+import { CommonWrapper } from "@/components/Container/CommonWrapper";
+import { CommonTitle } from "@/components/Container/CommonTitle";
 
 export default function Page() {
   const nickname = useNickname();
@@ -36,25 +38,23 @@ export default function Page() {
   }
 
   return (
-    <div className="flex pt-8 px-2 w-[1366px] flex-col max-[600px]:w-full max-[600px]:px-0.5">
-      <div className="flex flex-col gap-4">
-        <p className="text-3xl font-bold flex items-center gap-2 flex-wrap max-[600px]:hidden">⚔️ 과거 vs 현재 대결</p>
-        <PlainBox>
-          <div className="flex flex-col gap-2">
-            <p className="flex gap-1 items-center font-medium text-slate-700 dark:text-white max-[600px]:text-sm">
-              <InfoIcon />
-              사용 전 확인!
-            </p>
-            <p className="-mt-1 font-medium text-sm max-[600px]:text-xs">
-              {"• 첫 번째 캐릭터의 날짜를 두 번째보다 "}
-              <span className="underline underline-offset-4 decoration-2 decoration-sky-600">과거로 설정</span>
-              {"해 주세요."}
-            </p>
-            <p className="-mt-1 font-medium text-sm max-[600px]:text-xs">{"• 반지는 정확한 1:1 비교가 어려울 수 있습니다."}</p>
-          </div>
-        </PlainBox>
+    <CommonWrapper>
+      <div className="flex px-2 w-[1366px] flex-col max-[600px]:w-full max-[600px]:px-0.5">
+        <div className="flex flex-col gap-4">
+          <CommonTitle title="⚔️ 과거 vs 현재 대결" />
+          <PlainBox>
+            <div className="flex flex-col gap-2 w-full">
+              <p className="-mt-1 font-medium text-sm max-[600px]:text-xs text-white">
+                {"• 첫 번째 캐릭터의 날짜를 두 번째보다 "}
+                <span className="underline underline-offset-4 decoration-2 decoration-sky-400">과거로 설정</span>
+                {"해 주세요."}
+              </p>
+              <p className="-mt-1 font-medium text-sm max-[600px]:text-xs text-white">{"• 반지는 정확한 1:1 비교가 어려울 수 있습니다."}</p>
+            </div>
+          </PlainBox>
+        </div>
+        <ReportContainer nickname={nickname} />
       </div>
-      <ReportContainer nickname={nickname} />
-    </div>
+    </CommonWrapper>
   );
 }

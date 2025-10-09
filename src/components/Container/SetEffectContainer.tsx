@@ -9,17 +9,25 @@ export const SetEffectContainer = () => {
   const { set_effect } = characterInfo?.setEffect || {};
   const [selectedSetIndex, setSelectedSetIndex] = useState<string>("");
 
-  const handleMouseEnter = useCallback((e: MouseEvent) => {
-    const target = e.target as Element;
-    const parent = target.closest(".setbox");
-    if (!parent || parent.childElementCount === 0) return;
+  const handleMouseEnter = useCallback(
+    (e: MouseEvent) => {
+      const target = e.target as Element;
+      const parent = target.closest(".setbox");
+      if (!parent || parent.childElementCount === 0) return;
 
-    setSelectedSetIndex(parent.id);
-  }, []);
+      if (selectedSetIndex === parent.id) {
+        setSelectedSetIndex("");
+        return;
+      }
+
+      setSelectedSetIndex(parent.id);
+    },
+    [selectedSetIndex]
+  );
 
   // TODO: 오른쪽 사이드 영역에 컨텐츠 추가 시 아래 ContainerWrapper > row-span 옵션 수정 필요
   return (
-    <ContainerWrapper className="h-[240px] overflow-y-auto">
+    <ContainerWrapper className="h-[260px] overflow-y-auto">
       <div className="flex justify-between mb-2">
         <p
           className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
@@ -39,21 +47,27 @@ export const SetEffectContainer = () => {
             return (
               <div
                 key={index}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={() => setSelectedSetIndex("")}
+                onClick={handleMouseEnter}
                 id={index.toString()}
-                className="setbox flex items-center justify-between py-2 px-3 rounded-md bg-slate-200/60 dark:bg-white/5 hover:bg-slate-300/50 dark:hover:bg-white/10 cursor-pointer"
+                className="setbox flex flex-col justify-between py-2 px-3 rounded-md 
+                bg-slate-300/50 dark:bg-white/5 hover:bg-slate-400/50 dark:hover:bg-white/10 cursor-pointer"
               >
-                <span className="font-medium text-sm text-gray-700 dark:text-gray-300">{set.set_name}</span>
-                <div className="flex flex-row items-center gap-1">
-                  {activeSetCount === 0 && <span className="text-sm font-bold text-gray-500">세트효과 미발동</span>}
-                  {activeSetCount > 0 && <span className="text-sm font-bold text-green-500">{activeSetCount}세트효과 발동</span>}
-                  <span className="text-xs text-gray-500 dark:text-gray-400">({set.total_set_count}개 착용)</span>
+                <div className="flex flex-row gap-1 justify-between">
+                  <span className="font-medium text-sm text-gray-900 dark:text-gray-300">{set.set_name}</span>
+                  <div className="flex flex-row gap-1">
+                    {activeSetCount === 0 && <span className="text-sm font-bold text-gray-500">세트효과 미발동</span>}
+                    <div className="flex flex-row items-center gap-1">
+                      {activeSetCount > 0 && <span className="text-sm font-bold text-green-600">{activeSetCount}세트효과 발동</span>}
+                      <span className="text-xs text-gray-500 dark:text-gray-400">({set.total_set_count}개 착용)</span>
+                    </div>
+                  </div>
                 </div>
                 {/* 호버 시 세트 효과 목록 표시 */}
                 {selectedSetIndex === index.toString() && (
-                  <div className="absolute z-50 mt-[-100px] text-white bg-slate-950/90 dark:bg-[#121212]/90 border border-gray-700 rounded-md shadow-lg p-3 w-80">
-                    <div className="text-xs font-semibold mb-2">{set.set_name} 효과</div>
+                  <div
+                    className="text-white bg-slate-950/80 dark:bg-[#121212]/90
+                  rounded-md shadow-lg p-3 mt-2"
+                  >
                     <div className="space-y-1">
                       {set.set_option_full.map((effect, effectIndex) => {
                         const isActive = set.set_effect_info.some((activeEffect) => activeEffect.set_count === effect.set_count);

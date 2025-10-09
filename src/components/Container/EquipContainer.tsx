@@ -53,7 +53,7 @@ export const EquipContainer = () => {
   );
 
   return (
-    <ContainerWrapper className="gap-1">
+    <ContainerWrapper className="gap-1 z-10">
       <div className="flex flex-col justify-center">
         {!!characterInfo?.equipments ? (
           <div className="flex justify-between mb-1">

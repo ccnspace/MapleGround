@@ -59,9 +59,12 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
     <>
       <div className="flex flex-col items-center gap-3 mt-8 mb-8 px-6 min-w-[1280px] max-[600px]:min-w-0 max-[600px]:px-2">
         {/* 캐릭터 카드 컨테이너 */}
-        <div className="flex flex-row items-center justify-center gap-6 w-full min-w-[800px] max-w-4xl max-[600px]:min-w-0 max-[600px]:flex-col">
+        <div
+          className="flex flex-row items-center justify-center gap-6 w-full
+        min-w-[800px] max-w-4xl max-[600px]:min-w-0 max-[600px]:flex-col"
+        >
           <div className="w-[360px] flex-shrink-0 max-[600px]:w-[320px]">
-            <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4 text-center ">첫 번째 캐릭터</h3>
+            <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-2 text-center ">첫 번째 캐릭터</h3>
             <CharacterCard
               type="first"
               direction="left"
@@ -73,13 +76,11 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
 
           {/* VS 배너 - 중앙에 위치 */}
           <div className="flex flex-col items-center justify-center max-[600px]:my-4">
-            <div className="text-6xl font-black bg-gradient-to-r from-red-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
-              VS
-            </div>
+            <div className="text-6xl text-white font-extrabold">VS</div>
           </div>
 
           <div className="w-[360px] flex-shrink-0 max-[600px]:w-[320px]">
-            <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-4 text-center">두 번째 캐릭터</h3>
+            <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-2 text-center">두 번째 캐릭터</h3>
             <CharacterCard
               type="second"
               direction="right"
@@ -93,19 +94,15 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
         {/* 비교 버튼 */}
         <button
           onClick={handleClick}
-          className="w-[280px] px-8 py-2.5 rounded-xl text-base font-semibold text-white
-            bg-gradient-to-r from-indigo-500 to-purple-500
-            hover:from-indigo-600 hover:to-purple-600
-            transform transition-all duration-200
-            shadow-[0_2px_12px_rgba(99,102,241,0.3)]
-            active:scale-95 relative overflow-hidden
+          className="w-[280px] px-8 py-2.5 rounded-full text-base font-semibold text-white
+            bg-gradient-to-r from-sky-500 to-cyan-500
+            hover:from-sky-600 hover:to-cyan-600
+            border-2 border-white/40
+            active:scale-95 relative
             max-[600px]:w-[240px] max-[600px]:text-sm max-[600px]:py-2"
         >
           <span className="flex items-center justify-center gap-2 font-bold text-lg">
             <span>비교하기</span>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
           </span>
         </button>
 

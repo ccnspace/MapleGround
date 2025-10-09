@@ -23,6 +23,14 @@ const formatExpRate = (exp: number, maxExp: number) => {
   return ((exp / maxExp) * 100).toFixed(3);
 };
 
+const ExpItemWrapper = ({ children }: { children: React.ReactNode }) => {
+  return <div className="bg-white/50 dark:bg-black/30 rounded-lg p-3">{children}</div>;
+};
+
+const ExpDetailWrapper = ({ children }: { children: React.ReactNode }) => {
+  return <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-white/50 dark:bg-black/50">{children}</div>;
+};
+
 export const ExpContentContainer = () => {
   const nickname = useNickname();
   const characterAttributes = useCharacterStore((state) => state.characterAttributes?.[nickname]);
@@ -77,19 +85,19 @@ export const ExpContentContainer = () => {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full min-[600px]:mt-5">
       <div className="flex flex-col justify-center">
         <div className="flex flex-col">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 min-[1300px]:px-[120px]">
+          <div className="grid grid-cols-1 min-[600px]:grid-cols-3 gap-4 min-[600px]:px-[120px]">
             {/* Normal EXP Voucher Section */}
-            <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
-              <div className="text-md font-bold mb-2 text-sky-500 dark:text-sky-300 flex items-center gap-2">
+            <ExpItemWrapper>
+              <div className="text-md font-bold mb-2 text-sky-700 dark:text-sky-300 flex items-center gap-2">
                 <Image src={expIcon} alt="EXP 쿠폰" width={32} height={32} unoptimized style={{ imageRendering: "pixelated" }} />
                 일반 EXP 쿠폰 <span className="text-xs font-normal">(레벨 200 이상 사용 가능)</span>
               </div>
               {currentLevel >= LEVEL_REQUIREMENTS.NORMAL_EXP ? (
                 <div className="space-y-1.5">
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  <ExpDetailWrapper>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">1000개</span>
                     <div className="text-right">
                       <div className="text-md text-sky-500 dark:text-sky-300 font-bold">
@@ -97,8 +105,8 @@ export const ExpContentContainer = () => {
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(expVouchers * 1000)}</div>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  </ExpDetailWrapper>
+                  <ExpDetailWrapper>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">직접 입력</span>
                       <input
@@ -118,15 +126,15 @@ export const ExpContentContainer = () => {
                         {formatExp(calculateCustomVoucherExp(normalVoucherCount, expVouchers).exp)}
                       </div>
                     </div>
-                  </div>
+                  </ExpDetailWrapper>
                 </div>
               ) : (
                 <p className="text-sm text-gray-500 dark:text-gray-400">레벨 200 이상부터 사용할 수 있습니다.</p>
               )}
-            </div>
+            </ExpItemWrapper>
 
             {/* Advanced EXP Voucher Section */}
-            <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
+            <ExpItemWrapper>
               <div className="text-md font-bold mb-2 text-blue-600 dark:text-blue-400 flex items-center gap-2">
                 <Image
                   src={expAdvanceIcon}
@@ -140,7 +148,7 @@ export const ExpContentContainer = () => {
               </div>
               {currentLevel >= LEVEL_REQUIREMENTS.ADVANCED_EXP ? (
                 <div className="space-y-1.5">
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  <ExpDetailWrapper>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">1000개</span>
                     <div className="text-right">
                       <div className="text-md text-blue-600 dark:text-blue-400 font-bold">
@@ -148,8 +156,8 @@ export const ExpContentContainer = () => {
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(advancedExpVouchers * 1000)}</div>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  </ExpDetailWrapper>
+                  <ExpDetailWrapper>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">직접 입력</span>
                       <input
@@ -169,22 +177,22 @@ export const ExpContentContainer = () => {
                         {formatExp(calculateCustomVoucherExp(advancedVoucherCount, advancedExpVouchers).exp)}
                       </div>
                     </div>
-                  </div>
+                  </ExpDetailWrapper>
                 </div>
               ) : (
                 <p className="text-sm text-gray-500 dark:text-gray-400">레벨 260 이상부터 사용할 수 있습니다.</p>
               )}
-            </div>
+            </ExpItemWrapper>
 
             {/* VIP REST Section */}
-            <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
+            <ExpItemWrapper>
               <div className="text-md font-bold mb-2 text-violet-600 dark:text-violet-400 flex items-center gap-2">
                 <Image src={vipRestIcon} alt="VIP 사우나" width={32} height={32} unoptimized style={{ imageRendering: "pixelated" }} />
                 VIP 사우나/MVP 리조트 <span className="text-xs font-normal">(레벨 101 이상 사용 가능)</span>
               </div>
               {currentLevel >= LEVEL_REQUIREMENTS.VIP_REST ? (
                 <div className="space-y-1.5">
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  <ExpDetailWrapper>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">1개(30분)</span>
                     <div className="text-right">
                       <div className="text-md text-violet-600 dark:text-violet-400 font-bold">
@@ -192,8 +200,8 @@ export const ExpContentContainer = () => {
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(vipRestPerOneTicket)}</div>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  </ExpDetailWrapper>
+                  <ExpDetailWrapper>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">직접 입력</span>
                       <input
@@ -213,15 +221,15 @@ export const ExpContentContainer = () => {
                         {formatExp(calculateCustomVoucherExp(vipRestCount, vipRestPerOneTicket).exp)}
                       </div>
                     </div>
-                  </div>
+                  </ExpDetailWrapper>
                 </div>
               ) : (
                 <p className="text-sm text-gray-500 dark:text-gray-400">레벨 101 이상부터 사용할 수 있습니다.</p>
               )}
-            </div>
+            </ExpItemWrapper>
 
             {/* Extreme Monster Park Section */}
-            <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
+            <ExpItemWrapper>
               <div className="text-md font-semibold mb-2 text-teal-600 dark:text-teal-400 flex items-center gap-2">
                 <Image
                   src={monpaIcon}
@@ -235,7 +243,7 @@ export const ExpContentContainer = () => {
               </div>
               {currentLevel >= LEVEL_REQUIREMENTS.EXTREME_MONPARK ? (
                 <div className="space-y-1.5">
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  <ExpDetailWrapper>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">기본</span>
                     <div className="text-right">
                       <div className="text-md text-teal-600 dark:text-teal-400 font-bold">
@@ -243,8 +251,8 @@ export const ExpContentContainer = () => {
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(extremeMonpark)}</div>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  </ExpDetailWrapper>
+                  <ExpDetailWrapper>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">+50% 버프</span>
                     <div className="text-right">
                       <div className="text-md text-teal-600 dark:text-teal-400 font-bold">
@@ -252,22 +260,22 @@ export const ExpContentContainer = () => {
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(extremeMonpark + extremeMonpark * 0.5)}</div>
                     </div>
-                  </div>
+                  </ExpDetailWrapper>
                 </div>
               ) : (
                 <p className="text-sm text-gray-500 dark:text-gray-400">레벨 260 이상부터 참여할 수 있습니다.</p>
               )}
-            </div>
+            </ExpItemWrapper>
 
             {/* High Mountain Section */}
-            <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
+            <ExpItemWrapper>
               <div className="text-md font-semibold mb-2 text-lime-600 dark:text-lime-400 flex items-center gap-2">
                 <Image src={highIcon} alt="하이 마운틴" width={32} height={32} unoptimized style={{ imageRendering: "pixelated" }} />
                 하이 마운틴 <span className="text-xs font-normal">(레벨 260 이상 참여 가능)</span>
               </div>
               {currentLevel >= LEVEL_REQUIREMENTS.HIGH_MOUNTAIN ? (
                 <div className="space-y-1.5">
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  <ExpDetailWrapper>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">기본</span>
                     <div className="text-right">
                       <div className="text-md text-lime-600 dark:text-lime-400 font-bold">
@@ -275,8 +283,8 @@ export const ExpContentContainer = () => {
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(highMountain)}</div>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  </ExpDetailWrapper>
+                  <ExpDetailWrapper>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">5배(1단계 / 7,500 메포)</span>
                     <div className="text-right">
                       <div className="text-md text-lime-600 dark:text-lime-400 font-bold">
@@ -284,8 +292,8 @@ export const ExpContentContainer = () => {
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(highMountain * 5)}</div>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  </ExpDetailWrapper>
+                  <ExpDetailWrapper>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">9배(2단계 / 30,000 메포)</span>
                     <div className="text-right">
                       <div className="text-md text-lime-600 dark:text-lime-400 font-bold">
@@ -293,22 +301,22 @@ export const ExpContentContainer = () => {
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(highMountain * 9)}</div>
                     </div>
-                  </div>
+                  </ExpDetailWrapper>
                 </div>
               ) : (
                 <p className="text-sm text-gray-500 dark:text-gray-400">레벨 260 이상부터 참여할 수 있습니다.</p>
               )}
-            </div>
+            </ExpItemWrapper>
 
             {/* Angler Company Section */}
-            <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
+            <ExpItemWrapper>
               <div className="text-md font-semibold mb-2 text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
                 <Image src={anglerIcon} alt="앵글러 컴퍼니" width={32} height={32} unoptimized style={{ imageRendering: "pixelated" }} />
                 앵글러 컴퍼니 <span className="text-xs font-normal">(레벨 270 이상 참여 가능)</span>
               </div>
               {currentLevel >= LEVEL_REQUIREMENTS.ANGLER ? (
                 <div className="space-y-1.5">
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  <ExpDetailWrapper>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">기본</span>
                     <div className="text-right">
                       <div className="text-md text-indigo-600 dark:text-indigo-400 font-bold">
@@ -316,8 +324,8 @@ export const ExpContentContainer = () => {
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(anglerCompany)}</div>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  </ExpDetailWrapper>
+                  <ExpDetailWrapper>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">5배(1단계 / 10,000 메포)</span>
                     <div className="text-right">
                       <div className="text-md text-indigo-600 dark:text-indigo-400 font-bold">
@@ -325,8 +333,8 @@ export const ExpContentContainer = () => {
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(anglerCompany * 5)}</div>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  </ExpDetailWrapper>
+                  <ExpDetailWrapper>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">9배(2단계 / 40,000 메포)</span>
                     <div className="text-right">
                       <div className="text-md text-indigo-600 dark:text-indigo-400 font-bold">
@@ -334,29 +342,29 @@ export const ExpContentContainer = () => {
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(anglerCompany * 9)}</div>
                     </div>
-                  </div>
+                  </ExpDetailWrapper>
                 </div>
               ) : (
                 <p className="text-sm text-gray-500 dark:text-gray-400">레벨 270 이상부터 참여할 수 있습니다.</p>
               )}
-            </div>
+            </ExpItemWrapper>
 
             {/* Nightmare Section (악몽선경) */}
-            <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
+            <ExpItemWrapper>
               <div className="text-md font-semibold mb-2 text-rose-600 dark:text-rose-300 flex items-center gap-2">
                 <Image src={nightmareIcon} alt="앵글러 컴퍼니" width={32} height={32} unoptimized style={{ imageRendering: "pixelated" }} />
                 악몽선경 <span className="text-xs font-normal">(레벨 280 이상 참여 가능)</span>
               </div>
               {currentLevel >= LEVEL_REQUIREMENTS.NIGHTMARE ? (
                 <div className="space-y-1.5">
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  <ExpDetailWrapper>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">기본</span>
                     <div className="text-right">
                       <div className="text-md text-rose-600 dark:text-rose-400 font-bold">{formatExpRate(nightmare, characterMaxExp)}%</div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(nightmare)}</div>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  </ExpDetailWrapper>
+                  <ExpDetailWrapper>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">5배(1단계 / 12,500 메포)</span>
                     <div className="text-right">
                       <div className="text-md text-rose-600 dark:text-rose-400 font-bold">
@@ -364,8 +372,8 @@ export const ExpContentContainer = () => {
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(nightmare * 5)}</div>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                  </ExpDetailWrapper>
+                  <ExpDetailWrapper>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">9배(2단계 / 50,000 메포)</span>
                     <div className="text-right">
                       <div className="text-md text-rose-600 dark:text-rose-400 font-bold">
@@ -373,12 +381,12 @@ export const ExpContentContainer = () => {
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(nightmare * 9)}</div>
                     </div>
-                  </div>
+                  </ExpDetailWrapper>
                 </div>
               ) : (
                 <p className="text-sm text-gray-500 dark:text-gray-400">레벨 270 이상부터 참여할 수 있습니다.</p>
               )}
-            </div>
+            </ExpItemWrapper>
           </div>
         </div>
       </div>

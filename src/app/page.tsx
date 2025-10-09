@@ -4,7 +4,6 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { EnterIcon } from "@/components/svg/EnterIcon";
 import Image from "next/image";
-import MainBackgroundImg from "@/images/main_background.png";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useCharacterPowerStore } from "@/stores/characterPower";
 import { useCharacterStore } from "@/stores/character";
@@ -51,12 +50,6 @@ export default function Home() {
 
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center p-4">
-      {/* 배경 이미지 */}
-      <div className="absolute inset-0 w-full h-full">
-        <Image src={MainBackgroundImg} alt="background" fill priority className="object-cover" unoptimized />
-        {/* 배경 오버레이 */}
-        <div className="absolute inset-0 bg-black/10 dark:bg-black/50" />
-      </div>
       <div className="flex flex-col items-center gap-3">
         {/* 검색 카드 */}
         <div

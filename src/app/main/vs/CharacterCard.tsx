@@ -53,8 +53,7 @@ export const CharacterCard = ({ type, direction, characterImageUrl, nickname, re
   return (
     <div
       className="relative w-full h-full min-h-[368px] max-[600px]:min-h-[320px] rounded-2xl overflow-hidden
-      bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 
-      dark:from-slate-800 dark:via-slate-700 dark:to-slate-600
+      bg-gradient-to-br from-slate-50/20 via-slate-100/20 to-slate-200/20 
       border border-white/10
       shadow-sm hover:shadow-lg transition-all duration-300 group"
     >
@@ -84,11 +83,8 @@ export const CharacterCard = ({ type, direction, characterImageUrl, nickname, re
         {/* 캐릭터 이미지 컨테이너 */}
         <div className="flex-1 flex flex-col items-center justify-center mt-4 pb-4 relative">
           {/* 이미지 배경 효과 */}
-          <div
-            className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent 
-            dark:from-white/30 rounded-xl"
-          />
-          <div className="flex relative z-10 p-2 rounded-xl backdrop-blur-sm">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/70 to-transparent rounded-xl" />
+          <div className="flex relative z-10 p-2 rounded-xl">
             {!characterImageUrl && (
               <Image
                 className="flex max-[600px]:w-[200px] mt-20 mb-10"

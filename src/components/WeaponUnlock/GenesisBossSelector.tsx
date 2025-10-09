@@ -62,7 +62,7 @@ export const GenesisBossSelector: React.FC<Props> = ({ boss, config, onChange })
         <span className="text-gray-600 dark:text-gray-400 whitespace-nowrap">클리어</span>
       </div>
       <div className="ml-auto flex items-center gap-1 text-gray-900 dark:text-gray-100">
-        <span className="font-medium text-indigo-600 dark:text-white">{trace}</span>
+        <span className="font-medium text-indigo-600 dark:text-indigo-300">{trace}</span>
       </div>
     </div>
   );

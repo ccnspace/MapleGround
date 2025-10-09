@@ -90,9 +90,10 @@ export const DestinyUnlock = ({ onSave }: { onSave: (params: DestinyUnlockData) 
     <div className="flex flex-col gap-3">
       <div
         className="flex sticky top-0 justify-between items-center
+        border-2 border-sky-400
       bg-slate-300/95 dark:bg-gray-700/95 rounded-lg pt-2 pb-2 px-3 z-10"
       >
-        <span className="text-md font-bold text-gray-700 dark:text-gray-200">🗓️ 예상 해방 날짜</span>
+        <span className=" text-md font-bold text-gray-700 dark:text-gray-200">🗓️ 예상 해방 날짜</span>
         <span className="font-bold text-slate-900 dark:text-white text-base">{liberationDate}</span>
       </div>
       <div className="flex flex-col gap-2">

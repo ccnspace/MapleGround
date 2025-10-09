@@ -4,6 +4,7 @@ import { getExpValue } from "@/utils/expUtils";
 import { useCharacterStore } from "@/stores/character";
 import React from "react";
 import Image from "next/image";
+import { useNickname } from "@/hooks/useNickname";
 
 // Import images
 import expIcon from "@/images/exp.png";
@@ -12,7 +13,7 @@ import highIcon from "@/images/high.png";
 import anglerIcon from "@/images/angler.png";
 import monpaIcon from "@/images/monpa.png";
 import vipRestIcon from "@/images/vip.png";
-import { useNickname } from "@/hooks/useNickname";
+import nightmareIcon from "@/images/nightmare.png";
 
 const formatExp = (exp: number) => {
   return exp.toLocaleString();
@@ -38,6 +39,7 @@ export const ExpContentContainer = () => {
     HIGH_MOUNTAIN: 260,
     ANGLER: 270,
     VIP_REST: 101,
+    NIGHTMARE: 280,
   };
 
   const characterMaxExp = getExpValue({ level: currentLevel, type: "EXP" });
@@ -46,6 +48,7 @@ export const ExpContentContainer = () => {
   const highMountain = getExpValue({ level: currentLevel, type: "HIGH_MOUNTAIN" });
   const expVouchers = getExpValue({ level: currentLevel, type: "EXP_VOUCHERS" });
   const advancedExpVouchers = getExpValue({ level: currentLevel, type: "ADVANCED_EXP_VOUCHERS" });
+  const nightmare = getExpValue({ level: currentLevel, type: "NIGHTMARE" });
 
   // 5초마다 획득하는 vipRest 값임. vipRest 1개는 30분임. 30분은 1800초, 5초마다 획득하는 값은 1800 / 5 = 360임.
   const vipRest = getExpValue({ level: currentLevel, type: "VIP_REST" });
@@ -77,7 +80,7 @@ export const ExpContentContainer = () => {
     <div className="w-full">
       <div className="flex flex-col justify-center">
         <div className="flex flex-col">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 min-[1300px]:px-[120px]">
             {/* Normal EXP Voucher Section */}
             <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
               <div className="text-md font-bold mb-2 text-sky-500 dark:text-sky-300 flex items-center gap-2">
@@ -274,7 +277,7 @@ export const ExpContentContainer = () => {
                     </div>
                   </div>
                   <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">5배(1단계)</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">5배(1단계 / 7,500 메포)</span>
                     <div className="text-right">
                       <div className="text-md text-lime-600 dark:text-lime-400 font-bold">
                         {formatExpRate(highMountain * 5, characterMaxExp)}%
@@ -283,7 +286,7 @@ export const ExpContentContainer = () => {
                     </div>
                   </div>
                   <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">9배(2단계)</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">9배(2단계 / 30,000 메포)</span>
                     <div className="text-right">
                       <div className="text-md text-lime-600 dark:text-lime-400 font-bold">
                         {formatExpRate(highMountain * 9, characterMaxExp)}%
@@ -315,7 +318,7 @@ export const ExpContentContainer = () => {
                     </div>
                   </div>
                   <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">5배(1단계)</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">5배(1단계 / 10,000 메포)</span>
                     <div className="text-right">
                       <div className="text-md text-indigo-600 dark:text-indigo-400 font-bold">
                         {formatExpRate(anglerCompany * 5, characterMaxExp)}%
@@ -324,12 +327,51 @@ export const ExpContentContainer = () => {
                     </div>
                   </div>
                   <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">9배(2단계)</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">9배(2단계 / 40,000 메포)</span>
                     <div className="text-right">
                       <div className="text-md text-indigo-600 dark:text-indigo-400 font-bold">
                         {formatExpRate(anglerCompany * 9, characterMaxExp)}%
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(anglerCompany * 9)}</div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-400">레벨 270 이상부터 참여할 수 있습니다.</p>
+              )}
+            </div>
+
+            {/* Nightmare Section (악몽선경) */}
+            <div className="bg-slate-200/60 dark:bg-white/5 rounded-lg p-3 hover:bg-slate-300/50 dark:hover:bg-white/10 transition-all">
+              <div className="text-md font-semibold mb-2 text-rose-600 dark:text-rose-300 flex items-center gap-2">
+                <Image src={nightmareIcon} alt="앵글러 컴퍼니" width={32} height={32} unoptimized style={{ imageRendering: "pixelated" }} />
+                악몽선경 <span className="text-xs font-normal">(레벨 280 이상 참여 가능)</span>
+              </div>
+              {currentLevel >= LEVEL_REQUIREMENTS.NIGHTMARE ? (
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">기본</span>
+                    <div className="text-right">
+                      <div className="text-md text-rose-600 dark:text-rose-400 font-bold">{formatExpRate(nightmare, characterMaxExp)}%</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(nightmare)}</div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">5배(1단계 / 12,500 메포)</span>
+                    <div className="text-right">
+                      <div className="text-md text-rose-600 dark:text-rose-400 font-bold">
+                        {formatExpRate(nightmare * 5, characterMaxExp)}%
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(nightmare * 5)}</div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-slate-300/50 dark:bg-white/5">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">9배(2단계 / 50,000 메포)</span>
+                    <div className="text-right">
+                      <div className="text-md text-rose-600 dark:text-rose-400 font-bold">
+                        {formatExpRate(nightmare * 9, characterMaxExp)}%
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">{formatExp(nightmare * 9)}</div>
                     </div>
                   </div>
                 </div>

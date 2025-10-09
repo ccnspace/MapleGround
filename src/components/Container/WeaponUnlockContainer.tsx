@@ -6,6 +6,9 @@ import { openModal } from "@/utils/openModal";
 import { useNickname } from "@/hooks/useNickname";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { DestinyUnlockData, GenesisUnlockData } from "@/utils/localStorage";
+import Image from "next/image";
+import genesisIcon from "@/images/genesis.png";
+import destinyIcon from "@/images/destiny.png";
 
 type WeaponUnlockTab = "genesis" | "destiny";
 
@@ -79,26 +82,26 @@ export const WeaponUnlockContainer = () => {
 
   return (
     <ContainerWrapper className="w-full mb-3 flex items-center bg-transparent dark:bg-transparent">
-      <div className="flex flex-col items-center p-3 rounded-lg bg-slate-100 dark:bg-[#1f2024] w-fit">
+      <div className="flex flex-col items-center max-[600px]:p-1.5 p-2 rounded-lg bg-slate-100 dark:bg-[#1f2024] w-fit">
         <div className="flex mb-2 justify-between w-full">
           <p
-            className="flex font-bold text-base mb-2 pb-0.5 pt-0.5 gap-2
+            className="flex font-bold mb-2 pb-0.5 pt-0.5 gap-2
     text-gray-900 dark:text-gray-100
-    max-[600px]:text-sm items-center"
+    max-[600px]:text-xs text-sm items-center"
           >
             <button
-              title="설정값 저장"
+              title="저장"
               onClick={saveConfig}
-              className="p-1 pr-2 text-sm rounded-md bg-slate-200 dark:bg-gray-700 hover:bg-slate-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+              className="p-1 pr-2 rounded-md bg-slate-200 dark:bg-gray-700 hover:bg-slate-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
             >
-              💾 설정값 저장
+              💾 저장
             </button>
             <button
-              title="설정값 삭제"
+              title="삭제"
               onClick={resetConfig}
-              className="p-1 pr-2 text-sm rounded-md bg-slate-200 dark:bg-gray-700 hover:bg-slate-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+              className="p-1 pr-2 rounded-md bg-slate-200 dark:bg-gray-700 hover:bg-slate-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
             >
-              ⛔ 설정값 삭제
+              ⛔ 삭제
             </button>
           </p>
           <div className="flex items-center mb-2 gap-2">
@@ -110,7 +113,10 @@ export const WeaponUnlockContainer = () => {
               }`}
               onClick={() => setTab("genesis")}
             >
-              제네시스
+              <p className="flex items-center gap-1">
+                <Image src={genesisIcon} alt="제네시스" width={24} height={24} unoptimized style={{ imageRendering: "pixelated" }} />
+                제네시스
+              </p>
             </button>
             <button
               className={`px-2 py-1.5 text-xs rounded-md max-[600px]:px-1 ${
@@ -120,7 +126,10 @@ export const WeaponUnlockContainer = () => {
               }`}
               onClick={() => setTab("destiny")}
             >
-              데스티니
+              <p className="flex items-center gap-1">
+                <Image src={destinyIcon} alt="데스티니" width={24} height={24} unoptimized style={{ imageRendering: "pixelated" }} />
+                데스티니
+              </p>
             </button>
           </div>
         </div>

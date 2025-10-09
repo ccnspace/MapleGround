@@ -103,6 +103,7 @@ export const GenesisUnlock = ({ onSave }: { onSave: (params: GenesisUnlockData) 
     <div className="flex flex-col gap-3">
       <div
         className="flex sticky top-0 justify-between items-center
+        border-2 border-rose-400
          bg-slate-300/95 dark:bg-gray-700/95 rounded-lg pt-2 pb-2 px-3 z-10"
       >
         <span className="text-md font-bold text-gray-700 dark:text-gray-200 ">🗓️ 예상 해방 날짜</span>

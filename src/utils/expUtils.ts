@@ -528,9 +528,40 @@ const VIP_REST_TABLE = {
   289: 540295274,
 } as const;
 
+const NIGHTMARE_EXP_TABLE = {
+  280: HIGH_MOUNTAIN_EXP_TABLE["280"] * 2,
+  281: HIGH_MOUNTAIN_EXP_TABLE["281"] * 2,
+  282: HIGH_MOUNTAIN_EXP_TABLE["282"] * 2,
+  283: HIGH_MOUNTAIN_EXP_TABLE["283"] * 2,
+  284: HIGH_MOUNTAIN_EXP_TABLE["284"] * 2,
+  285: HIGH_MOUNTAIN_EXP_TABLE["285"] * 2,
+  286: HIGH_MOUNTAIN_EXP_TABLE["286"] * 2,
+  287: HIGH_MOUNTAIN_EXP_TABLE["287"] * 2,
+  288: HIGH_MOUNTAIN_EXP_TABLE["288"] * 2,
+  289: HIGH_MOUNTAIN_EXP_TABLE["289"] * 2,
+  290: 1_081_400_000_000,
+  291: 1_092_800_000_000,
+  292: 1_104_200_000_000,
+  293: 1_115_600_000_000,
+  294: 1_127_000_000_000,
+  295: 1_127_000_000_000,
+  296: 1_127_000_000_000,
+  297: 1_127_000_000_000,
+  298: 1_127_000_000_000,
+  299: 1_127_000_000_000,
+} as const;
+
 type ExpValue = {
   level: number;
-  type: "EXP" | "EXTREME_MONPARK" | "ANGLER_COMPANY" | "HIGH_MOUNTAIN" | "EXP_VOUCHERS" | "ADVANCED_EXP_VOUCHERS" | "VIP_REST";
+  type:
+    | "EXP"
+    | "EXTREME_MONPARK"
+    | "ANGLER_COMPANY"
+    | "HIGH_MOUNTAIN"
+    | "EXP_VOUCHERS"
+    | "ADVANCED_EXP_VOUCHERS"
+    | "VIP_REST"
+    | "NIGHTMARE";
 };
 
 export const getExpValue = ({ level, type }: ExpValue) => {
@@ -558,6 +589,9 @@ export const getExpValue = ({ level, type }: ExpValue) => {
       if (level < 101 || level > 299) return 0;
       if (level > 289) return VIP_REST_TABLE[289];
       return VIP_REST_TABLE[level as keyof typeof VIP_REST_TABLE];
+    case "NIGHTMARE":
+      if (level < 280 || level > 299) return 0;
+      return NIGHTMARE_EXP_TABLE[level as keyof typeof NIGHTMARE_EXP_TABLE];
     default:
       return 0;
   }

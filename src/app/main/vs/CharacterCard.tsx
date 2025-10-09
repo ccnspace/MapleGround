@@ -56,20 +56,8 @@ export const CharacterCard = ({ type, direction, characterImageUrl, nickname, re
       bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 
       dark:from-slate-800 dark:via-slate-700 dark:to-slate-600
       border border-white/10
-      shadow-xl hover:shadow-2xl transition-all duration-300 group"
+      shadow-sm hover:shadow-lg transition-all duration-300 group"
     >
-      {/* 상단 그라데이션 오버레이 */}
-      <div
-        className="absolute top-0 left-0 right-0 h-1/3 
-        bg-gradient-to-b from-pink-500/20 via-orange-500/10 to-transparent"
-      ></div>
-
-      {/* 하단 그라데이션 오버레이 */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-1/3 
-        bg-gradient-to-t from-blue-500/20 via-purple-500/10 to-transparent"
-      ></div>
-
       <div className="relative z-10 flex flex-col h-full p-4">
         {/* 날짜 선택기 */}
         <div
@@ -78,8 +66,8 @@ export const CharacterCard = ({ type, direction, characterImageUrl, nickname, re
           bg-gradient-to-r from-slate-600 to-slate-700
           hover:from-slate-700 hover:to-slate-800
           border border-slate-500 px-3 py-2 w-full cursor-pointer
-          transition-all duration-200 shadow-lg hover:shadow-xl
-          backdrop-blur-sm bg-opacity-90"
+          transition-all duration-200 hover:shadow-xl
+          bg-opacity-90"
         >
           <CalendarIcon />
           <span className="text-sm text-white font-semibold">{displayedDate}</span>

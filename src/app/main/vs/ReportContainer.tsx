@@ -99,7 +99,7 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
             hover:from-sky-600 hover:to-cyan-600
             border-2 border-white/40
             active:scale-95 relative
-            max-[600px]:w-[240px] max-[600px]:text-sm max-[600px]:py-2"
+            max-[600px]:w-[240px] max-[600px]:text-sm max-[600px]:py-2 max-[600px]:mt-10"
         >
           <span className="flex items-center justify-center gap-2 font-bold text-lg">
             <span>비교하기</span>

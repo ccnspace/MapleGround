@@ -81,8 +81,11 @@ export const WeaponUnlockContainer = () => {
   };
 
   return (
-    <ContainerWrapper className="w-full mb-3 flex items-center bg-transparent dark:bg-transparent">
-      <div className="flex flex-col items-center max-[600px]:p-1.5 p-2 rounded-lg bg-slate-100 dark:bg-[#1f2024] w-fit">
+    <div className="flex items-center justify-center p-3 rounded-lg">
+      <div
+        className="flex flex-col items-center bg-white/70 dark:bg-black/50
+      max-[600px]:p-1 max-[600px]:pt-2 py-2 px-3 rounded-lg w-fit"
+      >
         <div className="flex mb-2 justify-between w-full">
           <p
             className="flex font-bold mb-2 pb-0.5 pt-0.5 gap-2
@@ -136,6 +139,6 @@ export const WeaponUnlockContainer = () => {
         {tab === "genesis" && <GenesisUnlock onSave={setGenesisData} />}
         {tab === "destiny" && <DestinyUnlock onSave={setDestinyData} />}
       </div>
-    </ContainerWrapper>
+    </div>
   );
 };

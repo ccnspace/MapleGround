@@ -8,8 +8,8 @@ type Props = {
 
 export const GenesisMissionBossSelector: React.FC<Props> = ({ bossName, config, onChange }) => {
   return (
-    <div className="flex items-center justify-between gap-2 py-1.5 px-2 rounded-md bg-slate-200/60 dark:bg-white/5 hover:bg-slate-300/70 dark:hover:bg-white/10 transition-colors text-xs">
-      <p className="min-w-[64px] font-medium text-gray-900 dark:text-gray-100">{bossName}</p>
+    <div className="flex items-center justify-between gap-2 py-1.5 px-2 rounded-md bg-slate-400/30 dark:bg-white/20 hover:bg-slate-300/70 dark:hover:bg-white/10 transition-colors text-xs">
+      <p className="min-w-[64px] font-bold text-gray-900 dark:text-gray-100">{bossName}</p>
       <select
         value={config.partySize}
         onChange={(e) => onChange({ ...config, partySize: Number(e.target.value) })}

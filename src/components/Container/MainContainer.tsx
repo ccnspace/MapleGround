@@ -5,16 +5,14 @@ import { memo } from "react";
 import { EquipContainer } from "@/components/Container/EquipContainer";
 import { AbilityContainer } from "@/components/Container/AbilityContainer";
 import { StatContainer } from "@/components/Container/StatContainer";
-import { PetEquipContainer } from "@/components/Container/PetEquipContainer";
-import { Spinner } from "../svg/Spinner";
 import { useCharacterStore } from "@/stores/character";
 import { useCubeStore } from "@/stores/cube";
 import { useStarforceStore } from "@/stores/starforce";
-import { useTheme } from "next-themes";
 import { DimmedLayer } from "../DimmedLayer";
 import { SetEffectContainer } from "./SetEffectContainer";
 import { ContainerWrapper } from "./ContainerWrapper";
 import { UnionContainer } from "./UnionContainer";
+import { LoadingContainer } from "./LoadingContainer";
 
 const ChartContainer = dynamic(() => import("./ChartContainer"), {
   ssr: false,
@@ -55,15 +53,9 @@ export const MainContainer = () => {
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
   const cubeTargetItem = useCubeStore((state) => state.targetItem);
   const starforceTargetItem = useStarforceStore((state) => state.targetItem);
-  const { theme } = useTheme();
 
   if (fetchStatus !== "success") {
-    return (
-      <div className="main_loading w-[1366px] h-[calc(100vh-80px)] flex flex-col items-center justify-center">
-        <Spinner width="6em" height="6em" color={theme === "dark" ? "white" : "#616161"} />
-        <p className="text-sm text-slate-500 dark:text-slate-400 animate-pulse font-medium tracking-wide">정보를 불러오는 중입니다</p>
-      </div>
-    );
+    return <LoadingContainer />;
   }
 
   return (

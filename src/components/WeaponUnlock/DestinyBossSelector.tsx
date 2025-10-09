@@ -10,7 +10,7 @@ export const DestinyBossSelector: React.FC<Props> = ({ boss, config, onChange })
   const trace = calculateBossTrace(config, boss);
 
   return (
-    <div className="flex items-center gap-2 py-1.5 px-2 rounded-md bg-slate-200/60 dark:bg-white/5 hover:bg-slate-300/70 dark:hover:bg-white/10 transition-colors text-xs">
+    <div className="flex items-center gap-2 py-1.5 px-2 rounded-md bg-slate-400/30 dark:bg-white/20 hover:bg-slate-300/70 dark:hover:bg-white/10 transition-colors text-xs">
       <input
         type="checkbox"
         checked={config.isSelected}
@@ -20,7 +20,7 @@ export const DestinyBossSelector: React.FC<Props> = ({ boss, config, onChange })
             focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-1
             bg-white dark:bg-gray-700"
       />
-      <p className="min-w-[64px] font-medium text-gray-900 dark:text-gray-100">{boss.name}</p>
+      <p className="min-w-[64px] font-bold text-gray-900 dark:text-gray-100">{boss.name}</p>
       <select
         value={config.difficulty}
         onChange={(e) => onChange({ ...config, difficulty: e.target.value })}

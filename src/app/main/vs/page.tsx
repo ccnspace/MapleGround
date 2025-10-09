@@ -1,21 +1,18 @@
 "use client";
 
 import { PlainBox } from "@/components/PlainBox";
-import { InfoIcon } from "@/components/svg/InfoIcon";
 import { ReportContainer } from "./ReportContainer";
 import { useCharacterStore } from "@/stores/character";
 import { useEffect } from "react";
 import { useNickname } from "@/hooks/useNickname";
-import { Spinner } from "@/components/svg/Spinner";
-import { useTheme } from "next-themes";
 import { CommonWrapper } from "@/components/Container/CommonWrapper";
 import { CommonTitle } from "@/components/Container/CommonTitle";
+import { LoadingContainer } from "@/components/Container/LoadingContainer";
 
 export default function Page() {
   const nickname = useNickname();
   const fetchCharacterAttributes = useCharacterStore((state) => state.fetchCharacterAttributes);
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
-  const { theme } = useTheme();
 
   useEffect(() => {
     if (!nickname) return;
@@ -29,12 +26,7 @@ export default function Page() {
   }, [nickname, fetchCharacterAttributes]);
 
   if (fetchStatus !== "success") {
-    return (
-      <div className="main_loading w-[1366px] h-[calc(100vh-80px)] flex flex-col items-center justify-center max-[600px]:w-full">
-        <Spinner width="6em" height="6em" color={theme === "dark" ? "white" : "#616161"} />
-        <p className="text-sm text-slate-500 dark:text-slate-400 animate-pulse font-medium tracking-wide">정보를 불러오는 중입니다</p>
-      </div>
-    );
+    return <LoadingContainer />;
   }
 
   return (

@@ -47,7 +47,7 @@ export const AbilityContainer = () => {
   }, [preset, ability]);
 
   return (
-    <ContainerWrapper className="h-[240px]">
+    <ContainerWrapper>
       <div className="flex justify-between mb-2">
         <p
           className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 

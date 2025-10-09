@@ -104,7 +104,7 @@ export const GenesisUnlock = ({ onSave }: { onSave: (params: GenesisUnlockData) 
       <div
         className="flex sticky top-0 justify-between items-center
         border-2 border-rose-400
-         bg-slate-300/95 dark:bg-gray-700/95 rounded-lg pt-2 pb-2 px-3 z-10"
+         bg-slate-300/95 dark:bg-black/70 rounded-lg pt-2 pb-2 px-3 z-10"
       >
         <span className="text-md font-bold text-gray-700 dark:text-gray-200 ">🗓️ 예상 해방 날짜</span>
         <span className="font-bold text-slate-900 dark:text-white text-base">{liberationDate}</span>
@@ -199,15 +199,17 @@ export const GenesisUnlock = ({ onSave }: { onSave: (params: GenesisUnlockData) 
           <div className="ml-auto">획득량</div>
         </div>
 
-        {bossList.map((boss) => {
-          const config = configs.find((c) => c.name === boss.name)!;
-          return <GenesisBossSelector key={boss.name} boss={boss} config={config} onChange={updateConfig} />;
-        })}
+        <div className="overflow-y-auto max-h-[200px] flex gap-2 flex-col">
+          {bossList.map((boss) => {
+            const config = configs.find((c) => c.name === boss.name)!;
+            return <GenesisBossSelector key={boss.name} boss={boss} config={config} onChange={updateConfig} />;
+          })}
+        </div>
 
         <p className="mt-3 border-l-2 border-slate-500 dark:border-slate-200 pl-2 text-sm font-bold text-gray-700 dark:text-gray-300">
           미션 클리어 당시 파티 인원
         </p>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 overflow-y-auto max-h-[120px]">
           {missionList.map((mission) => {
             const missionConfig = missionConfigs.find((c) => c.name === mission.name)!;
             return (
@@ -222,7 +224,7 @@ export const GenesisUnlock = ({ onSave }: { onSave: (params: GenesisUnlockData) 
         </div>
       </div>
 
-      <div className="mt-3 p-4 bg-slate-300/50 dark:bg-gray-700/50 rounded-lg space-y-3">
+      <div className="mt-3 p-4 bg-slate-400/30 dark:bg-gray-700/50 rounded-lg space-y-3">
         <div className="pt-1 space-y-2 text-xs opacity-85">
           <div className="flex justify-between items-center">
             <span className="font-bold text-gray-700 dark:text-gray-400">주간 총 획득량</span>
@@ -239,9 +241,9 @@ export const GenesisUnlock = ({ onSave }: { onSave: (params: GenesisUnlockData) 
         </div>
       </div>
 
-      <div className="mt-1 p-4 bg-slate-300/50 dark:bg-gray-700/50 rounded-lg">
+      <div className="mt-1 p-4 bg-slate-400/30 dark:bg-gray-700/50 rounded-lg">
         <div className="flex justify-between items-center border-b border-gray-300 dark:border-gray-700 pb-3">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">예상 클리어 기록</span>
+          <span className="text-sm font-bold text-black dark:text-gray-200">예상 클리어 기록</span>
         </div>
         <div className="flex flex-col pt-1 px-2 gap-1.5 text-xs max-h-[200px] overflow-y-auto">
           {liberationRecords?.map((record, idx) => (

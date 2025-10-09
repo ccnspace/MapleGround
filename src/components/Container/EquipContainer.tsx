@@ -89,8 +89,11 @@ export const EquipContainer = () => {
             </div>
           </div>
         )}
-        <p className="max-[600px]:text-xs bg-slate-200 dark:bg-black/40 rounded-md p-1 text-sm text-center font-bold text-black dark:text-gray-300 mb-3">
-          ✨ 아이템을 눌러서 <span className="text-lime-700 dark:text-lime-400">잠재능력-스타포스 시뮬레이션</span>을 즐겨보세요!
+        <p
+          className="max-[600px]:text-xs bg-gradient-to-r from-lime-300 to-green-400 rounded-md p-1 text-sm text-center font-bold 
+        text-black mb-3"
+        >
+          ✨ 아이템을 눌러서 잠재능력-스타포스 시뮬레이션을 즐겨보세요!
         </p>
         <EquipContext.Provider value={contextValue}>
           <EquipActionContext.Provider value={setSelectedEquipName}>

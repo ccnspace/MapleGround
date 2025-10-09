@@ -73,11 +73,11 @@ export default function Home() {
           <form className="flex flex-col items-center gap-4 z-10" onSubmit={handleSubmit}>
             <div
               className="relative flex items-center rounded-lg w-64
-            border-2 border-slate-300/80"
+            border-2 border-slate-300/40"
             >
               <input
                 className="w-full px-3 py-2 font-normal text-white bg-slate-900 rounded-lg outline-none placeholder:text-slate-300
-                focus:ring-2 focus:ring-lime-500/80 focus:ring-offset-0
+                focus:ring-4 focus:ring-lime-300 focus:ring-offset-0
                 transition-all duration-300 shadow-lg
                 focus:shadow-[0_0_15px_rgba(99,102,241,0.1)]"
                 value={nickname}

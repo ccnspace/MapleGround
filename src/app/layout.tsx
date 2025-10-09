@@ -6,6 +6,7 @@ import { pretendard } from "./fonts/pretendard";
 import { Modal } from "@/components/Modal";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
+import { NoticeModal } from "@/components/NoticeModal";
 
 export const metadata: Metadata = {
   title: "MapleGround: 메이플그라운드",
@@ -37,6 +38,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark">
           <Header />
           <Modal />
+          <NoticeModal />
           <main className="flex-1">{children}</main>
           <footer className="flex justify-center items-center py-4 border-t border-slate-200 dark:border-white/10">
             <div className="footer flex gap-1 text-sm text-slate-600 dark:text-slate-400">

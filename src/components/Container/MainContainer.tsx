@@ -14,6 +14,7 @@ import { useTheme } from "next-themes";
 import { DimmedLayer } from "../DimmedLayer";
 import { SetEffectContainer } from "./SetEffectContainer";
 import { ContainerWrapper } from "./ContainerWrapper";
+import { UnionContainer } from "./UnionContainer";
 
 const ChartContainer = dynamic(() => import("./ChartContainer"), {
   ssr: false,
@@ -36,6 +37,7 @@ const RightSideGridContainer = memo(() => (
   <div className="right_sideBar grid">
     <AbilityContainer />
     <SetEffectContainer />
+    <UnionContainer />
   </div>
 ));
 

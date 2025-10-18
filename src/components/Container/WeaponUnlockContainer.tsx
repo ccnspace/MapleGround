@@ -83,7 +83,7 @@ export const WeaponUnlockContainer = () => {
   return (
     <div className="flex items-center justify-center p-3 rounded-lg">
       <div
-        className="flex flex-col items-center bg-white/70 dark:bg-black/50
+        className="flex flex-col items-center bg-slate-100 dark:bg-slate-600/50
       max-[600px]:p-1 max-[600px]:pt-2 py-2 px-3 rounded-lg w-fit"
       >
         <div className="flex mb-2 justify-between w-full">

@@ -14,7 +14,7 @@ export const ContainerWrapper = ({
        border border-white/30 dark:border-white/10
        px-2 pt-2 pb-2 rounded-lg gap-1 ${className ?? ""}`}
     >
-      <div className={`bg-white/80 dark:bg-black/60 backdrop-blur-sm rounded-lg p-3 ${innerClassName ?? ""}`}>{children}</div>
+      <div className={`bg-slate-100 dark:bg-black/60 backdrop-blur-sm rounded-lg p-3 ${innerClassName ?? ""}`}>{children}</div>
     </div>
   );
 };

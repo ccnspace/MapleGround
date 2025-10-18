@@ -4,11 +4,12 @@ import { useCharacterStore } from "@/stores/character";
 import { CharacterCard } from "./CharacterCard";
 import { useVersusInfo } from "@/hooks/useVersusInfo";
 import { DimmedLayer } from "@/components/DimmedLayer";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useModalStore } from "@/stores/modal";
-import { STAT_LABELS, STAT_DISPLAY_ORDER } from "@/consts/statLabels";
-import { ComparisonStats } from "@/types/Equipment";
-import Image from "next/image";
+import { ReportCard } from "@/components/Report/ReportCard";
+import { ReportSectionTitle } from "@/components/Report/ReportSectionTitle";
+import { SimpleComparisonItem } from "@/components/Report/SimpleComparisonItem";
+import { DetailedComparisonItem } from "@/components/Report/DetailedComparisonItem";
 
 export const ReportContainer = ({ nickname }: { nickname: string }) => {
   const {
@@ -46,14 +47,14 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
       resetVersusReport();
     }
     // TODO: detail report 초기화
-  }, [versusSimpleReport.length]);
+  }, [versusSimpleReport.length, resetVersusReport]);
 
   // 페이지 나갈 때 초기화
   useEffect(() => {
     return () => {
       resetPersonData();
     };
-  }, []);
+  }, [resetPersonData]);
 
   return (
     <>
@@ -74,9 +75,20 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
             />
           </div>
 
-          {/* VS 배너 - 중앙에 위치 */}
+          {/* 비교 버튼 */}
           <div className="flex flex-col items-center justify-center max-[600px]:my-4">
-            <div className="text-6xl text-white font-extrabold">VS</div>
+            <button
+              onClick={handleClick}
+              className="w-[180px] px-8 py-2.5 rounded-3xl text-base font-semibold text-white
+            bg-gradient-to-r from-sky-500 to-cyan-500
+            hover:from-sky-600 hover:to-cyan-600
+            border-2 border-white/40
+            max-[600px]:w-[280px] max-[600px]:text-sm max-[600px]:py-2 max-[600px]:mt-10"
+            >
+              <span className="flex items-center justify-center gap-2 font-bold text-xl">
+                <span>비교하기</span>
+              </span>
+            </button>
           </div>
 
           <div className="w-[360px] flex-shrink-0 max-[600px]:w-[320px]">
@@ -91,21 +103,6 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
           </div>
         </div>
 
-        {/* 비교 버튼 */}
-        <button
-          onClick={handleClick}
-          className="w-[280px] px-8 py-2.5 rounded-full text-base font-semibold text-white
-            bg-gradient-to-r from-sky-500 to-cyan-500
-            hover:from-sky-600 hover:to-cyan-600
-            border-2 border-white/40
-            active:scale-95 relative
-            max-[600px]:w-[240px] max-[600px]:text-sm max-[600px]:py-2 max-[600px]:mt-10"
-        >
-          <span className="flex items-center justify-center gap-2 font-bold text-lg">
-            <span>비교하기</span>
-          </span>
-        </button>
-
         {/* 비교 리포트 */}
         <div
           className="w-full max-w-7xl min-w-[1280px] grid grid-cols-3 gap-6 mt-4 
@@ -113,272 +110,88 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
         >
           {/* 간단 비교 리포트 */}
           {versusSimpleReport.length > 0 && (
-            <div className="w-full">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 max-[600px]:p-2 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700 h-[500px] max-[600px]:h-[400px] overflow-y-auto">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-3 h-8 bg-gradient-to-b from-blue-400 to-indigo-500 rounded-full"></div>
-                  <h4 className="text-lg font-bold text-slate-700 dark:text-slate-200">간단 비교 리포트</h4>
-                </div>
-                <div className="space-y-2 h-[calc(100%-3.5rem)] overflow-y-auto px-1">
-                  {versusSimpleReport.map((item, index) => (
-                    <div
-                      key={item.name}
-                      className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-2.5 border border-slate-100 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600/50 transition-all duration-300"
-                    >
-                      <div className="grid grid-cols-3 items-center gap-2">
-                        {/* 왼쪽 수치 */}
-                        <div className="flex flex-col items-center">
-                          <div
-                            className={`text-xs font-semibold ${
-                              item.isWinner === "first" ? "text-slate-800 dark:text-slate-100" : "text-slate-400 dark:text-slate-500"
-                            }`}
-                          >
-                            {item.firstPerson}
-                          </div>
-                        </div>
-
-                        {/* 중앙 영역 */}
-                        <div className="flex flex-col items-center gap-1">
-                          {/* 항목명 */}
-                          <div className="text-xs font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">{item.name}</div>
-
-                          {/* WIN 라벨 */}
-                          {item.isWinner === "first" && (
-                            <div className="px-1.5 py-0.5 bg-gradient-to-r from-rose-400 to-pink-500 text-white text-[10px] font-medium rounded-full">
-                              과거 WIN
-                            </div>
-                          )}
-                          {item.isWinner === "second" && (
-                            <div className="px-1.5 py-0.5 bg-gradient-to-r from-emerald-400 to-teal-500 text-white text-[10px] font-medium rounded-full">
-                              현재 WIN
-                            </div>
-                          )}
-                        </div>
-
-                        {/* 오른쪽 수치 */}
-                        <div className="flex flex-col items-center">
-                          <div
-                            className={`text-xs font-semibold ${
-                              item.isWinner === "second" ? "text-slate-800 dark:text-slate-100" : "text-slate-400 dark:text-slate-500"
-                            }`}
-                          >
-                            {item.secondPerson}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            <ReportCard className="h-[500px] max-[600px]:h-[400px] overflow-y-auto">
+              <ReportSectionTitle title="간단 비교 리포트" gradientFrom="blue-400" gradientTo="indigo-500" />
+              <div className="space-y-2 h-[calc(100%-3.5rem)] overflow-y-auto px-1">
+                {versusSimpleReport.map((item) => (
+                  <SimpleComparisonItem
+                    key={item.name}
+                    name={item.name}
+                    firstPerson={item.firstPerson}
+                    secondPerson={item.secondPerson}
+                    isWinner={item.isWinner}
+                  />
+                ))}
               </div>
-            </div>
+            </ReportCard>
           )}
 
           {/* 상세 비교 리포트 */}
           {versusDetailReport && (
             <>
               {/* 많이 성장시킨 아이템 */}
-
-              <div className="w-full">
-                <div className="h-[500px] bg-white dark:bg-slate-800 rounded-2xl p-5 max-[600px]:p-2 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-3 h-8 bg-gradient-to-b from-emerald-400 to-teal-500 rounded-full"></div>
-                    <h4 className="text-lg font-bold text-slate-700 dark:text-slate-200">나를 성장시킨 아이템</h4>
+              <ReportCard className="h-[500px]">
+                <ReportSectionTitle title="나를 성장시킨 아이템" gradientFrom="emerald-400" gradientTo="teal-500" />
+                {versusDetailReport.positiveScores.length > 0 && (
+                  <div className="space-y-3 h-[calc(100%-3.5rem)] overflow-y-auto px-1">
+                    {versusDetailReport.positiveScores.map((item, index) => (
+                      <DetailedComparisonItem
+                        key={item.itemSlot}
+                        index={index}
+                        itemSlot={item.itemSlot}
+                        firstPersonItemIcon={item.firstPersonItemIcon}
+                        secondPersonItemIcon={item.secondPersonItemIcon}
+                        score={item.score}
+                        comparison={item.comparison}
+                        variant="positive"
+                      />
+                    ))}
                   </div>
-                  {versusDetailReport.positiveScores.length > 0 && (
-                    <div className="space-y-3 h-[calc(100%-3.5rem)] overflow-y-auto px-1">
-                      {versusDetailReport.positiveScores.map((item, index) => (
-                        <div
-                          key={item.itemSlot}
-                          className="group relative bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 border border-slate-100 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600/50 transition-all duration-300"
-                        >
-                          <div className="flex items-center gap-4">
-                            {/* 순위 */}
-                            <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold text-sm">{index + 1}</span>
-                            </div>
-
-                            {/* 아이템 아이콘들 */}
-                            <div className="flex items-center gap-3 flex-1">
-                              <Image
-                                src={item.firstPersonItemIcon}
-                                alt="과거 아이템"
-                                width={48}
-                                height={48}
-                                unoptimized
-                                style={{ width: "auto", height: "auto" }}
-                                className="rounded-lg"
-                              />
-                              <div className="flex items-center">
-                                <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                </svg>
-                              </div>
-                              <Image
-                                src={item.secondPersonItemIcon}
-                                alt="현재 아이템"
-                                width={48}
-                                height={48}
-                                unoptimized
-                                style={{ width: "auto", height: "auto" }}
-                                className="rounded-lg"
-                              />
-                            </div>
-
-                            {/* 점수 */}
-                            <div className="flex-shrink-0">
-                              <div className="text-right">
-                                <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">+{item.score.toFixed(1)}</div>
-                                <div className="text-xs text-slate-500 dark:text-slate-400">{item.itemSlot}</div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* 호버 시 상세 정보 */}
-                          <div
-                            className={`absolute left-1/2 -translate-x-1/2 ${
-                              index < 2 ? "top-full mt-2" : "bottom-full mb-2"
-                            } bg-white dark:bg-slate-800 rounded-lg p-4 shadow-xl border border-slate-200 dark:border-slate-600 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 w-80`}
-                          >
-                            <div className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-2">상세 비교 정보</div>
-                            <div className="grid grid-cols-2 gap-2 text-xs">
-                              {STAT_DISPLAY_ORDER.map((key) => {
-                                const value = (item.comparison as ComparisonStats)[key];
-                                if (value === undefined) return null;
-
-                                return (
-                                  <div key={key} className="flex justify-between">
-                                    <span className="text-slate-600 dark:text-slate-400">{STAT_LABELS[key]}</span>
-                                    <span
-                                      className={`font-semibold ${
-                                        value > 0
-                                          ? "text-emerald-600 dark:text-emerald-400"
-                                          : value < 0
-                                          ? "text-red-600 dark:text-red-400"
-                                          : "text-slate-500 dark:text-slate-400"
-                                      }`}
-                                    >
-                                      {value > 0 ? "+" : ""}
-                                      {value}
-                                    </span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {versusDetailReport.positiveScores.length === 0 && (
-                    <div className="flex items-center justify-center h-[calc(100%-3.5rem)]">
-                      <p className="text-slate-500 dark:text-slate-400">나를 성장시킨 아이템이 없습니다.</p>
-                    </div>
-                  )}
-                </div>
-              </div>
+                )}
+                {versusDetailReport.positiveScores.length === 0 && (
+                  <div className="flex items-center justify-center h-[calc(100%-3.5rem)]">
+                    <p className="text-slate-500 dark:text-slate-400">나를 성장시킨 아이템이 없습니다.</p>
+                  </div>
+                )}
+              </ReportCard>
 
               {/* 전투력을 떨어트린 아이템 */}
-              <div className="w-full">
-                <div className="h-[500px] bg-white dark:bg-slate-800 rounded-2xl p-5 max-[600px]:p-2 shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-700">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-3 h-8 bg-gradient-to-b from-rose-400 to-pink-500 rounded-full"></div>
-                    <h4 className="text-lg font-bold text-slate-700 dark:text-slate-200">성장을 방해한 아이템</h4>
+              <ReportCard className="h-[500px]">
+                <ReportSectionTitle title="성장을 방해한 아이템" gradientFrom="rose-400" gradientTo="pink-500" />
+                {versusDetailReport.negativeScores.length > 0 && (
+                  <div className="space-y-3 h-[calc(100%-3.5rem)] overflow-y-auto px-1">
+                    {versusDetailReport.negativeScores.map((item, index) => (
+                      <DetailedComparisonItem
+                        key={item.itemSlot}
+                        index={index}
+                        itemSlot={item.itemSlot}
+                        firstPersonItemIcon={item.firstPersonItemIcon}
+                        secondPersonItemIcon={item.secondPersonItemIcon}
+                        score={item.score}
+                        comparison={item.comparison}
+                        variant="negative"
+                      />
+                    ))}
                   </div>
-                  {versusDetailReport.negativeScores.length > 0 && (
-                    <div className="space-y-3 h-[calc(100%-3.5rem)] overflow-y-auto px-1">
-                      {versusDetailReport.negativeScores.map((item, index) => (
-                        <div
-                          key={item.itemSlot}
-                          className="group relative bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 border border-slate-100 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600/50 transition-all duration-300"
-                        >
-                          <div className="flex items-center gap-4">
-                            {/* 순위 */}
-                            <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold text-sm">{index + 1}</span>
-                            </div>
-
-                            {/* 아이템 아이콘들 */}
-                            <div className="flex items-center gap-3 flex-1">
-                              <Image
-                                src={item.firstPersonItemIcon}
-                                alt="과거 아이템"
-                                width={48}
-                                height={48}
-                                unoptimized
-                                style={{ width: "auto", height: "auto" }}
-                                className="rounded-lg"
-                              />
-                              <div className="flex items-center">
-                                <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                </svg>
-                              </div>
-                              <Image
-                                src={item.secondPersonItemIcon}
-                                alt="현재 아이템"
-                                width={48}
-                                height={48}
-                                unoptimized
-                                style={{ width: "auto", height: "auto" }}
-                                className="rounded-lg"
-                              />
-                            </div>
-
-                            {/* 점수 */}
-                            <div className="flex-shrink-0">
-                              <div className="text-right">
-                                <div className="text-lg font-bold text-rose-600 dark:text-rose-400">{item.score.toFixed(1)}</div>
-                                <div className="text-xs text-slate-500 dark:text-slate-400">{item.itemSlot}</div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* 호버 시 상세 정보 */}
-                          <div
-                            className={`absolute left-1/2 -translate-x-1/2 ${
-                              index < 2 ? "top-full mt-2" : "bottom-full mb-2"
-                            } bg-white dark:bg-slate-800 rounded-lg p-4 shadow-xl border border-slate-200 dark:border-slate-600 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 w-80`}
-                          >
-                            <div className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-2">상세 비교 정보</div>
-                            <div className="grid grid-cols-2 gap-2 text-xs">
-                              {STAT_DISPLAY_ORDER.map((key) => {
-                                const value = (item.comparison as ComparisonStats)[key];
-                                if (value === undefined) return null;
-
-                                return (
-                                  <div key={key} className="flex justify-between">
-                                    <span className="text-slate-600 dark:text-slate-400">{STAT_LABELS[key]}</span>
-                                    <span
-                                      className={`font-semibold ${
-                                        value > 0
-                                          ? "text-emerald-600 dark:text-emerald-400"
-                                          : value < 0
-                                          ? "text-red-600 dark:text-red-400"
-                                          : "text-slate-500 dark:text-slate-400"
-                                      }`}
-                                    >
-                                      {value > 0 ? "+" : ""}
-                                      {value}
-                                    </span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {versusDetailReport.negativeScores.length === 0 && (
-                    <div className="flex items-center justify-center h-[calc(100%-3.5rem)]">
-                      <p className="text-slate-500 dark:text-slate-400">성장을 방해한 아이템이 없습니다.</p>
-                    </div>
-                  )}
-                </div>
-              </div>
+                )}
+                {versusDetailReport.negativeScores.length === 0 && (
+                  <div className="flex items-center justify-center h-[calc(100%-3.5rem)]">
+                    <p className="text-slate-500 dark:text-slate-400">성장을 방해한 아이템이 없습니다.</p>
+                  </div>
+                )}
+              </ReportCard>
             </>
           )}
         </div>
+
+        {versusSimpleReport.length === 0 && !versusDetailReport && (
+          <div
+            className="flex items-center justify-center h-[200px] w-full
+          rounded-lg bg-slate-100 dark:bg-slate-600/80"
+          >
+            <p className="text-slate-500 dark:text-slate-400">비교 데이터가 없습니다.</p>
+          </div>
+        )}
       </div>
 
       {isLoading && <DimmedLayer spinner />}

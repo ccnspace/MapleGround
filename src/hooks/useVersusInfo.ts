@@ -228,10 +228,10 @@ export const useVersusInfo = () => {
     ]);
   };
 
-  const resetVersusReport = () => {
+  const resetVersusReport = useCallback(() => {
     setVersusSimpleReport([]);
     setVersusDetailReport(undefined);
-  };
+  }, []);
 
   const getDetailReport = () => {
     const { firstPersonInfo, secondPersonInfo } = useVersusStore.getState();

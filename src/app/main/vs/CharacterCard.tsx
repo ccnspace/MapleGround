@@ -53,9 +53,8 @@ export const CharacterCard = ({ type, direction, characterImageUrl, nickname, re
   return (
     <div
       className="relative w-full h-full min-h-[368px] max-[600px]:min-h-[320px] rounded-2xl overflow-hidden
-      bg-gradient-to-br from-slate-50/20 via-slate-100/20 to-slate-200/20 
-      border border-white/10
-      shadow-sm hover:shadow-lg transition-all duration-300 group"
+      bg-slate-300/70
+      shadow-sm"
     >
       <div className="relative z-10 flex flex-col h-full p-4">
         {/* 날짜 선택기 */}

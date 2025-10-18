@@ -54,7 +54,7 @@ abbr:where([title]) {
   display: grid;
   grid-template-columns: repeat(3, minmax(420px, 1fr));
   grid-auto-flow: row;
-  padding-top: 16px;
+  padding-top: 24px;
   height: fit-content;
   padding-bottom: 12px;
 }

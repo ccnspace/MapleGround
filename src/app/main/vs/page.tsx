@@ -37,11 +37,11 @@ export default function Page() {
           <PlainBox>
             <div className="flex flex-col gap-2 w-full">
               <p className="-mt-1 font-medium text-sm max-[600px]:text-xs text-white">
-                {"• 첫 번째 캐릭터의 날짜를 두 번째보다 "}
-                <span className="underline underline-offset-4 decoration-2 decoration-sky-400">과거로 설정</span>
-                {"해 주세요."}
+                {"📢 첫 번째 캐릭터를 두 번째 캐릭터보다 과거로 설정해 주세요."}
               </p>
-              <p className="-mt-1 font-medium text-sm max-[600px]:text-xs text-white">{"• 반지는 정확한 1:1 비교가 어려울 수 있습니다."}</p>
+              <p className="-mt-1 font-medium text-sm max-[600px]:text-xs text-white">
+                {"📢 반지는 정확한 1:1 비교가 어려울 수 있습니다."}
+              </p>
             </div>
           </PlainBox>
         </div>

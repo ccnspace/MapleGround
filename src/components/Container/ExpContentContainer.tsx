@@ -24,7 +24,7 @@ const formatExpRate = (exp: number, maxExp: number) => {
 };
 
 const ExpItemWrapper = ({ children }: { children: React.ReactNode }) => {
-  return <div className="bg-white/50 dark:bg-black/30 rounded-lg p-3">{children}</div>;
+  return <div className="bg-slate-200 border border-slate-300 dark:border-slate-600 dark:bg-slate-600/80 rounded-lg p-3">{children}</div>;
 };
 
 const ExpDetailWrapper = ({ children }: { children: React.ReactNode }) => {

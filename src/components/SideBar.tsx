@@ -21,7 +21,7 @@ export const SideBar = () => {
   const isSuccess = fetchStatus === "success";
 
   const pathname = usePathname();
-  const isMyPage = pathname === "/my";
+  const isMyPage = pathname.startsWith("/my");
 
   const nickname = useNickname(!isMyPage);
   const isMyDisabled = !loggedInUserInfo;

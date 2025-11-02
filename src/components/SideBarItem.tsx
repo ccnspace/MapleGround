@@ -1,6 +1,5 @@
 import Link from "next/link";
-import type { SideBarItemType } from "./SideBar";
-import { usePathname } from "next/navigation";
+import { useCurrentPage } from "@/hooks/useCurrentPage";
 
 type Props = {
   icon: string;
@@ -15,9 +14,13 @@ type Props = {
 export const SideBarItem = ({ icon, title, src, isUpdated, tooltip, disabled, className }: Props) => {
   // 빈 src인 경우 비활성화된 상태로 표시
   const isDisabled = !src || src === "" || disabled;
-  const pathname = usePathname();
-  const sidebarPath = new URL(`${window.location.origin}${src}`).pathname;
-  const isCurrentPage = pathname === sidebarPath;
+  const isCurrentPage = useCurrentPage({
+    src,
+    comparisonFn: (pathname, currentPage) => {
+      if (!pathname.startsWith("/my")) return pathname === currentPage;
+      return pathname.startsWith(currentPage);
+    },
+  });
 
   const showTooltip = isDisabled && !!tooltip;
   const showUpdated = isUpdated && !tooltip;
@@ -47,8 +50,8 @@ export const SideBarItem = ({ icon, title, src, isUpdated, tooltip, disabled, cl
     <Link href={src}>
       <li
         className={`flex gap-3 items-center my-1 px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-200
-          bg-white/50 hover:bg-white/90 dark:bg-black/40 dark:hover:bg-black/60 hover:shadow-sm group 
-          ${isCurrentPage ? "bg-white/100 ring-2 ring-inset ring-slate-600 dark:ring-2 dark:ring-inset dark:ring-sky-200" : ""}
+           hover:bg-white dark:bg-black/40 dark:hover:bg-black/60 hover:shadow-sm group 
+          ${isCurrentPage ? "bg-white/100 ring-2 ring-inset ring-slate-600 dark:ring-2 dark:ring-inset dark:ring-sky-200" : "bg-white/50"}
        ${className}`}
       >
         <div className="text-slate-600 dark:text-slate-300">{icon}</div>

@@ -6,7 +6,7 @@ import { devtools, persist } from "zustand/middleware";
 type CharacterState = {
   fetchStatus: "success" | "error" | "idle" | "loading";
   characterAttributes: Record<string, CharacterAttributes> | null;
-  lastVisitedNickname: string | null;
+  lastVisitedNickname: string;
 };
 
 type CharacterAction = {
@@ -20,7 +20,7 @@ type CharacterAction = {
 const initialState: CharacterState = {
   fetchStatus: "idle",
   characterAttributes: null,
-  lastVisitedNickname: null,
+  lastVisitedNickname: "",
 };
 
 export const useCharacterStore = create<CharacterState & CharacterAction>()(

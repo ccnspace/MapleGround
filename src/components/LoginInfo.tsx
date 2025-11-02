@@ -4,9 +4,15 @@ import NexonLoginImg from "@/images/nexonLogin.png";
 import { getOAuthUrl } from "@/apis/getOAuthUrl";
 import { logout } from "@/apis/logout";
 import { useLoggedInStore } from "@/stores/loggedIn";
+import { useRouter } from "next/navigation";
 
 export const LoginInfo = () => {
   const fetchStatus = useLoggedInStore((state) => state.fetchStatus);
+  const router = useRouter();
+
+  const handleMyPageClick = () => {
+    router.push("/my");
+  };
 
   const handleNexonLoginClick = async () => {
     const authUrl = await getOAuthUrl();
@@ -36,6 +42,7 @@ export const LoginInfo = () => {
         </p>
         <div className="flex items-center gap-2 font-bold">
           <button
+            onClick={handleMyPageClick}
             className="flex items-center cursor-pointer text-[14px] gap-2 text-black
             bg-gradient-to-r from-sky-400 to-green-400 rounded-md
             hover:from-sky-500 hover:to-green-500

@@ -6,6 +6,7 @@ import { SideBarItem } from "./SideBarItem";
 import { useCharacterStore } from "@/stores/character";
 import { useNickname } from "@/hooks/useNickname";
 import { usePathname } from "next/navigation";
+import { useLoggedInStore } from "@/stores/loggedIn";
 
 export type SideBarItemType = {
   icon: ReactElement | string;
@@ -16,10 +17,14 @@ export type SideBarItemType = {
 
 export const SideBar = () => {
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
+  const loggedInUserInfo = useLoggedInStore((state) => state.loggedInUserInfo);
   const isSuccess = fetchStatus === "success";
-  const nickname = useNickname();
+
   const pathname = usePathname();
   const isMyPage = pathname === "/my";
+
+  const nickname = useNickname(!isMyPage);
+  const isMyDisabled = !loggedInUserInfo;
 
   if (!isSuccess && !isMyPage) return null;
 
@@ -32,7 +37,9 @@ export const SideBar = () => {
             icon={"↗️"}
             title={"마이메이플"}
             src={`/my`}
+            disabled={isMyDisabled}
             isUpdated
+            tooltip={isMyDisabled ? "로그인 후 이용할 수 있습니다." : undefined}
             className="bg-gradient-to-r from-sky-400 to-green-400 hover:from-sky-500 hover:to-green-500
             dark:bg-gradient-to-r dark:from-sky-600 dark:to-green-400 dark:hover:from-sky-600 dark:hover:to-green-600
             "

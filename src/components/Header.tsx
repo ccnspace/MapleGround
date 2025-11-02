@@ -6,13 +6,12 @@ import Image from "next/image";
 import Logo from "@/images/mainLogo.png";
 import { getOAuthUrl } from "@/apis/getOAuthUrl";
 import NexonLoginImg from "@/images/nexonLogin.png";
-import { useLoggedInStore } from "@/stores/loggedIn";
+import { useLoggedIn } from "@/hooks/useLoggedIn";
 import { logout } from "@/apis/logout";
 
 export const Header = () => {
   const router = useRouter();
-  const loggedInUserInfo = useLoggedInStore((state) => state.loggedInUserInfo);
-  const fetchStatus = useLoggedInStore((state) => state.fetchStatus);
+  const { loggedInUserInfo, fetchStatus } = useLoggedIn();
 
   const handleLogoutClick = async () => {
     await logout();

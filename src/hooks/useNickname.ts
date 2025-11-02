@@ -1,13 +1,14 @@
 import { openModal } from "@/utils/openModal";
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useCharacterStore } from "@/stores/character";
 
-export const useNickname = () => {
+export const useNickname = (enable?: boolean) => {
   const searchParams = useSearchParams();
   const nickname = searchParams.get("name");
   const router = useRouter();
+  const lastVisitedNickname = useCharacterStore((state) => state.lastVisitedNickname);
 
-  if (!nickname) {
+  if (!nickname && enable) {
     // throw new Error("Nickname is required");
     openModal({
       type: "alert",
@@ -16,5 +17,5 @@ export const useNickname = () => {
     });
   }
 
-  return nickname as string;
+  return nickname || (lastVisitedNickname as string);
 };

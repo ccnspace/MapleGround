@@ -1,12 +1,12 @@
-import { useLoggedIn } from "@/hooks/useLoggedIn";
 import { Spinner } from "./svg/Spinner";
 import Image from "next/image";
 import NexonLoginImg from "@/images/nexonLogin.png";
 import { getOAuthUrl } from "@/apis/getOAuthUrl";
 import { logout } from "@/apis/logout";
+import { useLoggedInStore } from "@/stores/loggedIn";
 
 export const LoginInfo = () => {
-  const { fetchStatus } = useLoggedIn();
+  const fetchStatus = useLoggedInStore((state) => state.fetchStatus);
 
   const handleNexonLoginClick = async () => {
     const authUrl = await getOAuthUrl();

@@ -14,6 +14,7 @@ export const useLoggedIn = () => {
   );
 
   useEffect(() => {
+    if (fetchStatus !== "idle") return;
     setFetchStatus("loading");
     getUserInfoByOAuth()
       .then((userInfo) => {
@@ -24,7 +25,6 @@ export const useLoggedIn = () => {
         setLoggedInUserInfo(null);
         setFetchStatus("error");
       });
-    // eslint-disable-next-line
-  }, []);
+  }, [fetchStatus]);
   return { loggedInUserInfo, fetchStatus };
 };

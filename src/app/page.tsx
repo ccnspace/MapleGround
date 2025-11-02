@@ -63,7 +63,7 @@ export default function Home() {
     <main className="relative flex min-h-screen flex-col items-center justify-center p-4">
       <div className="relative flex items-center mb-4">
         <button
-          className="flex items-center gap-1 text-xs font-bold text-white bg-slate-800/30 hover:bg-slate-800/40
+          className="flex items-center gap-1 text-sm font-bold text-white bg-slate-800/40 hover:bg-slate-800/40
           p-1.5 rounded-md"
           onClick={handleNoticeButtonClick}
         >

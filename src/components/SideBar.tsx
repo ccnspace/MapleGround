@@ -46,8 +46,8 @@ export const SideBar = () => {
           />
           <SideBarItem icon={"🏠"} title={"메인으로"} src={`/main?name=${nickname}`} isUpdated={false} />
           <SideBarItem icon={"⚔️"} title={"과거 vs 현재 대결"} src={`/main/vs?name=${nickname}`} isUpdated={false} />
-          <SideBarItem icon={"📊"} title={"경험치 효율 계산"} src={`/main/exp?name=${nickname}`} isUpdated />
-          <SideBarItem icon={"🗡️"} title={"무기 해방 날짜 계산"} src={`/main/weapon?name=${nickname}`} isUpdated />
+          <SideBarItem icon={"📊"} title={"경험치 효율 계산"} src={`/main/exp?name=${nickname}`} isUpdated={false} />
+          <SideBarItem icon={"🗡️"} title={"무기 해방 날짜 계산"} src={`/main/weapon?name=${nickname}`} isUpdated={false} />
           <SideBarItem icon={"🪙"} title={"주간보스 정산(Coming Soon)"} src={""} isUpdated={false} />
         </ul>
       </nav>

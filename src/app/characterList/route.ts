@@ -3,13 +3,9 @@ import { withAuth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-const API_DOMAIN = "https://openid.nexon.com/oauth2/userinfo";
-
-export const GET = withAuth(async (request: NextRequest, accessToken: string) => {
-  const userInfo = await fetch(API_DOMAIN, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+export const GET = withAuth(async (_request: NextRequest, accessToken: string) => {
+  const userInfo = await fetch(`${process.env.NEXON_API_DOMAIN}/character/list`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
 
   if (!userInfo.ok) {

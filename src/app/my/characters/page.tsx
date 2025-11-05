@@ -54,7 +54,7 @@ const CharacterCard = ({ characterList }: { characterList: CharacterInfo[] }) =>
             </div>
           </div>
           <div
-            className="flex items-center justify-center flex-row gap-2 text-sm font-bold
+            className="flex items-center justify-center flex-row gap-2 text-md font-bold
             bg-slate-400/50 dark:bg-slate-600 rounded-lg p-1
           "
           >
@@ -68,8 +68,8 @@ const CharacterCard = ({ characterList }: { characterList: CharacterInfo[] }) =>
 };
 
 const sortOptions = [
-  { label: "레벨 낮은 순", value: "레벨 낮은 순" },
   { label: "레벨 높은 순", value: "레벨 높은 순" },
+  { label: "레벨 낮은 순", value: "레벨 낮은 순" },
 ] as const;
 
 type SortOption = (typeof sortOptions)[number]["value"];
@@ -95,7 +95,7 @@ export default function Page() {
   }, [characterList]);
 
   const [selectedWorld, setSelectedWorld] = useState<string>("전체");
-  const [selectedSort, setSelectedSort] = useState<SortOption>("레벨 낮은 순");
+  const [selectedSort, setSelectedSort] = useState<SortOption>("레벨 높은 순");
 
   const handleSelectSort = (value: string) => {
     setSelectedSort(value as SortOption);

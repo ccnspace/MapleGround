@@ -90,7 +90,7 @@ export function withAuth<T = any>(
       // 유효한 토큰이면 원래 handler 실행
       return await handler(request, result.accessToken);
     } catch (error) {
-      return Response.json({ message: "요청이 올바르지 않습니다." }, { status: 400 });
+      return Response.json({ message: "인증 과정에서 오류가 발생하였습니다." }, { status: 400 });
     }
   };
 }

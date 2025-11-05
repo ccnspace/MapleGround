@@ -37,15 +37,19 @@ export async function getSession(sessionId: string) {
     const data = await redis.get(`${sessionId}`);
     const parsed = JSON.parse(data as string);
     return parsed as SessionData;
-  } catch {
-    return null;
+  } catch (error) {
+    throw new Error("세션 조회 실패");
   }
 }
 
 // 세션 삭제
 export async function deleteSession(sessionId: string) {
-  if (!redis.isOpen) {
-    await redis.connect();
+  try {
+    if (!redis.isOpen) {
+      await redis.connect();
+    }
+    await redis.del(`${sessionId}`);
+  } catch (error) {
+    throw new Error("세션 삭제 실패");
   }
-  await redis.del(`${sessionId}`);
 }

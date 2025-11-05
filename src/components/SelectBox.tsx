@@ -5,9 +5,10 @@ type BasicSelectProps = {
   onSelect: (option: string) => void;
   disabled?: boolean;
   style?: CSSProperties;
+  fontSize?: "xs" | "sm" | "md" | "lg";
 };
 
-export const SelectBox: React.FC<BasicSelectProps> = memo(({ options, onSelect, disabled = false, style }) => {
+export const SelectBox: React.FC<BasicSelectProps> = memo(({ options, onSelect, disabled = false, style, fontSize = "xs" }) => {
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
     const selectedOption = options.find((option) => option === selectedValue);
@@ -18,7 +19,13 @@ export const SelectBox: React.FC<BasicSelectProps> = memo(({ options, onSelect, 
 
   return (
     <div className="w-64" style={style}>
-      <select disabled={disabled} className="w-full text-xs p-1 border rounded-lg overflow-auto" onChange={handleChange}>
+      <select
+        disabled={disabled}
+        className={`w-full p-1 border rounded-lg overflow-auto ${
+          fontSize === "xs" ? "text-xs" : fontSize === "sm" ? "text-sm" : fontSize === "md" ? "text-md" : "text-lg"
+        }`}
+        onChange={handleChange}
+      >
         <option defaultValue={options[0]} disabled>
           {"Select an option"}
         </option>

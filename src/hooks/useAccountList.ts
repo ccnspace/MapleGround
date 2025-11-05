@@ -2,8 +2,8 @@ import { getCharacterList } from "@/apis/getCharacterList";
 import type { AccountInfo } from "@/types/CharacterList";
 import { useEffect, useState } from "react";
 
-export const useCharacterList = () => {
-  const [characterList, setCharacterList] = useState<AccountInfo[]>([]);
+export const useAccountList = () => {
+  const [accountList, setAccountList] = useState<AccountInfo[]>([]);
   const [fetchStatus, setFetchStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   useEffect(() => {
@@ -11,7 +11,7 @@ export const useCharacterList = () => {
     setFetchStatus("loading");
     getCharacterList()
       .then((characterList) => {
-        setCharacterList(characterList);
+        setAccountList(characterList);
         setFetchStatus("success");
       })
       .catch(() => {
@@ -19,5 +19,5 @@ export const useCharacterList = () => {
       });
   }, []);
 
-  return { characterList, fetchStatus };
+  return { accountList, fetchStatus };
 };

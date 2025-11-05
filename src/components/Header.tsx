@@ -8,13 +8,20 @@ import { getOAuthUrl } from "@/apis/getOAuthUrl";
 import NexonLoginImg from "@/images/nexonLogin.png";
 import { useLoggedIn } from "@/hooks/useLoggedIn";
 import { logout } from "@/apis/logout";
+import { openModal } from "@/utils/openModal";
 
 export const Header = () => {
   const router = useRouter();
   const { loggedInUserInfo, fetchStatus } = useLoggedIn();
 
-  const handleLogoutClick = async () => {
-    await logout();
+  const handleLogoutClick = () => {
+    openModal({
+      type: "confirm",
+      message: "로그아웃하시겠습니까?",
+      confirmLabel: "로그아웃",
+      cancelLabel: "취소",
+      confirmCallback: logout,
+    });
   };
 
   const handleNexonLoginClick = async () => {

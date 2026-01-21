@@ -7,6 +7,10 @@ import { NewLabel } from "./NewLabel";
 
 const NOTICE_DATA = [
   {
+    date: "2026.01.21",
+    data: `경험치 효율 계산기의 데이터를 업데이트했습니다. (25.12.18 업데이트 기준)`,
+  },
+  {
     date: "2025.10.10",
     data: `전반적인 사이트 디자인이 개선되었습니다.`,
   },

@@ -13,10 +13,18 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  if (request.nextUrl.pathname === "/my") {
+    const cookie = request.headers.get("cookie") ?? "";
+    const sessionId = cookie.match(/session_id=([^;]+)/)?.[1];
+    if (!sessionId) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
 // 미들웨어를 적용할 경로 설정
 export const config = {
-  matcher: "/main",
+  matcher: ["/main", "/my"],
 };

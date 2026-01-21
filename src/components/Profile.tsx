@@ -1,6 +1,5 @@
 "use client";
 
-import { Spinner } from "./svg/Spinner";
 import Image from "next/image";
 import { Badge } from "./Badge";
 import { BackIcon } from "./svg/BackIcon";
@@ -12,6 +11,7 @@ import { useCharacterPowerStore } from "@/stores/characterPower";
 import { useNickname } from "@/hooks/useNickname";
 import { useRouter } from "next/navigation";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { getWorldIcon } from "@/utils/getWorldIcon";
 
 type ProfileProps = {
   characterAttributes: CharacterAttributes;
@@ -75,8 +75,9 @@ const Profile = ({ characterAttributes }: ProfileProps) => {
             <Badge bgColor="pink" text={"직업"} />
             {character_class}
           </p>
-          <p className="text-slate-100 text-sm">
+          <p className="text-slate-100 text-sm flex items-center gap-0.5">
             <Badge bgColor="blue" text={"월드"} />
+            <Image src={getWorldIcon(world_name)} alt={world_name} width={14} height={14} unoptimized />
             {world_name}
           </p>
           <p className="text-slate-100 text-sm">

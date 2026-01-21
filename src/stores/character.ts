@@ -6,6 +6,7 @@ import { devtools, persist } from "zustand/middleware";
 type CharacterState = {
   fetchStatus: "success" | "error" | "idle" | "loading";
   characterAttributes: Record<string, CharacterAttributes> | null;
+  lastVisitedNickname: string;
 };
 
 type CharacterAction = {
@@ -13,11 +14,13 @@ type CharacterAction = {
   setCharacterAttributes: (data: CharacterAttributes, nickname: string) => void;
   resetCharacterData: (nickname: string) => void;
   fetchCharacterAttributes: (nickname: string, signal?: AbortSignal) => Promise<void>;
+  setLastVisitedNickname: (nickname: string) => void;
 };
 
 const initialState: CharacterState = {
   fetchStatus: "idle",
   characterAttributes: null,
+  lastVisitedNickname: "",
 };
 
 export const useCharacterStore = create<CharacterState & CharacterAction>()(
@@ -25,6 +28,9 @@ export const useCharacterStore = create<CharacterState & CharacterAction>()(
     persist(
       (set, get) => ({
         ...initialState,
+        setLastVisitedNickname: (nickname) => {
+          set({ lastVisitedNickname: nickname });
+        },
         setCharacterAttributes: (characterAttributes, nickname) => {
           set({
             characterAttributes: {
@@ -44,7 +50,8 @@ export const useCharacterStore = create<CharacterState & CharacterAction>()(
           set({ characterAttributes: { ...rest } });
         },
         fetchCharacterAttributes: async (nickname: string, signal?: AbortSignal) => {
-          const { characterAttributes, setFetchStatus, setCharacterAttributes, resetCharacterData } = get();
+          const { characterAttributes, setFetchStatus, setCharacterAttributes, setLastVisitedNickname } = get();
+          setLastVisitedNickname(nickname);
 
           if (characterAttributes?.[nickname]) {
             const currentTime = new Date();

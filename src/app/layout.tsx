@@ -5,10 +5,8 @@ import { Header } from "@/components/Header";
 import { pretendard } from "./fonts/pretendard";
 import { Modal } from "@/components/Modal";
 import { ThemeProvider } from "next-themes";
-import "./globals.css";
 import { NoticeModal } from "@/components/NoticeModal";
-import Image from "next/image";
-import MainBackgroundImg from "@/images/main_background.png";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "MapleGround: 메이플그라운드",
@@ -36,13 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <meta name="naver-site-verification" content="101f51f334f08a591bbe05f2cabd51ae4bd382d1" />
-      <body className={`${pretendard.variable} font-pretendard bg-white dark:bg-[#131313] min-h-screen flex flex-col`}>
-        {/* 공통 배경 이미지 */}
-        <div className="fixed inset-0 w-full h-full -z-50">
-          <Image src={MainBackgroundImg} alt="background" fill priority className="object-cover" unoptimized />
-          {/* 배경 오버레이 */}
-          <div className="absolute inset-0 bg-black/10 dark:bg-black/50" />
-        </div>
+      <body className={`${pretendard.variable} font-pretendard bg-white dark:bg-[#0C0C0E] min-h-screen flex flex-col`}>
         <ThemeProvider attribute="class" defaultTheme="dark">
           <Header />
           <Modal />

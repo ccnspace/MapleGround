@@ -4,7 +4,6 @@ import { WeaponUnlockContainer } from "@/components/Container/WeaponUnlockContai
 import { useNickname } from "@/hooks/useNickname";
 import { useCharacterStore } from "@/stores/character";
 import { useEffect } from "react";
-import { useTheme } from "next-themes";
 import { PlainBox } from "@/components/PlainBox";
 import { CommonWrapper } from "@/components/Container/CommonWrapper";
 import { CommonTitle } from "@/components/Container/CommonTitle";
@@ -14,7 +13,6 @@ export default function WeaponPage() {
   const nickname = useNickname();
   const fetchCharacterAttributes = useCharacterStore((state) => state.fetchCharacterAttributes);
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
-  const { theme } = useTheme();
 
   useEffect(() => {
     if (!nickname) return;

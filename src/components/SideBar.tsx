@@ -24,7 +24,7 @@ export const SideBar = () => {
   return (
     <div className="sidebar flex-shrink-0 w-96 font-bold text-md">
       <ProfileWrapper />
-      <nav className="mt-3">
+      {/* <nav className="mt-3">
         <ul className="flex flex-col gap-0.5 mx-5 bg-white/30 dark:bg-black/30 rounded-lg py-1.5 px-2 backdrop-blur-sm">
           <SideBarItem icon={"🏠"} title={"메인으로"} src={`/main?name=${nickname}`} isUpdated={false} />
           <SideBarItem icon={"⚔️"} title={"과거 vs 현재 대결"} src={`/main/vs?name=${nickname}`} isUpdated={false} />
@@ -32,7 +32,7 @@ export const SideBar = () => {
           <SideBarItem icon={"🗡️"} title={"무기 해방 날짜 계산"} src={`/main/weapon?name=${nickname}`} isUpdated />
           <SideBarItem icon={"🪙"} title={"주간보스 정산(Coming Soon)"} src={""} isUpdated={false} />
         </ul>
-      </nav>
+      </nav> */}
     </div>
   );
 };

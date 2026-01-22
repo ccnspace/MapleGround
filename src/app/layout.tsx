@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <meta name="naver-site-verification" content="101f51f334f08a591bbe05f2cabd51ae4bd382d1" />
-      <body className={`${pretendard.variable} font-pretendard bg-white dark:bg-[#0C0C0E] min-h-screen flex flex-col`}>
+      <body className={`${pretendard.variable} font-pretendard bg-white dark:bg-color-900 min-h-screen flex flex-col`}>
         <ThemeProvider attribute="class" defaultTheme="dark">
           <Header />
           <Modal />

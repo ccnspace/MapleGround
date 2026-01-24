@@ -47,9 +47,33 @@ const HeaderNavItem = ({
   );
 };
 
+const HeaderMenuList = () => {
+  const nickname = useNickname();
+  return (
+    <ul className="flex text-[15px] gap-6">
+      <HeaderNavItem pathname={"/main"} nickname={nickname} isUpdated={false}>
+        메인
+      </HeaderNavItem>
+      <HeaderNavItem pathname={"/main/vs"} nickname={nickname} isUpdated={false}>
+        과거vs현재
+      </HeaderNavItem>
+      <HeaderNavItem pathname={"/main/exp"} nickname={nickname} isUpdated={true}>
+        경험치 효율 계산
+      </HeaderNavItem>
+      <HeaderNavItem pathname={"/main/weapon"} nickname={nickname} isUpdated={true}>
+        해방날짜 계산
+      </HeaderNavItem>
+      <HeaderNavItem pathname={"/main/boss"} nickname={nickname} isUpdated={false}>
+        주간보스 정산
+      </HeaderNavItem>
+    </ul>
+  );
+};
+
 export const Header = () => {
   const router = useRouter();
-  const nickname = useNickname();
+  const pathname = usePathname();
+  const isHome = pathname === "/";
 
   return (
     <header className="header px-2 flex bg-white dark:bg-color-950/80 justify-between items-center pr-8 shadow font-bold text-lg">
@@ -57,23 +81,7 @@ export const Header = () => {
         <div className="pt-2 pb-2 pl-6 pr-3 text-md cursor-pointer flex items-center" onClick={() => router.push("/")}>
           <Image src={Logo} alt="logo" quality={100} width={90} height={60} className="flex" />
         </div>
-        <ul className="flex text-[15px] gap-6">
-          <HeaderNavItem pathname={"/main"} nickname={nickname} isUpdated={false}>
-            메인
-          </HeaderNavItem>
-          <HeaderNavItem pathname={"/main/vs"} nickname={nickname} isUpdated={false}>
-            과거vs현재
-          </HeaderNavItem>
-          <HeaderNavItem pathname={"/main/exp"} nickname={nickname} isUpdated={true}>
-            경험치 효율 계산
-          </HeaderNavItem>
-          <HeaderNavItem pathname={"/main/weapon"} nickname={nickname} isUpdated={true}>
-            해방날짜 계산
-          </HeaderNavItem>
-          <HeaderNavItem pathname={"/main/boss"} nickname={nickname} isUpdated={false}>
-            주간보스 정산
-          </HeaderNavItem>
-        </ul>
+        {!isHome && <HeaderMenuList />}
       </div>
       <ThemeChanger />
     </header>

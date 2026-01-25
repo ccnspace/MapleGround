@@ -140,15 +140,25 @@ export const importantStats: Record<string, string[]> = {
   ],
   마력: ["아크메이지(불,독)", "아크메이지(썬,콜)", "비숍", "플레임위자드", "배틀메이지", "루미너스", "에반", "일리움", "라라", "키네시스"],
 };
-const mainStats = ["최종 데미지", "데미지", "크리티컬 데미지", "아이템 드롭률", "메소 획득량", "보스 몬스터 데미지", "방어율 무시"];
+const mainStats = [
+  "최종 데미지",
+  "데미지",
+  "크리티컬 데미지",
+  "아이템 드롭률",
+  "메소 획득량",
+  "보스 몬스터 데미지",
+  "방어율 무시",
+  "아케인포스",
+  "어센틱포스",
+];
 const getStatItemStyle = (jobName: string, valueName: string) => {
   if (importantStats[valueName]?.includes(jobName)) {
-    return "font-bold bg-yellow-100 border-2 border-yellow-200 dark:bg-black/30 dark:border-yellow-200/50";
+    return "font-bold text-blue-600 dark:text-sky-400";
   }
   if (mainStats.includes(valueName)) {
-    return "font-bold bg-slate-400/20 border-2 border-slate-100/5 dark:border-lime-400/40";
+    return "font-bold text-black dark:text-white";
   }
-  return "font-bold";
+  return "font-bold text-slate-500";
 };
 
 type StatItemProps = {
@@ -158,7 +168,12 @@ type StatItemProps = {
   className?: string;
 };
 const StatItem = ({ statName, jobName, statObject, className, children }: PropsWithChildren<StatItemProps>) => (
-  <div className={`${getStatItemStyle(jobName, statName)} flex items-center rounded-md px-1.5 pt-1.5 pb-1.5 ${className}`}>
+  <div
+    className={`${getStatItemStyle(
+      jobName,
+      statName
+    )} flex items-center px-1 py-1 border-b border-dashed border-b-slate-300 dark:border-b-white/15 ${className}`}
+  >
     <span className="font-bold">{statName}</span>
     <span className="font-medium px-1 ml-auto">{statObject[statName]}</span>
     {children}
@@ -213,7 +228,7 @@ export const StatContainer = () => {
           </div>
 
           <div className="grid grid-cols-2 rounded-md px-2 pt-2 pb-3 gap-2 text-sm">
-            <div className="flex items-center rounded-md px-1.5 pt-1 pb-1 col-span-2 font-bold bg-slate-400/20 border-2 border-slate-100/5 dark:border-lime-400/40">
+            <div className="flex items-center rounded-md px-1.5 pt-1 pb-1 col-span-2 font-bold bg-slate-400/20">
               <span className="font-extrabold">스탯 공격력</span>
               <span className="font-medium px-1 pt-1 pb-1 ml-auto">
                 {`${statObject["최소 스탯공격력"]} ~ ${statObject["최대 스탯공격력"]}`}

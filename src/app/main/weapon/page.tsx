@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { WeaponUnlockContainer } from "@/components/Container/WeaponUnlockContainer";
 import { useNickname } from "@/hooks/useNickname";
 import { useCharacterStore } from "@/stores/character";
@@ -9,7 +10,7 @@ import { CommonWrapper } from "@/components/Container/CommonWrapper";
 import { CommonTitle } from "@/components/Container/CommonTitle";
 import { LoadingContainer } from "@/components/Container/LoadingContainer";
 
-export default function WeaponPage() {
+const WeaponPageContent = () => {
   const nickname = useNickname();
   const fetchCharacterAttributes = useCharacterStore((state) => state.fetchCharacterAttributes);
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
@@ -54,5 +55,13 @@ export default function WeaponPage() {
         <WeaponUnlockContainer />
       </div>
     </CommonWrapper>
+  );
+};
+
+export default function WeaponPage() {
+  return (
+    <Suspense fallback={<LoadingContainer />}>
+      <WeaponPageContent />
+    </Suspense>
   );
 }

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import { Header } from "@/components/Header";
@@ -36,7 +37,9 @@ export default function RootLayout({
       <meta name="naver-site-verification" content="101f51f334f08a591bbe05f2cabd51ae4bd382d1" />
       <body className={`${pretendard.variable} font-pretendard bg-white dark:bg-color-900 min-h-screen flex flex-col`}>
         <ThemeProvider attribute="class" defaultTheme="dark">
-          <Header />
+          <Suspense>
+            <Header />
+          </Suspense>
           <Modal />
           <NoticeModal />
           <main className="flex-1">{children}</main>

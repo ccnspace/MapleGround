@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { ExpContentContainer } from "@/components/Container/ExpContentContainer";
 import { useNickname } from "@/hooks/useNickname";
 import { useCharacterStore } from "@/stores/character";
@@ -8,7 +9,7 @@ import { CommonWrapper } from "@/components/Container/CommonWrapper";
 import { CommonTitle } from "@/components/Container/CommonTitle";
 import { LoadingContainer } from "@/components/Container/LoadingContainer";
 
-export default function ExpPage() {
+const ExpPageContent = () => {
   const nickname = useNickname({ isEnableErrorModal: false });
   const fetchCharacterAttributes = useCharacterStore((state) => state.fetchCharacterAttributes);
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
@@ -42,5 +43,13 @@ export default function ExpPage() {
         <ExpContentContainer nickname={nickname} />
       </div>
     </CommonWrapper>
+  );
+};
+
+export default function ExpPage() {
+  return (
+    <Suspense fallback={<LoadingContainer />}>
+      <ExpPageContent />
+    </Suspense>
   );
 }

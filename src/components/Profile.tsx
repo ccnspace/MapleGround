@@ -154,8 +154,8 @@ export const ProfileWrapper = () => {
 
   return (
     <div
-      className={`profile flex flex-col gap-3 items-center justify-center
-     font-medium rounded-lg relative mx-5 mt-6 mb-2 px-3 pt-6 pb-3 max-h-[360px] ${bgColor}`}
+      className={`profile flex flex-col gap-3 items-center justify-center w-96 max-[600px]:w-full
+     font-medium rounded-lg relative mx-5 mt-6 mb-2 px-3 pt-6 pb-2 max-h-[360px] ${bgColor}`}
     >
       <div className="absolute left-0 top-0 px-3 pt-1.5 hover:cursor-pointer" onClick={handleChangeBookmark}>
         <span

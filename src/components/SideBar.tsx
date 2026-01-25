@@ -20,7 +20,7 @@ const BookmarkSection = () => {
   }
 
   return (
-    <div className="mt-1 mx-5 p-3 rounded-lg bg-slate-100 dark:bg-black/30 max-h-60 overflow-y-auto">
+    <div className="mt-1 mx-5 p-3 rounded-lg bg-slate-100 dark:bg-black/30 max-h-60 overflow-y-auto w-96 max-[600px]:w-full">
       <div className="flex items-center gap-1 mb-1 px-1">
         <span className="text-sm font-semibold text-gray-700 dark:text-gray-400">즐겨찾기한 캐릭터</span>
         <span className="text-xs text-gray-400 dark:text-gray-500">({bookmarks.length})</span>
@@ -51,7 +51,7 @@ export const SideBar = () => {
   if (!isSuccess) return null;
 
   return (
-    <div className="sidebar flex-shrink-0 w-96 font-bold text-md">
+    <div className="flex flex-col items-center font-bold text-md">
       <ProfileWrapper />
       <BookmarkSection />
     </div>

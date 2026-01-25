@@ -13,6 +13,7 @@ import anglerIcon from "@/images/angler.png";
 import monpaIcon from "@/images/monpa.png";
 import vipRestIcon from "@/images/vip.png";
 import nightmareIcon from "@/images/nightmare.png";
+import { PlainBox } from "../PlainBox";
 
 const MIN_LEVEL = 1;
 const MAX_LEVEL = 299;
@@ -123,7 +124,7 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
   const showLevelInput = !nickname || !character_level;
 
   return (
-    <div className="w-full min-[600px]:mt-5">
+    <div className="w-full">
       <div className="flex flex-col justify-center gap-5">
         {/* 레벨 입력 섹션 */}
         {showLevelInput && (
@@ -134,11 +135,11 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
 
         {/* 현재 레벨 표시 */}
         {currentLevel > 0 && (
-          <div className="min-[600px]:px-[120px]">
+          <PlainBox>
             <div className="flex items-center justify-center gap-2 text-sm font-bold text-gray-600 dark:text-gray-400">
               현재 기준 레벨 <span className="text-lg text-sky-600 dark:text-sky-400">Lv.{currentLevel}</span>
             </div>
-          </div>
+          </PlainBox>
         )}
 
         <div className="flex flex-col">

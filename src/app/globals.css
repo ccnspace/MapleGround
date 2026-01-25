@@ -77,7 +77,7 @@ abbr:where([title]) {
 .right_sideBar {
   display: grid;
   grid-row: span 2;
-  grid-template-rows: 240px 260px 700px;
+  grid-template-rows: 240px 300px 600px;
   gap: 12px;
 }
 
@@ -92,7 +92,7 @@ abbr:where([title]) {
 
   .right_sideBar {
     gap: 16px;
-    grid-template-rows: 260px 260px 360px;
+    grid-template-rows: 240px 300px 380px;
   }
 }
 

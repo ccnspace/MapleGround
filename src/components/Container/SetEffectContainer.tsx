@@ -27,7 +27,7 @@ export const SetEffectContainer = () => {
 
   // TODO: 오른쪽 사이드 영역에 컨텐츠 추가 시 아래 ContainerWrapper > row-span 옵션 수정 필요
   return (
-    <ContainerWrapper className="h-[260px] overflow-y-auto">
+    <ContainerWrapper className="h-[300px] overflow-y-auto">
       <div className="flex justify-between mb-2">
         <p
           className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 

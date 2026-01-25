@@ -37,15 +37,15 @@ export default function WeaponPage() {
             <span className="px-2 py-0.5 text-xs font-bold text-white bg-red-500 rounded-full">NEW</span>
           </CommonTitle>
           <PlainBox>
-            <div className="flex flex-col gap-2">
-              <p className="-mt-1 font-medium text-sm max-[600px]:text-xs text-white">
+            <div className="flex flex-col gap-1">
+              <p className="font-medium text-sm max-[600px]:text-xs">
                 {"📢 "}
-                <span className="text-cyan-300 font-bold">주간 클리어 보스</span>
+                <span className="font-bold">주간 클리어 보스</span>
                 {" 데이터를 설정하면, 예상 해방 날짜가 계산됩니다."}
               </p>
-              <p className="-mt-1 font-medium text-sm max-[600px]:text-xs text-white">
+              <p className="font-medium text-sm max-[600px]:text-xs">
                 {"📢 "}
-                <span className="text-cyan-300 font-bold">미션 클리어 당시 파티 인원</span>
+                <span className="font-bold">미션 클리어 당시 파티 인원</span>
                 {"은, 해당 보스의 미션을 클리어 했을 때의 파티 인원입니다."}
               </p>
             </div>

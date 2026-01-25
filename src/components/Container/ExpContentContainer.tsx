@@ -15,7 +15,7 @@ import vipRestIcon from "@/images/vip.png";
 import nightmareIcon from "@/images/nightmare.png";
 
 const MIN_LEVEL = 1;
-const MAX_LEVEL = 300;
+const MAX_LEVEL = 299;
 
 const formatExp = (exp: number) => {
   return exp.toLocaleString();

@@ -22,6 +22,8 @@ const formatExp = (exp: number) => {
 };
 
 const formatExpRate = (exp: number, maxExp: number) => {
+  const value = ((exp / maxExp) * 100).toFixed(3);
+  if (value === "NaN") return "-";
   return ((exp / maxExp) * 100).toFixed(3);
 };
 

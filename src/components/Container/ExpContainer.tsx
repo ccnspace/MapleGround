@@ -1,7 +1,6 @@
 "use client";
 
 import Chart, { type Props } from "react-apexcharts";
-import { useCharacterStore } from "@/stores/character";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { ContainerWrapper } from "./ContainerWrapper";

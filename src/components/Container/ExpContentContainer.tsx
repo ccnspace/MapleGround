@@ -4,7 +4,6 @@ import { getExpValue } from "@/utils/expUtils";
 import { useCharacterStore } from "@/stores/character";
 import React from "react";
 import Image from "next/image";
-import { useNickname } from "@/hooks/useNickname";
 
 // Import images
 import expIcon from "@/images/exp.png";
@@ -14,6 +13,9 @@ import anglerIcon from "@/images/angler.png";
 import monpaIcon from "@/images/monpa.png";
 import vipRestIcon from "@/images/vip.png";
 import nightmareIcon from "@/images/nightmare.png";
+
+const MIN_LEVEL = 1;
+const MAX_LEVEL = 300;
 
 const formatExp = (exp: number) => {
   return exp.toLocaleString();
@@ -31,15 +33,47 @@ const ExpDetailWrapper = ({ children }: { children: React.ReactNode }) => {
   return <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-white/50 dark:bg-black/50">{children}</div>;
 };
 
-export const ExpContentContainer = () => {
-  const nickname = useNickname();
-  const characterAttributes = useCharacterStore((state) => state.characterAttributes?.[nickname]);
+const LevelInput = ({ value, onChange, characterLevel }: { value: string; onChange: (value: string) => void; characterLevel?: number }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    if (inputValue === "" || /^\d+$/.test(inputValue)) {
+      const numValue = parseInt(inputValue);
+      if (inputValue === "" || (numValue >= MIN_LEVEL && numValue <= MAX_LEVEL)) {
+        onChange(inputValue);
+      }
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-xl border border-slate-300 dark:border-slate-600">
+      <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">캐릭터 레벨</label>
+      <input
+        type="text"
+        value={value}
+        onChange={handleChange}
+        placeholder={characterLevel ? String(characterLevel) : "레벨 입력"}
+        className="w-24 px-3 py-2 text-center text-lg font-bold rounded-lg border-2 border-slate-400 dark:border-slate-500 
+                   bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100
+                   focus:border-sky-500 dark:focus:border-sky-400 focus:outline-none transition-colors"
+      />
+      <span className="text-xs text-gray-500 dark:text-gray-400">
+        ({MIN_LEVEL}~{MAX_LEVEL})
+      </span>
+    </div>
+  );
+};
+
+export const ExpContentContainer = ({ nickname }: { nickname: string | null }) => {
+  const characterAttributes = useCharacterStore((state) => state.characterAttributes?.[nickname ?? ""]);
   const { character_level } = characterAttributes?.basic || {};
+
+  const [manualLevel, setManualLevel] = React.useState<string>("");
   const [normalVoucherCount, setNormalVoucherCount] = React.useState<string>("");
   const [advancedVoucherCount, setAdvancedVoucherCount] = React.useState<string>("");
   const [vipRestCount, setVipRestCount] = React.useState<string>("");
 
-  const currentLevel = character_level || 0;
+  // nickname이 있으면 캐릭터 레벨 사용, 없으면 직접 입력한 레벨 사용
+  const currentLevel = nickname && character_level ? character_level : parseInt(manualLevel) || 0;
   const LEVEL_REQUIREMENTS = {
     NORMAL_EXP: 200,
     ADVANCED_EXP: 260,
@@ -84,9 +118,27 @@ export const ExpContentContainer = () => {
     };
   };
 
+  const showLevelInput = !nickname || !character_level;
+
   return (
     <div className="w-full min-[600px]:mt-5">
-      <div className="flex flex-col justify-center">
+      <div className="flex flex-col justify-center gap-5">
+        {/* 레벨 입력 섹션 */}
+        {showLevelInput && (
+          <div className="min-[600px]:px-[120px]">
+            <LevelInput value={manualLevel} onChange={setManualLevel} characterLevel={character_level} />
+          </div>
+        )}
+
+        {/* 현재 레벨 표시 */}
+        {currentLevel > 0 && (
+          <div className="min-[600px]:px-[120px]">
+            <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+              현재 기준 레벨: <span className="font-bold text-lg text-sky-600 dark:text-sky-400">Lv.{currentLevel}</span>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col">
           <div className="grid grid-cols-1 min-[600px]:grid-cols-3 gap-4 min-[600px]:px-[120px]">
             {/* Normal EXP Voucher Section */}

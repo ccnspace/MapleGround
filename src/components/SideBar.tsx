@@ -2,10 +2,7 @@
 
 import { ReactElement } from "react";
 import { ProfileWrapper } from "./Profile";
-import { StarIcon } from "./svg/StarIcon";
-import { SideBarItem } from "./SideBarItem";
 import { useCharacterStore } from "@/stores/character";
-import { useNickname } from "@/hooks/useNickname";
 
 export type SideBarItemType = {
   icon: ReactElement | string;
@@ -17,7 +14,6 @@ export type SideBarItemType = {
 export const SideBar = () => {
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
   const isSuccess = fetchStatus === "success";
-  const nickname = useNickname();
 
   if (!isSuccess) return null;
 

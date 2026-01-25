@@ -9,7 +9,7 @@ import { CommonTitle } from "@/components/Container/CommonTitle";
 import { LoadingContainer } from "@/components/Container/LoadingContainer";
 
 export default function ExpPage() {
-  const nickname = useNickname();
+  const nickname = useNickname({ isEnableErrorModal: false });
   const fetchCharacterAttributes = useCharacterStore((state) => state.fetchCharacterAttributes);
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
 
@@ -24,7 +24,10 @@ export default function ExpPage() {
     };
   }, [nickname, fetchCharacterAttributes]);
 
-  if (fetchStatus !== "success") {
+  // nickname이 있을 때만 로딩 체크, 없으면 바로 컨텐츠 표시
+  const isLoading = nickname && fetchStatus !== "success";
+
+  if (isLoading) {
     return <LoadingContainer />;
   }
 
@@ -36,7 +39,7 @@ export default function ExpPage() {
             <span className="px-2 py-0.5 text-xs font-bold text-white bg-red-500 rounded-full">UPDATED</span>
           </CommonTitle>
         </div>
-        <ExpContentContainer />
+        <ExpContentContainer nickname={nickname} />
       </div>
     </CommonWrapper>
   );

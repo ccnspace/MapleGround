@@ -2,7 +2,7 @@
 module.exports = {
   content: ["./src/pages/**/*.{js,ts,jsx,tsx,mdx}", "./src/components/**/*.{js,ts,jsx,tsx,mdx}", "./src/app/**/*.{js,ts,jsx,tsx,mdx}"],
   darkMode: "class",
-  safelist: ["text-teal-300", "text-indigo-300"],
+  safelist: ["text-teal-300", "text-indigo-300", "from-blue-500", "to-indigo-500"],
   theme: {
     extend: {
       fontFamily: {

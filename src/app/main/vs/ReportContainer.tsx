@@ -111,7 +111,7 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
           {/* 간단 비교 리포트 */}
           {versusSimpleReport.length > 0 && (
             <ReportCard className="h-[500px] max-[600px]:h-[400px] overflow-y-auto">
-              <ReportSectionTitle title="간단 비교 리포트" gradientFrom="blue-400" gradientTo="indigo-500" />
+              <ReportSectionTitle title="간단 비교 리포트" gradientFrom="blue-500" gradientTo="indigo-500" />
               <div className="space-y-2 h-[calc(100%-3.5rem)] overflow-y-auto px-1">
                 {versusSimpleReport.map((item) => (
                   <SimpleComparisonItem

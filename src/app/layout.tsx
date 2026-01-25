@@ -41,8 +41,8 @@ export default function RootLayout({
           <NoticeModal />
           <main className="flex-1">{children}</main>
           <footer className="flex justify-center items-center py-4">
-            <div className="footer flex gap-1 text-sm text-white dark:text-slate-400">
-              <p>© 2025 메이플그라운드. All rights reserved.</p>
+            <div className="footer flex gap-1 text-sm text-color-400 dark:text-color-300">
+              <p>© 2026 메이플그라운드. All rights reserved.</p>
               <p className="text-sky-400">
                 Data based on <span className="font-bold">NEXON Open API</span>
               </p>

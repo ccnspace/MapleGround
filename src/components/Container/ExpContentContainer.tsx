@@ -135,8 +135,8 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
         {/* 현재 레벨 표시 */}
         {currentLevel > 0 && (
           <div className="min-[600px]:px-[120px]">
-            <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-              현재 기준 레벨: <span className="font-bold text-lg text-sky-600 dark:text-sky-400">Lv.{currentLevel}</span>
+            <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              현재 기준 레벨 <span className="font-bold text-lg text-sky-600 dark:text-sky-400">Lv.{currentLevel}</span>
             </div>
           </div>
         )}
@@ -438,7 +438,7 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
                   </ExpDetailWrapper>
                 </div>
               ) : (
-                <p className="text-sm text-gray-500 dark:text-gray-400">레벨 270 이상부터 참여할 수 있습니다.</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">레벨 280 이상부터 참여할 수 있습니다.</p>
               )}
             </ExpItemWrapper>
           </div>

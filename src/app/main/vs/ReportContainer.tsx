@@ -91,7 +91,7 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
             </button>
           </div>
 
-          <div className="w-[360px] flex-shrink-0 max-[600px]:w-[320px]">
+          <div className="w-[360px] flex-shrink-0 max-[600px]:w-[320px] max-[600px]:mb-8">
             <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 mb-2 text-center">두 번째 캐릭터</h3>
             <CharacterCard
               type="second"
@@ -185,10 +185,7 @@ export const ReportContainer = ({ nickname }: { nickname: string }) => {
         </div>
 
         {versusSimpleReport.length === 0 && !versusDetailReport && (
-          <div
-            className="flex items-center justify-center h-[200px] w-full
-          rounded-lg bg-slate-100 dark:bg-slate-600/80"
-          >
+          <div className="flex items-center justify-center h-[200px] w-full">
             <p className="text-slate-500 dark:text-slate-400">비교 데이터가 없습니다.</p>
           </div>
         )}

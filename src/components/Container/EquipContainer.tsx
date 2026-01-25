@@ -62,7 +62,7 @@ export const EquipContainer = () => {
               border-l-4 border-l-lime-400 items-center max-[600px]:text-sm
              "
             >
-              일반 장비 아이템
+              장비 아이템
             </p>
             <div
               className="flex font-bold flex-row gap-3 text-sm mb-2 px-1 pb-1 pt-1

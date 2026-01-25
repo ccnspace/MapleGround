@@ -71,9 +71,9 @@ export const DetailedComparisonItem = ({
 
       {/* 호버 시 상세 정보 */}
       <div
-        className={`absolute left-1/2 -translate-x-1/2 ${
+        className={`absolute left-1/2 -translate-x-1/2 w-[90%] ${
           index < 2 ? "top-full mt-2" : "bottom-full mb-2"
-        } bg-white dark:bg-slate-800 rounded-lg p-4 shadow-xl border border-slate-200 dark:border-slate-600 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 w-80`}
+        } bg-white dark:bg-slate-800 rounded-lg p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 w-80`}
       >
         <div className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-2">상세 비교 정보</div>
         <div className="grid grid-cols-2 gap-2 text-xs">

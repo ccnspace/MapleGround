@@ -52,23 +52,23 @@ export const CharacterCard = ({ type, direction, characterImageUrl, nickname, re
 
   return (
     <div
-      className="relative w-full h-full min-h-[368px] max-[600px]:min-h-[320px] rounded-2xl overflow-hidden
+      className="relative w-full h-full min-h-[368px] max-[600px]:min-h-[280px] rounded-2xl overflow-hidden
       bg-slate-300/70
       shadow-sm"
     >
-      <div className="relative z-10 flex flex-col h-full p-4">
+      <div className="relative z-10 flex flex-col h-full p-4 max-[600px]:p-2">
         {/* 날짜 선택기 */}
         <div
           onClick={handleDivClick}
           className="flex items-center justify-center gap-2 rounded-xl 
           bg-gradient-to-r from-slate-600 to-slate-700
           hover:from-slate-700 hover:to-slate-800
-          border border-slate-500 px-3 py-2 w-full cursor-pointer
+          border border-slate-500 px-3 py-2 max-[600px]:px-2 max-[600px]:py-1.5 w-full cursor-pointer
           transition-all duration-200 hover:shadow-xl
           bg-opacity-90"
         >
           <CalendarIcon />
-          <span className="text-sm text-white font-semibold">{displayedDate}</span>
+          <span className="text-sm max-[600px]:text-xs text-white font-semibold">{displayedDate}</span>
           <input
             ref={dateInputRef}
             type="date"
@@ -80,13 +80,13 @@ export const CharacterCard = ({ type, direction, characterImageUrl, nickname, re
         </div>
 
         {/* 캐릭터 이미지 컨테이너 */}
-        <div className="flex-1 flex flex-col items-center justify-center mt-4 pb-4 relative">
+        <div className="flex-1 flex flex-col items-center justify-center mt-4 max-[600px]:mt-2 pb-4 max-[600px]:pb-2 relative">
           {/* 이미지 배경 효과 */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/70 to-transparent rounded-xl" />
-          <div className="flex relative z-10 p-2 rounded-xl">
+          <div className="flex relative z-10 p-2 rounded-xl max-[600px]:origin-center">
             {!characterImageUrl && (
               <Image
-                className="flex max-[600px]:w-[200px] mt-20 mb-10"
+                className="flex mt-20 mb-10 max-[600px]:mt-10 max-[600px]:mb-5"
                 style={{
                   imageRendering: "pixelated",
                   ...(direction === "left" ? { transform: "scale(-1, 1)" } : {}),
@@ -115,8 +115,8 @@ export const CharacterCard = ({ type, direction, characterImageUrl, nickname, re
           </div>
           {nickname && (
             <div
-              className="flex justify-center rounded-xl p-2 
-              text-sm font-bold w-[200px] text-white bg-black/30"
+              className="flex justify-center rounded-xl p-2 max-[600px]:p-1.5
+              text-sm max-[600px]:text-xs font-bold w-[200px] max-[600px]:w-full max-[600px]:max-w-[140px] text-white bg-black/30 truncate"
             >
               {nickname}
             </div>

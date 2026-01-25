@@ -15,7 +15,8 @@ export const useNickname = ({ isEnableErrorModal = true }: { isEnableErrorModal?
         confirmCallback: () => router.push("/"),
       });
     }
+    return null;
   }
 
-  return nickname as string | null;
+  return nickname as string;
 };

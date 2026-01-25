@@ -7,10 +7,8 @@ import { useCharacterPowerStore } from "@/stores/characterPower";
 import { useShallow } from "zustand/shallow";
 import { Spinner } from "../svg/Spinner";
 import { ContainerWrapper } from "./ContainerWrapper";
-import { useNickname } from "@/hooks/useNickname";
 
-const ChartContainer = () => {
-  const nickname = useNickname();
+const ChartContainer = ({ nickname }: { nickname: string }) => {
   const { fetchStatus, characterPower, fetchCharacterPower } = useCharacterPowerStore(
     useShallow((state) => ({
       fetchStatus: state.fetchStatus,

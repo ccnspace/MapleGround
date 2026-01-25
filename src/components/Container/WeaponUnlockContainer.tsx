@@ -14,7 +14,7 @@ type WeaponUnlockTab = "genesis" | "destiny";
 
 export const WeaponUnlockContainer = () => {
   const [tab, setTab] = useState<WeaponUnlockTab>("genesis");
-  const nickname = useNickname();
+  const nickname = useNickname() ?? "";
   const { set: setGenesisLocalStorage, value: genesisUnlock, remove: removeGenesisLocalStorage } = useLocalStorage("genesisUnlock");
   const { set: setDestinyLocalStorage, value: destinyUnlock, remove: removeDestinyLocalStorage } = useLocalStorage("destinyUnlock");
   const [genesisData, setGenesisData] = useState<GenesisUnlockData | null>(null);

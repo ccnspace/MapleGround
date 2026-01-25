@@ -13,6 +13,7 @@ import { SetEffectContainer } from "./SetEffectContainer";
 import { ContainerWrapper } from "./ContainerWrapper";
 import { UnionContainer } from "./UnionContainer";
 import { LoadingContainer } from "./LoadingContainer";
+import { useNickname } from "@/hooks/useNickname";
 
 const ChartContainer = dynamic(() => import("./ChartContainer"), {
   ssr: false,
@@ -41,20 +42,21 @@ const RightSideGridContainer = memo(() => (
 
 RightSideGridContainer.displayName = "RightSideGridContainer";
 
-const BottomGridContainer = memo(() => (
+const BottomGridContainer = memo(({ nickname }: { nickname: string }) => (
   <div className="col-span-2">
-    <ChartContainer />
+    <ChartContainer nickname={nickname} />
   </div>
 ));
 
 BottomGridContainer.displayName = "BottomGridContainer";
 
 export const MainContainer = () => {
+  const nickname = useNickname();
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
   const cubeTargetItem = useCubeStore((state) => state.targetItem);
   const starforceTargetItem = useStarforceStore((state) => state.targetItem);
 
-  if (fetchStatus !== "success") {
+  if (fetchStatus !== "success" || !nickname) {
     return <LoadingContainer />;
   }
 
@@ -63,7 +65,7 @@ export const MainContainer = () => {
       <StatContainer />
       <EquipContainer />
       <RightSideGridContainer />
-      <BottomGridContainer />
+      <BottomGridContainer nickname={nickname} />
       {cubeTargetItem && <CubeContainer />}
       {starforceTargetItem && <StarforceContainer targetItem={starforceTargetItem} />}
     </div>

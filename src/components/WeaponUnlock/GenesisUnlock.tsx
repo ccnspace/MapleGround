@@ -30,7 +30,7 @@ const DEFAULT_MISSION_CONFIG = missionList.map((mission) => ({
 }));
 
 export const GenesisUnlock = ({ onSave }: { onSave: (params: GenesisUnlockData) => void }) => {
-  const nickname = useNickname();
+  const nickname = useNickname() ?? "";
   const { value: genesisUnlockFromLocalStorage } = useLocalStorage("genesisUnlock");
   const genesisUnlockInfo = genesisUnlockFromLocalStorage?.[nickname];
 

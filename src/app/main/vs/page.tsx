@@ -25,7 +25,7 @@ export default function Page() {
     };
   }, [nickname, fetchCharacterAttributes]);
 
-  if (fetchStatus !== "success") {
+  if (fetchStatus !== "success" || !nickname) {
     return <LoadingContainer />;
   }
 

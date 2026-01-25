@@ -18,7 +18,7 @@ export const EquipActionContext = createContext((_name: string) => {});
 
 export const EquipContainer = () => {
   const [selectedEquipName, setSelectedEquipName] = useState("");
-  const nickname = useNickname();
+  const nickname = useNickname() ?? "";
   const defaultPresetNo = useCharacterStore((state) => state.characterAttributes?.[nickname]?.normalEquip?.preset_no);
   const [preset, setPreset] = useState(defaultPresetNo ?? 0);
   const { characterInfo } = useCharacterInfo(preset);

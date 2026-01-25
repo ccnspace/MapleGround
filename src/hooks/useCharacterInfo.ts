@@ -26,7 +26,7 @@ export type CharacterInfo = {
 
 /** 현재 검색한 캐릭터의 정보를 반환하는 hook */
 export const useCharacterInfo = (preset?: number) => {
-  const nickname = useNickname();
+  const nickname = useNickname() ?? "";
   const { characterAttributes, basic, normalEquip, cashEquip, symbolEquip, androidEquip, stat, ability, setEffect } = useCharacterStore(
     useShallow((state) => ({
       characterAttributes: state.characterAttributes?.[nickname],

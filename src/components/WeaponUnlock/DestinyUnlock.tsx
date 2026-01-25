@@ -28,7 +28,7 @@ const DEFAULT_MISSION_CONFIG = missionList.map((mission) => ({
 }));
 
 export const DestinyUnlock = ({ onSave }: { onSave: (params: DestinyUnlockData) => void }) => {
-  const nickname = useNickname();
+  const nickname = useNickname() ?? "";
   const { value: destinyUnlockFromLocalStorage } = useLocalStorage("destinyUnlock");
   const destinyUnlockInfo = destinyUnlockFromLocalStorage?.[nickname];
 

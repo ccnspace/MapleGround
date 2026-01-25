@@ -1,4 +1,3 @@
-import { ContainerWrapper } from "./ContainerWrapper";
 import { useState } from "react";
 import { GenesisUnlock } from "../WeaponUnlock/GenesisUnlock";
 import { DestinyUnlock } from "../WeaponUnlock/DestinyUnlock";
@@ -14,7 +13,7 @@ type WeaponUnlockTab = "genesis" | "destiny";
 
 export const WeaponUnlockContainer = () => {
   const [tab, setTab] = useState<WeaponUnlockTab>("genesis");
-  const nickname = useNickname();
+  const nickname = useNickname() ?? "";
   const { set: setGenesisLocalStorage, value: genesisUnlock, remove: removeGenesisLocalStorage } = useLocalStorage("genesisUnlock");
   const { set: setDestinyLocalStorage, value: destinyUnlock, remove: removeDestinyLocalStorage } = useLocalStorage("destinyUnlock");
   const [genesisData, setGenesisData] = useState<GenesisUnlockData | null>(null);
@@ -83,8 +82,8 @@ export const WeaponUnlockContainer = () => {
   return (
     <div className="flex items-center justify-center p-3 rounded-lg">
       <div
-        className="flex flex-col items-center bg-slate-100 dark:bg-slate-600/50
-      max-[600px]:p-1 max-[600px]:pt-2 py-2 px-3 rounded-lg w-fit"
+        className="flex flex-col items-center bg-slate-100 dark:bg-color-950/70
+      max-[600px]:p-1 max-[600px]:pt-2 py-3 px-3 rounded-lg w-fit"
       >
         <div className="flex mb-2 justify-between w-full">
           <p

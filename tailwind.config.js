@@ -2,7 +2,7 @@
 module.exports = {
   content: ["./src/pages/**/*.{js,ts,jsx,tsx,mdx}", "./src/components/**/*.{js,ts,jsx,tsx,mdx}", "./src/app/**/*.{js,ts,jsx,tsx,mdx}"],
   darkMode: "class",
-  safelist: ["text-teal-300", "text-indigo-300"],
+  safelist: ["text-teal-300", "text-indigo-300", "from-blue-500", "to-indigo-500"],
   theme: {
     extend: {
       fontFamily: {
@@ -10,6 +10,17 @@ module.exports = {
       },
       colors: {
         coreNavy: "#131625",
+        "color-50": "#F1F1F3",
+        "color-100": "#D8D8DF",
+        "color-200": "#BFBFCA",
+        "color-300": "#A6A6B5",
+        "color-400": "#8D8DA0",
+        "color-500": "#74748B",
+        "color-600": "#5F5F72",
+        "color-700": "#4A4A59",
+        "color-800": "#353540",
+        "color-900": "#1E1E24",
+        "color-950": "#0C0C0E",
       },
       keyframes: {
         starBlink: {
@@ -41,4 +52,4 @@ module.exports = {
     },
   },
   plugins: [],
-};
+}

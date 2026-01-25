@@ -26,7 +26,7 @@ export const DetailedComparisonItem = ({
   const scoreDisplay = variant === "positive" ? `+${score.toFixed(1)}` : score.toFixed(1);
 
   return (
-    <div className="group relative bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 border border-slate-100 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600/50 transition-all duration-300">
+    <div className="group relative bg-white dark:bg-slate-700/50 rounded-xl p-4 hover:bg-slate-100 dark:hover:bg-slate-600/50 transition-all duration-300">
       <div className="flex items-center gap-4">
         {/* 순위 */}
         <div className={`flex-shrink-0 w-8 h-8 bg-gradient-to-br ${gradientClass} rounded-full flex items-center justify-center`}>

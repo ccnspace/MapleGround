@@ -114,7 +114,7 @@ export const ProfileWrapper = () => {
   const { fetchStatus, characterAttributes, resetCharacterData } = useCharacterStore(
     useShallow((state) => ({
       fetchStatus: state.fetchStatus,
-      characterAttributes: state.characterAttributes?.[nickname],
+      characterAttributes: state.characterAttributes?.[nickname ?? ""],
       resetCharacterData: state.resetCharacterData,
     }))
   );
@@ -125,7 +125,7 @@ export const ProfileWrapper = () => {
 
   const { value: bookmark, set: setBookmark } = useLocalStorage("bookmark");
 
-  const hasBookmarked = bookmark && !!bookmark.includes(nickname);
+  const hasBookmarked = bookmark && !!bookmark.includes(nickname ?? "");
   const bookmarkLabel = hasBookmarked ? "★ 북마크중" : "★ 북마크하기";
 
   const handleChangeBookmark = () => {
@@ -163,7 +163,7 @@ export const ProfileWrapper = () => {
         <div className="absolute left-0 top-0 px-3 pt-1.5 hover:cursor-pointer" onClick={handleChangeBookmark}>
           <span
             className={`bg-slate-600 hover:bg-slate-500 rounded-md px-1.5 py-1
-            text-sm ${hasBookmarked ? "text-yellow-300" : "text-slate-400"}`}
+            text-xs ${hasBookmarked ? "text-yellow-300" : "text-slate-300"}`}
           >
             {bookmarkLabel}
           </span>

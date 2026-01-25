@@ -11,6 +11,7 @@ import MainLogo from "@/images/mainLogo.png";
 import { openModal } from "@/utils/openModal";
 import { useNoticeModalStore } from "@/stores/noticeModal";
 import { NewLabel } from "@/components/NewLabel";
+import MainBackgroundImg from "@/images/main_background.png";
 
 export default function Home() {
   const [nickname, setNickname] = useState("");
@@ -50,6 +51,12 @@ export default function Home() {
 
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center p-4">
+      {/* 공통 배경 이미지 */}
+      <div className="fixed inset-0 w-full h-full -z-50">
+        <Image src={MainBackgroundImg} alt="background" fill priority className="object-cover" unoptimized />
+        {/* 배경 오버레이 */}
+        <div className="absolute inset-0 bg-black/10 dark:bg-black/50" />
+      </div>
       <div className="flex flex-col items-center gap-3">
         {/* 검색 카드 */}
         <div
@@ -123,7 +130,7 @@ export default function Home() {
         </div>
         <div className="relative flex items-center">
           <button
-            className="flex items-center gap-1 text-xs font-bold text-white bg-slate-800/30 hover:bg-slate-800/40
+            className="flex items-center gap-1 text-xs font-bold text-white bg-slate-800/60 hover:bg-slate-800/80
           p-1.5 rounded-md"
             onClick={handleNoticeButtonClick}
           >

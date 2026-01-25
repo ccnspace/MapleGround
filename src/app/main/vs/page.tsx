@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { PlainBox } from "@/components/PlainBox";
 import { ReportContainer } from "./ReportContainer";
 import { useCharacterStore } from "@/stores/character";
@@ -9,7 +10,7 @@ import { CommonWrapper } from "@/components/Container/CommonWrapper";
 import { CommonTitle } from "@/components/Container/CommonTitle";
 import { LoadingContainer } from "@/components/Container/LoadingContainer";
 
-export default function Page() {
+const VsPageContent = () => {
   const nickname = useNickname();
   const fetchCharacterAttributes = useCharacterStore((state) => state.fetchCharacterAttributes);
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
@@ -25,7 +26,7 @@ export default function Page() {
     };
   }, [nickname, fetchCharacterAttributes]);
 
-  if (fetchStatus !== "success") {
+  if (fetchStatus !== "success" || !nickname) {
     return <LoadingContainer />;
   }
 
@@ -35,18 +36,22 @@ export default function Page() {
         <div className="flex flex-col gap-4">
           <CommonTitle title="⚔️ 과거 vs 현재 대결" />
           <PlainBox>
-            <div className="flex flex-col gap-2 w-full">
-              <p className="-mt-1 font-medium text-sm max-[600px]:text-xs text-white">
-                {"📢 첫 번째 캐릭터를 두 번째 캐릭터보다 과거로 설정해 주세요."}
-              </p>
-              <p className="-mt-1 font-medium text-sm max-[600px]:text-xs text-white">
-                {"📢 반지는 정확한 1:1 비교가 어려울 수 있습니다."}
-              </p>
+            <div className="flex flex-col gap-1 w-full">
+              <p className="font-medium text-sm max-[600px]:text-xs">{"📢 첫 번째 캐릭터를 두 번째 캐릭터보다 과거로 설정해 주세요."}</p>
+              <p className="font-medium text-sm max-[600px]:text-xs">{"📢 반지는 정확한 1:1 비교가 어려울 수 있습니다."}</p>
             </div>
           </PlainBox>
         </div>
         <ReportContainer nickname={nickname} />
       </div>
     </CommonWrapper>
+  );
+};
+
+export default function Page() {
+  return (
+    <Suspense fallback={<LoadingContainer />}>
+      <VsPageContent />
+    </Suspense>
   );
 }

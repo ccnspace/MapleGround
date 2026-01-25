@@ -157,7 +157,7 @@ const PetBox = ({
 };
 
 export const PetEquipContainer = () => {
-  const nickname = useNickname();
+  const nickname = useNickname() ?? "";
   const petEquip = useCharacterStore((state) => state.characterAttributes?.[nickname]?.petEquip);
   // const [petInfos, setPetInfos] = useState<PetInfo[]>([]);
   const [selectedPetIndex, setSelectedPetIndex] = useState<string>("");

@@ -75,7 +75,7 @@ export const EquipInventory = () => {
       {hasSymbol ? (
         <>
           <div className="flex flex-col mt-3 items-start gap-2">
-            <div className="grid grid-cols-6 grid-flow-row gap-1.5">
+            <div className="grid grid-cols-6 grid-flow-row gap-1.5 max-[600px]:grid-cols-5">
               {Object.values(arcaneSymbol)?.map((item) => (
                 <SymbolEquipIcon
                   key={item.symbol_name}
@@ -86,7 +86,7 @@ export const EquipInventory = () => {
                 />
               ))}
             </div>
-            <div className="grid grid-cols-6 grid-flow-row gap-1.5">
+            <div className="grid grid-cols-6 grid-flow-row gap-1.5 max-[600px]:grid-cols-5">
               {Object.values(authenticSymbol)?.map((item) => (
                 <SymbolEquipIcon
                   key={item.symbol_name}

@@ -7,7 +7,7 @@ interface SimpleComparisonItemProps {
 
 export const SimpleComparisonItem = ({ name, firstPerson, secondPerson, isWinner }: SimpleComparisonItemProps) => {
   return (
-    <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-2.5 border border-slate-100 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600/50 transition-all duration-300">
+    <div className="bg-white dark:bg-slate-700/50 rounded-lg p-2.5 hover:bg-slate-100 dark:hover:bg-slate-600/50 transition-all duration-300">
       <div className="grid grid-cols-3 items-center gap-2">
         {/* 왼쪽 수치 */}
         <div className="flex flex-col items-center">
@@ -26,16 +26,8 @@ export const SimpleComparisonItem = ({ name, firstPerson, secondPerson, isWinner
           <div className="text-xs font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">{name}</div>
 
           {/* WIN 라벨 */}
-          {isWinner === "first" && (
-            <div className="px-1.5 py-0.5 bg-gradient-to-r from-rose-400 to-pink-500 text-white text-[10px] font-medium rounded-full">
-              과거 WIN
-            </div>
-          )}
-          {isWinner === "second" && (
-            <div className="px-1.5 py-0.5 bg-gradient-to-r from-emerald-400 to-teal-500 text-white text-[10px] font-medium rounded-full">
-              현재 WIN
-            </div>
-          )}
+          {isWinner === "first" && <div className="px-1.5 py-0.5 text-rose-400 text-xs font-bold">과거 WIN</div>}
+          {isWinner === "second" && <div className="px-1.5 py-0.5 text-sky-500 text-xs font-bold">현재 WIN</div>}
         </div>
 
         {/* 오른쪽 수치 */}

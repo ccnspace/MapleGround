@@ -6,7 +6,7 @@ import Image from "next/image";
 import { EquipDetailCard } from "../EquiqDetailCard";
 
 const commonEquipStyle = `equip_wrapper flex hover:bg-slate-400/60 dark:hover:bg-white/40 relative justify-center
-  items-center bg-slate-300 dark:bg-[#4f515a] w-16 h-16 rounded-md cursor-pointer`;
+  items-center bg-slate-300 dark:bg-[#4f515a] w-16 h-16 max-[600px]:w-12 max-[600px]:h-12 rounded-md cursor-pointer`;
 
 // TODO: EquipDetailCard에 공통화
 const commonDetailStyle = { position: "absolute", zIndex: 1000, top: 10, left: 10 } as CSSProperties;

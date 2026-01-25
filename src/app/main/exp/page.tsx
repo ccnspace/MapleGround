@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { CommonWrapper } from "@/components/Container/CommonWrapper";
 import { CommonTitle } from "@/components/Container/CommonTitle";
 import { LoadingContainer } from "@/components/Container/LoadingContainer";
+import { PlainBox } from "@/components/PlainBox";
 
 const ExpPageContent = () => {
   const nickname = useNickname({ isEnableErrorModal: false });
@@ -39,6 +40,15 @@ const ExpPageContent = () => {
           <CommonTitle title="📊 경험치 효율 계산">
             <span className="px-2 py-0.5 text-xs font-bold text-white bg-red-500 rounded-full">NEW (25년 12월 업데이트 반영)</span>
           </CommonTitle>
+          <PlainBox>
+            <div className="flex flex-col gap-1">
+              <p className="font-medium text-sm max-[600px]:text-xs">
+                {"📢 "}
+                <span className="font-bold">현재 입력된 캐릭터 </span>
+                {"기준으로 계산합니다."}
+              </p>
+            </div>
+          </PlainBox>
         </div>
         <ExpContentContainer nickname={nickname} />
       </div>

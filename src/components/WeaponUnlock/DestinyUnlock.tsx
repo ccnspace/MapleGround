@@ -87,29 +87,29 @@ export const DestinyUnlock = ({ onSave }: { onSave: (params: DestinyUnlockData) 
   }, [startDate, baseTrace, missionStep, configs, missionConfigs]);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 w-full">
       <div
         className="flex sticky top-0 justify-between items-center
         border-2 border-sky-400
-      bg-slate-300/95 dark:bg-black/70 rounded-lg pt-2 pb-2 px-3 z-10"
+        bg-slate-300/95 dark:bg-black/70 rounded-lg pt-2 pb-2 px-3 max-[600px]:px-2 z-10"
       >
-        <span className="text-md font-bold text-gray-700 dark:text-gray-200">🗓️ 예상 해방 날짜</span>
-        <span className="font-bold text-slate-900 dark:text-white text-base">{liberationDate}</span>
+        <span className="text-md max-[600px]:text-sm font-bold text-gray-700 dark:text-gray-200">🗓️ 예상 해방 날짜</span>
+        <span className="font-bold text-slate-900 dark:text-white text-base max-[600px]:text-sm">{liberationDate}</span>
       </div>
       <div className="flex flex-col gap-2">
         <div className="flex flex-col gap-2">
-          <p className="border-l-2 border-slate-500 dark:border-slate-200 pl-2 text-sm font-bold text-gray-700 dark:text-gray-300">
+          <p className="border-l-2 border-slate-500 dark:border-slate-200 pl-2 text-sm max-[600px]:text-xs font-bold text-gray-700 dark:text-gray-300">
             주간 클리어 보스
           </p>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="flex flex-col items-center gap-2">
+          <div className="grid grid-cols-3 max-[600px]:grid-cols-1 gap-4 max-[600px]:gap-2">
+            <div className="flex flex-col items-center max-[600px]:items-start gap-2 max-[600px]:gap-1">
               <label className="block text-xs font-bold text-gray-700 dark:text-gray-300">현재 미션 단계</label>
               <select
                 value={missionStep}
                 onChange={(e) => setMissionStep(Number(e.target.value))}
-                className="block w-full h-[24px] px-1 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 
-                text-gray-900 dark:text-gray-100 shadow-sm 
-                focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400 sm:text-sm"
+                className="block w-full h-[28px] max-[600px]:h-[32px] px-1 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 
+                text-gray-900 dark:text-gray-100 shadow-sm text-sm max-[600px]:text-xs
+                focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400"
               >
                 {missionList.map((mission, idx) => (
                   <option key={mission.name} value={idx + 1}>
@@ -119,19 +119,19 @@ export const DestinyUnlock = ({ onSave }: { onSave: (params: DestinyUnlockData) 
               </select>
             </div>
 
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center max-[600px]:items-start gap-2 max-[600px]:gap-1">
               <label className="block text-xs font-bold text-gray-700 dark:text-gray-300">시작 날짜</label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="block w-full h-[24px] px-1 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 
-                text-gray-900 dark:text-gray-100 shadow-sm 
-                focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400 sm:text-sm"
+                className="block w-full h-[28px] max-[600px]:h-[32px] px-1 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 
+                text-gray-900 dark:text-gray-100 shadow-sm text-sm max-[600px]:text-xs
+                focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400"
               />
             </div>
 
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center max-[600px]:items-start gap-2 max-[600px]:gap-1">
               <label className="block text-xs font-bold text-gray-700 dark:text-gray-300">보유 대적자의 결의</label>
               <input
                 type="text"
@@ -143,9 +143,9 @@ export const DestinyUnlock = ({ onSave }: { onSave: (params: DestinyUnlockData) 
                     setBaseTrace(numValue);
                   }
                 }}
-                className="block w-full h-[24px] px-1 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 
-                text-gray-900 dark:text-gray-100 shadow-sm 
-                focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400 sm:text-sm"
+                className="block w-full h-[28px] max-[600px]:h-[32px] px-1 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 
+                text-gray-900 dark:text-gray-100 shadow-sm text-sm max-[600px]:text-xs
+                focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                 placeholder="0.00"
               />
             </div>
@@ -154,7 +154,8 @@ export const DestinyUnlock = ({ onSave }: { onSave: (params: DestinyUnlockData) 
       </div>
 
       <div className="flex flex-col gap-2">
-        <div className="flex font-bold items-center gap-2 px-2 text-[11px] text-gray-500 dark:text-gray-400">
+        {/* 보스 선택 헤더 - 모바일에서 숨김 */}
+        <div className="flex font-bold items-center gap-2 px-2 text-[11px] text-gray-500 dark:text-gray-400 max-[600px]:hidden">
           <input
             type="checkbox"
             checked={isAllSelected}
@@ -171,15 +172,29 @@ export const DestinyUnlock = ({ onSave }: { onSave: (params: DestinyUnlockData) 
           <div className="ml-auto">획득량</div>
         </div>
 
-        {bossList.map((boss) => {
-          const config = configs.find((c) => c.name === boss.name)!;
-          return <DestinyBossSelector key={boss.name} boss={boss} config={config} onChange={updateConfig} />;
-        })}
-
-        <p className="mt-3 border-l-2 border-slate-500 dark:border-slate-200 pl-2 text-sm font-bold text-gray-700 dark:text-gray-300">
+        {/* 모바일용 전체 선택 */}
+        <div className="hidden max-[600px]:flex items-center gap-2 px-2 text-xs text-gray-500 dark:text-gray-400">
+          <input
+            type="checkbox"
+            checked={isAllSelected}
+            onChange={(e) => toggleAllBosses(e.target.checked)}
+            className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 rounded 
+              border-gray-300 dark:border-gray-600 
+              focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-1
+              bg-white dark:bg-gray-700"
+          />
+          <span className="font-bold">전체 선택</span>
+        </div>
+        <div className="overflow-y-auto max-h-[240px] flex gap-2 flex-col">
+          {bossList.map((boss) => {
+            const config = configs.find((c) => c.name === boss.name)!;
+            return <DestinyBossSelector key={boss.name} boss={boss} config={config} onChange={updateConfig} />;
+          })}
+        </div>
+        <p className="mt-3 border-l-2 border-slate-500 dark:border-slate-200 pl-2 text-sm max-[600px]:text-xs font-bold text-gray-700 dark:text-gray-300">
           미션 클리어 당시 파티 인원
         </p>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 max-[600px]:grid-cols-1 gap-2">
           {missionList.map((mission) => {
             const missionConfig = missionConfigs.find((c) => c.name === mission.name)!;
             return (

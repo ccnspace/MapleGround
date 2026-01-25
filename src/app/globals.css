@@ -114,7 +114,7 @@ abbr:where([title]) {
   .root_container {
     display: flex;
     flex-direction: column;
-    padding: 1em;
+    padding: 0.6em;
   }
 }
 
@@ -149,16 +149,6 @@ abbr:where([title]) {
 
   .cube_guide {
     display: none;
-  }
-}
-
-@media (max-width: 600px) {
-  .sidebar {
-    border: none;
-    width: 100%;
-  }
-  .sidebar .profile {
-    margin: 0.36em;
   }
 }
 

@@ -153,33 +153,29 @@ export const ProfileWrapper = () => {
   };
 
   return (
-    <>
-      <div
-        className={`profile flex flex-col gap-3 items-center justify-center
-     font-medium rounded-lg relative
-      mx-5 mt-6 mb-4 px-3 pt-6 pb-1 h-72 
-     ${bgColor}`}
-      >
-        <div className="absolute left-0 top-0 px-3 pt-1.5 hover:cursor-pointer" onClick={handleChangeBookmark}>
-          <span
-            className={`bg-slate-600 hover:bg-slate-500 rounded-md px-1.5 py-1
+    <div
+      className={`profile flex flex-col gap-3 items-center justify-center
+     font-medium rounded-lg relative mx-5 mt-6 mb-2 px-3 pt-6 pb-3 max-h-[360px] ${bgColor}`}
+    >
+      <div className="absolute left-0 top-0 px-3 pt-1.5 hover:cursor-pointer" onClick={handleChangeBookmark}>
+        <span
+          className={`bg-slate-600 hover:bg-slate-500 rounded-md px-1.5 py-1
             text-xs ${hasBookmarked ? "text-yellow-300" : "text-slate-300"}`}
-          >
-            {bookmarkLabel}
-          </span>
+        >
+          {bookmarkLabel}
+        </span>
+      </div>
+      {isSearchError && <p className="text-white text-base">검색결과가 없습니다.</p>}
+      {hasProfile && <Profile characterAttributes={characterAttributes} />}
+      {(hasProfile || isSearchError) && (
+        <div className="absolute right-0 top-0 px-3 pt-3 hover:cursor-pointer" onClick={resetProfile}>
+          <BackIcon />
         </div>
-        {isSearchError && <p className="text-white text-base">검색결과가 없습니다.</p>}
-        {hasProfile && <Profile characterAttributes={characterAttributes} />}
-        {(hasProfile || isSearchError) && (
-          <div className="absolute right-0 top-0 px-3 pt-3 hover:cursor-pointer" onClick={resetProfile}>
-            <BackIcon />
-          </div>
-        )}
+      )}
+      <div className="flex backdrop-blur-sm flex-col gap-1 p-1 mx-4 max-[600px]:hidden">
+        <p className="text-white/80 text-xs font-medium">{`ⓘ 최근 데이터 조회 시간에서 30분 경과한 경우 데이터가 자동 갱신됩니다.`}</p>
+        <p className="text-white/80 text-xs font-medium">{`ⓘ [전체 데이터 갱신] 버튼을 누르면 모든 데이터를 현재 시각 기준으로 갱신합니다.`}</p>
       </div>
-      <div className="flex backdrop-blur-sm flex-col gap-1 bg-white/30 dark:bg-black/30 rounded-lg p-3 mx-5">
-        <p className="text-black dark:text-white text-xs font-medium">{`ⓘ 최근 데이터 조회 시간보다 30분 이상 지난 경우 데이터가 자동 갱신됩니다.`}</p>
-        <p className="text-black dark:text-white text-xs font-medium">{`ⓘ [전체 데이터 갱신] 버튼을 누르면 모든 데이터를 현재 시각 기준으로 갱신합니다.`}</p>
-      </div>
-    </>
+    </div>
   );
 };

@@ -40,10 +40,22 @@ export const bossList: Boss[] = [
     availableDifficulties: ["노멀", "카오스", "익스트림"],
   },
   {
+    name: "최초의 대적자",
+    type: "weekly",
+    rewards: { 노멀: 20, 하드: 120, 익스트림: 500 },
+    availableDifficulties: ["노멀", "하드", "익스트림"],
+  },
+  {
     name: "사도 카링",
     type: "weekly",
     rewards: { 노멀: 20, 하드: 160, 익스트림: 1200 },
     availableDifficulties: ["노멀", "하드", "익스트림"],
+  },
+  {
+    name: "찬란한 흉성",
+    type: "weekly",
+    rewards: { 노멀: 20, 하드: 380 },
+    availableDifficulties: ["노멀", "하드"],
   },
   { name: "림보", type: "weekly", rewards: { 노멀: 120, 하드: 360 }, availableDifficulties: ["노멀", "하드"] },
   { name: "발드릭스", type: "weekly", rewards: { 노멀: 150, 하드: 450 }, availableDifficulties: ["노멀", "하드"] },

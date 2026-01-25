@@ -80,57 +80,58 @@ export const WeaponUnlockContainer = () => {
   };
 
   return (
-    <div className="flex items-center justify-center p-3 rounded-lg">
+    <div className="flex items-center justify-center p-3 max-[600px]:p-0 rounded-lg w-full">
       <div
         className="flex flex-col items-center bg-slate-100 dark:bg-color-950/70
-      max-[600px]:p-1 max-[600px]:pt-2 py-3 px-3 rounded-lg w-fit"
+        max-[600px]:p-2 max-[600px]:pt-2 py-5 px-5 rounded-lg w-full max-w-[800px]"
       >
-        <div className="flex mb-2 justify-between w-full">
-          <p
+        {/* 버튼 영역 - 모바일에서 세로 배치 */}
+        <div className="flex mb-2 justify-between w-full max-[600px]:flex-col max-[600px]:gap-2">
+          <div
             className="flex font-bold mb-2 pb-0.5 pt-0.5 gap-2
-    text-gray-900 dark:text-gray-100
-    max-[600px]:text-xs text-sm items-center"
+              text-gray-900 dark:text-gray-100
+              max-[600px]:text-xs text-sm items-center max-[600px]:justify-center"
           >
             <button
               title="저장"
               onClick={saveConfig}
-              className="p-1 pr-2 rounded-md bg-slate-200 dark:bg-gray-700 hover:bg-slate-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+              className="p-1 pr-2 max-[600px]:px-3 max-[600px]:py-1.5 rounded-md bg-slate-200 dark:bg-gray-700 hover:bg-slate-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
             >
               💾 저장
             </button>
             <button
               title="삭제"
               onClick={resetConfig}
-              className="p-1 pr-2 rounded-md bg-slate-200 dark:bg-gray-700 hover:bg-slate-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
+              className="p-1 pr-2 max-[600px]:px-3 max-[600px]:py-1.5 rounded-md bg-slate-200 dark:bg-gray-700 hover:bg-slate-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
             >
               ⛔ 삭제
             </button>
-          </p>
-          <div className="flex items-center mb-2 gap-2">
+          </div>
+          <div className="flex items-center mb-2 gap-2 max-[600px]:justify-center">
             <button
-              className={`px-2 py-1.5 text-xs rounded-md max-[600px]:px-1 ${
+              className={`px-2 py-1.5 text-xs rounded-md max-[600px]:flex-1 ${
                 tab === "genesis"
                   ? "bg-gradient-to-b from-rose-900/90 to-rose-500/70 hover:bg-rose-900/90 font-bold text-white"
                   : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
               }`}
               onClick={() => setTab("genesis")}
             >
-              <p className="flex items-center gap-1">
+              <p className="flex items-center justify-center gap-1">
                 <Image src={genesisIcon} alt="제네시스" width={24} height={24} unoptimized style={{ imageRendering: "pixelated" }} />
-                제네시스
+                <span className="max-[400px]:hidden">제네시스</span>
               </p>
             </button>
             <button
-              className={`px-2 py-1.5 text-xs rounded-md max-[600px]:px-1 ${
+              className={`px-2 py-1.5 text-xs rounded-md max-[600px]:flex-1 ${
                 tab === "destiny"
                   ? "bg-gradient-to-b from-blue-900/90 to-sky-500/70 hover:bg-sky-900/90 font-bold text-white"
                   : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
               }`}
               onClick={() => setTab("destiny")}
             >
-              <p className="flex items-center gap-1">
+              <p className="flex items-center justify-center gap-1">
                 <Image src={destinyIcon} alt="데스티니" width={24} height={24} unoptimized style={{ imageRendering: "pixelated" }} />
-                데스티니
+                <span className="max-[400px]:hidden">데스티니</span>
               </p>
             </button>
           </div>

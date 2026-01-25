@@ -48,7 +48,7 @@ const LevelInput = ({ value, onChange, characterLevel }: { value: string; onChan
   };
 
   return (
-    <div className="flex items-center justify-center gap-3 p-4 border-b border-dashed border-color-200 dark:border-color-700">
+    <div className="flex items-center justify-center gap-3 p-4">
       <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">캐릭터 레벨</label>
       <input
         type="text"
@@ -133,15 +133,6 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
           </div>
         )}
 
-        {/* 현재 레벨 표시 */}
-        {currentLevel > 0 && (
-          <PlainBox>
-            <div className="flex items-center justify-center gap-2 text-sm font-bold text-gray-600 dark:text-gray-400">
-              현재 기준 레벨 <span className="text-lg text-sky-600 dark:text-sky-400">Lv.{currentLevel}</span>
-            </div>
-          </PlainBox>
-        )}
-
         <div className="flex flex-col">
           <div className="grid grid-cols-1 min-[600px]:grid-cols-2 gap-4 min-[600px]:px-[120px]">
             {/* Normal EXP Voucher Section */}
@@ -163,7 +154,7 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
                   </ExpDetailWrapper>
                   <ExpDetailWrapper>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">직접 입력</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">입력</span>
                       <input
                         type="text"
                         value={normalVoucherCount}
@@ -214,7 +205,7 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
                   </ExpDetailWrapper>
                   <ExpDetailWrapper>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">직접 입력</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">입력</span>
                       <input
                         type="text"
                         value={advancedVoucherCount}
@@ -258,7 +249,7 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
                   </ExpDetailWrapper>
                   <ExpDetailWrapper>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">직접 입력</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">입력</span>
                       <input
                         type="text"
                         value={vipRestCount}

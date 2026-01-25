@@ -20,7 +20,7 @@ const BookmarkSection = () => {
   }
 
   return (
-    <div className="mt-3 mx-5 p-2 rounded-lg bg-slate-100 dark:bg-black/30 max-h-60 overflow-y-auto">
+    <div className="mt-1 mx-5 p-3 rounded-lg bg-slate-100 dark:bg-black/30 max-h-60 overflow-y-auto">
       <div className="flex items-center gap-1 mb-1 px-1">
         <span className="text-sm font-semibold text-gray-700 dark:text-gray-400">즐겨찾기한 캐릭터</span>
         <span className="text-xs text-gray-400 dark:text-gray-500">({bookmarks.length})</span>

@@ -28,6 +28,9 @@ import {
 } from "@/constants/unionBlockShapes";
 import { generateOrientations, type Orientation, type SolverResult } from "@/utils/unionAutoPlace";
 
+const TIMEOUT_MS = 90_000;
+const TIMEOUT_MESSAGE = `⏱ 시간 초과 (${TIMEOUT_MS / 1000}s). 구역이나 블록 구성을 조금 바꿔 다시 시도해 주세요.`;
+
 const BLOCK_ICONS: Record<string, StaticImageData> = {
   전사: warriorIcon,
   마법사: magicianIcon,
@@ -535,7 +538,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
     worker.postMessage({
       paintedKeys: Array.from(paintedCells),
       classes,
-      timeoutMs: 90_000,
+      timeoutMs: TIMEOUT_MS,
       // 성공 조건: 어떤 배치에서든 중앙 2×2 에 적어도 하나의 블록 아이콘이 있어야 함
       requireCenterIcon: true,
     });
@@ -1422,9 +1425,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
                   </div>
                 )}
                 {solveStatus === "timeout" && (
-                  <div className="text-[13px] font-bold text-amber-600 dark:text-amber-400">
-                    ⏱ 시간 초과 (60s). 구역이나 블록 구성을 조금 바꿔 다시 시도해 주세요.
-                  </div>
+                  <div className="text-[13px] font-bold text-amber-600 dark:text-amber-400">{TIMEOUT_MESSAGE}</div>
                 )}
                 {solveStatus === "error" && (
                   <div className="text-[13px] font-bold text-red-600 dark:text-red-400">✕ 자동 배치 실행 중 오류가 발생했습니다.</div>

@@ -27,6 +27,7 @@ import {
   type BlockJobCategory,
 } from "@/constants/unionBlockShapes";
 import { generateOrientations, type Orientation, type SolverResult } from "@/utils/unionAutoPlace";
+import { openModal } from "@/utils/openModal";
 
 const TIMEOUT_MS = 90_000;
 const TIMEOUT_MESSAGE = `⏱ 시간 초과 (${TIMEOUT_MS / 1000}s). 구역이나 블록 구성을 조금 바꿔 다시 시도해 주세요.`;
@@ -446,8 +447,6 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
 
   const hasPaintedDisconnected = paintedDisconnectedCells.size > 0;
 
-  const canAutoPlace = paintedCells.size > 0 && hasPaintedCenter && !hasPaintedDisconnected;
-
   // ── 자동 배치 솔버 실행 상태 / Worker 관리 ──
   type SolveStatus = "idle" | "running" | "timeout" | "unsolvable" | "ok" | "error";
   const [solveStatus, setSolveStatus] = useState<SolveStatus>("idle");
@@ -455,6 +454,8 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
   const workerRef = useRef<Worker | null>(null);
   const solveStartRef = useRef<number>(0);
   const solveTickerRef = useRef<number | null>(null);
+
+  const canAutoPlace = paintedCells.size > 0 && hasPaintedCenter && !hasPaintedDisconnected;
 
   useEffect(() => {
     return () => {
@@ -500,6 +501,37 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
       classes.push({ key, count, orientations: generateOrientations(shape) });
     });
 
+    // Same-shape 병합: 서로 다른 (카테고리, 등급) 이지만 orientation 집합이 동일한 클래스를
+    // 하나로 묶어 count 를 합친다. 솔버 탐색 시 중복 슬롯 순열을 제거해 탐색 공간이 극적으로 줄어든다
+    // (예: 도적 SS + 하이브리드 SS 는 동일 L-shape → 6 배 감속).
+    // 병합 결과의 대표 key 는 첫 원본 classKey 를 쓰고, 각 원본 (key, count) 리스트를 별도 보관해
+    // 솔버 결과 수신 시 placements 를 원래 classKey 로 되돌려준다.
+    const fingerprint = (orientations: Orientation[]): string =>
+      orientations
+        .map((o) => o.cells.map((c) => `${c.dx},${c.dy}`).join(",") + "#" + o.iconCellIdx)
+        .sort()
+        .join("|");
+
+    type MergeGroup = { repKey: string; count: number; orientations: Orientation[]; originals: Array<{ key: string; count: number }> };
+    const mergeMap = new Map<string, MergeGroup>();
+    for (const c of classes) {
+      const fp = fingerprint(c.orientations);
+      const g = mergeMap.get(fp);
+      if (g) {
+        g.count += c.count;
+        g.originals.push({ key: c.key, count: c.count });
+      } else {
+        mergeMap.set(fp, { repKey: c.key, count: c.count, orientations: c.orientations, originals: [{ key: c.key, count: c.count }] });
+      }
+    }
+    const mergedClasses: Array<{ key: string; count: number; orientations: Orientation[] }> = [];
+    // repKey → originals 리스트 매핑 (결과 분배에 사용)
+    const mergeMeta = new Map<string, Array<{ key: string; count: number }>>();
+    mergeMap.forEach((g) => {
+      mergedClasses.push({ key: g.repKey, count: g.count, orientations: g.orientations });
+      mergeMeta.set(g.repKey, g.originals);
+    });
+
     setSolveStatus("running");
     setSolveElapsedMs(0);
     solveStartRef.current = Date.now();
@@ -518,9 +550,30 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
       }
       setSolveElapsedMs(Date.now() - solveStartRef.current);
       if (result.status === "timeout") setSolveStatus("timeout");
-      else if (result.status === "unsolvable") setSolveStatus("unsolvable");
-      else if (result.status === "ok") {
-        setAutoPlacements(result.placements);
+      else if (result.status === "unsolvable") {
+        setSolveStatus("unsolvable");
+        openModal({ message: "선택한 블록 구성으로는 정확히 채울 수 없습니다.\n색칠한 칸을 조금 바꿔 다시 시도해 주세요." });
+      } else if (result.status === "ok") {
+        // 병합 대표 key 로 반환된 placements 를 원본 classKey 로 분배한다.
+        // 같은 shape 클래스들은 시각적으로 구분 불가하므로 원본 (key, count) 순서대로 소진.
+        const perKeyCounter = new Map<string, number>();
+        const distributed = result.placements.map((p) => {
+          const originals = mergeMeta.get(p.classKey);
+          if (!originals || originals.length === 1) return p;
+          const used = perKeyCounter.get(p.classKey) ?? 0;
+          let cursor = used;
+          for (const o of originals) {
+            if (cursor < o.count) {
+              perKeyCounter.set(p.classKey, used + 1);
+              return { ...p, classKey: o.key };
+            }
+            cursor -= o.count;
+          }
+          // 폴백 (도달 불가): 마지막 원본
+          perKeyCounter.set(p.classKey, used + 1);
+          return { ...p, classKey: originals[originals.length - 1].key };
+        });
+        setAutoPlacements(distributed);
         setSolveStatus("ok");
       }
       worker.terminate();
@@ -537,7 +590,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
     };
     worker.postMessage({
       paintedKeys: Array.from(paintedCells),
-      classes,
+      classes: mergedClasses,
       timeoutMs: TIMEOUT_MS,
       // 성공 조건: 어떤 배치에서든 중앙 2×2 에 적어도 하나의 블록 아이콘이 있어야 함
       requireCenterIcon: true,
@@ -1065,7 +1118,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
               </p>
 
               {/* 그리드 컨트롤 (그룹 선택) */}
-              <div className="flex flex-wrap items-center gap-3 px-1 text-md">
+              <div className="flex flex-wrap items-center gap-3 px-1 py-1 text-md">
                 <p className="font-bold text-gray-500 dark:text-gray-400">그리드</p>
                 <label className="flex items-center gap-1.5 cursor-pointer select-none">
                   <input type="checkbox" checked={groupMode} onChange={(e) => setGroupMode(e.target.checked)} className="accent-sky-500" />
@@ -1098,8 +1151,8 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
                 {/* 규칙 경고 칩 — 이 행에 inline 으로 들어가 layout shift 방지. 끊어짐 우선. */}
                 {hasPaintedDisconnected && (
                   <span
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
-                      text-[11px] font-bold
+                    className="inline-flex items-center gap-1 px-2 rounded-full
+                      text-sm font-bold
                       bg-red-50 dark:bg-red-950/40
                       text-red-600 dark:text-red-300
                       border border-red-200 dark:border-red-800/60"
@@ -1111,8 +1164,8 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
                 )}
                 {paintedCells.size > 0 && !hasPaintedCenter && (
                   <span
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
-                      text-[11px] font-bold
+                    className="inline-flex items-center gap-1 px-2 rounded-full
+                      text-sm font-bold
                       bg-red-50 dark:bg-red-950/40
                       text-red-600 dark:text-red-300
                       border border-red-200 dark:border-red-800/60"
@@ -1287,6 +1340,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
                 </div>
                 <span className="ml-auto text-sm text-gray-500 dark:text-gray-400">
                   보유 총 칸 <span className="font-bold text-gray-800 dark:text-gray-100">{totalAvailableCells}</span>
+                  {solveStatus === "ok" && <span className="ml-2 tabular-nums">· 탐색 {(solveElapsedMs / 1000).toFixed(2)}초</span>}
                 </span>
               </div>
 
@@ -1330,22 +1384,23 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
                             const count = activeCounts.get(`${job}:${grade}`) ?? 0;
                             return (
                               <td key={grade} className="px-2 py-2 text-center">
-                                <select
+                                <input
+                                  type="number"
+                                  min={0}
                                   value={count}
                                   disabled={!useManual}
-                                  onChange={(e) => handleManualCountChange(job, grade, parseInt(e.target.value, 10))}
+                                  onChange={(e) => {
+                                    const raw = e.target.value;
+                                    const parsed = raw === "" ? 0 : parseInt(raw, 10);
+                                    if (Number.isNaN(parsed)) return;
+                                    handleManualCountChange(job, grade, Math.max(0, parsed));
+                                  }}
                                   className={`w-[56px] text-center rounded-md border text-[12px] font-semibold
                                   bg-white dark:bg-color-900 border-slate-300 dark:border-white/10
                                   text-gray-700 dark:text-gray-200
                                   focus:outline-none focus:ring-2 focus:ring-sky-300 dark:focus:ring-sky-600
                                   py-1 ${!useManual ? "opacity-60 cursor-not-allowed" : ""}`}
-                                >
-                                  {Array.from({ length: 11 }).map((_, n) => (
-                                    <option key={n} value={n}>
-                                      {n}
-                                    </option>
-                                  ))}
-                                </select>
+                                />
                               </td>
                             );
                           })}
@@ -1359,20 +1414,6 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
               {/* 자동 배치 영역 (배지 + 버튼, 중앙정렬) + 상태 메시지 */}
               <div className="flex flex-col items-center gap-2">
                 <div className="flex items-center justify-center gap-3 flex-wrap">
-                  {canAutoPlace && (
-                    <span
-                      className="inline-flex items-center gap-1 px-3 py-1 rounded-full
-                        text-[13px] font-extrabold
-                        text-emerald-700 dark:text-emerald-300
-                        bg-emerald-100 dark:bg-emerald-500/20
-                        border border-emerald-400/70 dark:border-emerald-500/60
-                        shadow-sm shadow-emerald-500/20
-                        animate-pulse"
-                    >
-                      <span aria-hidden>✓</span>
-                      <span>준비 완료</span>
-                    </span>
-                  )}
                   <button
                     type="button"
                     disabled={!canAutoPlace || solveStatus === "running"}
@@ -1418,18 +1459,18 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
                   )}
                 </div>
 
-                {/* 솔버 상태 메시지 (실패/시간초과/오류) */}
-                {solveStatus === "unsolvable" && (
-                  <div className="text-[13px] font-bold text-red-600 dark:text-red-400">
-                    ✕ 선택한 블록 구성으로는 이 구역을 정확히 채울 수 없습니다.
-                  </div>
-                )}
-                {solveStatus === "timeout" && (
-                  <div className="text-[13px] font-bold text-amber-600 dark:text-amber-400">{TIMEOUT_MESSAGE}</div>
-                )}
-                {solveStatus === "error" && (
-                  <div className="text-[13px] font-bold text-red-600 dark:text-red-400">✕ 자동 배치 실행 중 오류가 발생했습니다.</div>
-                )}
+                {/* 솔버 상태 메시지 (시간초과/오류 — unsolvable 은 공통 모달로 표시) */}
+                <div className="min-h-[20px] text-[13px] font-bold" aria-live="polite">
+                  {solveStatus === "running" && solveElapsedMs > 60000 && (
+                    <span className="text-amber-600 dark:text-amber-400">
+                      TIP: 시간이 오래 걸리면 색칠한 칸을 조금 바꿔서 시도해 주세요. (90초 이상은 실패 처리)
+                    </span>
+                  )}
+                  {solveStatus === "timeout" && <span className="text-amber-600 dark:text-amber-400">{TIMEOUT_MESSAGE}</span>}
+                  {solveStatus === "error" && (
+                    <span className="text-red-600 dark:text-red-400">✕ 자동 배치 실행 중 오류가 발생했습니다.</span>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -1558,7 +1599,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
                   {hasDisconnected && (
                     <span
                       className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
-                    text-[11px] font-bold
+                    text-sm font-bold
                     bg-red-50 dark:bg-red-950/40
                     text-red-600 dark:text-red-300
                     border border-red-200 dark:border-red-800/60"
@@ -1571,7 +1612,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
                   {!hasCenterBlock && (
                     <span
                       className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
-                    text-[11px] font-bold
+                    text-sm font-bold
                     bg-red-50 dark:bg-red-950/40
                     text-red-600 dark:text-red-300
                     border border-red-200 dark:border-red-800/60"

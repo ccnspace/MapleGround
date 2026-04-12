@@ -64,7 +64,9 @@ export const Modal = () => {
         </div>
       </div>
 
-      <DimmedLayer style={{ zIndex: 10000 }} />
+      {/* 다이얼로그(10001) 위에 공통 모달 dim 이 깔리도록 10500 사용.
+          modal_container / .modal 은 globals.css 에서 11000 → 최상단 보장. */}
+      <DimmedLayer style={{ zIndex: 10500 }} />
     </>
   );
 };

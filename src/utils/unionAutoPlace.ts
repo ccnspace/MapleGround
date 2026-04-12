@@ -237,14 +237,32 @@ export const solve = (input: SolverInput): SolverResult => {
   const cellCovered = new Uint8Array(TOTAL_CELLS); // 1 = 이미 덮인 셀
   const cellValidCount = new Int32Array(TOTAL_CELLS); // 해당 셀을 덮을 수 있는 active row 수
 
+  // 각 클래스의 피스 크기 (orientation 간 셀 수 동일)
+  const classSize = classes.map((c) => (c.orientations[0]?.cells.length ?? 0));
+  // 각 row 가 속한 클래스 캐시 — activeRowsPerClass 증감 시 hot path 룩업 줄임
+  const rowClass = new Int32Array(rows.length);
+  for (let i = 0; i < rows.length; i++) rowClass[i] = rows[i].classIdx;
+
   // 각 row 의 iconBit 이 중앙 2×2 에 속하는지 사전 계산 (hot path 룩업 1회 메모리 로드).
   const rowIconInCenter = new Uint8Array(rows.length);
   for (let i = 0; i < rows.length; i++) rowIconInCenter[i] = CENTER_MASK[rows[i].iconBit];
 
   // 중앙 2×2 에 아이콘을 놓을 수 있는 active row 수 (incremental 유지).
-  // requireCenterIcon 이 true 이고 iconsInCenter===0 인 상태에서 이 값이 0 이 되면 해(解)가 없음 → 조기 실패.
   let centerCapableCount = 0;
   for (let i = 0; i < rows.length; i++) if (rowIconInCenter[i]) centerCapableCount++;
+
+  // 클래스별 active row 수 (effective capacity 계산용)
+  const activeRowsPerClass = new Int32Array(classes.length);
+  for (let c = 0; c < classes.length; c++) activeRowsPerClass[c] = classRows[c].length;
+
+  // iconBit ∈ center 인 row 들의 인덱스 사전 수집 (피스 크기 내림차순 정렬).
+  // requireCenter 이고 iconsInCenter===0 일 때 MRV 대신 이 리스트로 분기해서
+  // 중앙 제약을 탐색 루트에서 한 번에 확정한다 (sparse center painted 토폴로지에 중요).
+  const centerRowsOrdered: number[] = [];
+  for (let i = 0; i < rows.length; i++) {
+    if (rowIconInCenter[i]) centerRowsOrdered.push(i);
+  }
+  centerRowsOrdered.sort((a, b) => rows[b].cells.length - rows[a].cells.length);
 
   for (const r of rows) {
     for (const b of r.cells) cellValidCount[b]++;
@@ -258,15 +276,112 @@ export const solve = (input: SolverInput): SolverResult => {
           rowActive[rIdx] = 0;
           for (const b of rows[rIdx].cells) cellValidCount[b]--;
           if (rowIconInCenter[rIdx]) centerCapableCount--;
+          activeRowsPerClass[rowClass[rIdx]]--;
         }
       }
     }
   }
 
+  // ─────────────────────────────────────────────────────────────
+  // 초기 feasibility: painted_count 가 클래스 피스 크기들의 bounded 부분합으로
+  // 표현 가능한가? (필요조건; 기하 조건은 별도) O(painted × totalCount).
+  // 커버해야 할 셀 수 = paintedCells.length. "어떤 subset 으로 정확히 이 합을 낼 수 있는가" 체크.
+  // 슬랙이 있어 부분합이 painted 보다 커도 되지만, 정확히 painted 를 만들 수 있어야 한다.
+  {
+    const N = paintedCells.length;
+    const dp = new Uint8Array(N + 1);
+    dp[0] = 1;
+    for (let c = 0; c < classes.length; c++) {
+      const s = classSize[c];
+      if (s <= 0 || s > N) continue;
+      const cap = Math.min(remaining[c], activeRowsPerClass[c]);
+      for (let k = 0; k < cap; k++) {
+        for (let j = N; j >= s; j--) {
+          if (dp[j - s]) dp[j] = 1;
+        }
+      }
+      if (dp[N]) break;
+    }
+    if (!dp[N]) return { status: "unsolvable", nodes: 0, elapsedMs: 0 };
+  }
+  // ─────────────────────────────────────────────────────────────
+
   const placements: Placement[] = [];
   const startTime = Date.now();
   let nodes = 0;
   let timedOut = false;
+  // 덮여야 할 남은 painted 셀 수 (incremental). effective capacity 체크용.
+  let uncoveredCount = paintedCells.length;
+
+  // ─ Connected-component subset-sum pruning 준비 ─
+  // 탐색 도중 uncovered painted 셀들은 여러 connected component 를 이룰 수 있다.
+  // 각 component 의 크기가 "남은 클래스 피스들의 bounded 부분합으로 만들 수 없는 값"이면
+  // 그 가지는 아무리 파도 실패 → 즉시 fail.
+  // 예: 피스가 4,5 셀만 있으면 size ∈ {1,2,3,6,7,11} component 는 항상 infeasible.
+
+  // painted 셀의 4방향 인접 painted 이웃 사전 계산 (flood-fill 가속)
+  const cellNeighbors: number[][] = new Array(TOTAL_CELLS);
+  for (let i = 0; i < TOTAL_CELLS; i++) cellNeighbors[i] = [];
+  for (const b of paintedCells) {
+    const nbs: number[] = [];
+    const x = (b % COLS) + MIN_X;
+    const y = Math.floor(b / COLS) + MIN_Y;
+    if (x > MIN_X) { const nb = b - 1; if (boardHasBit(painted, nb)) nbs.push(nb); }
+    if (x < MAX_X) { const nb = b + 1; if (boardHasBit(painted, nb)) nbs.push(nb); }
+    if (y > MIN_Y) { const nb = b - COLS; if (boardHasBit(painted, nb)) nbs.push(nb); }
+    if (y < MAX_Y) { const nb = b + COLS; if (boardHasBit(painted, nb)) nbs.push(nb); }
+    cellNeighbors[b] = nbs;
+  }
+
+  const ccVisited = new Uint8Array(TOTAL_CELLS);
+  const ccQueue = new Int32Array(paintedCells.length || 1);
+  // 남은 클래스 capacity 로 만들 수 있는 부분합 집합. 매 branching 마다 재계산.
+  const reachableSizes = new Uint8Array(paintedCells.length + 1);
+
+  const recomputeReachable = () => {
+    reachableSizes.fill(0);
+    reachableSizes[0] = 1;
+    const N = uncoveredCount;
+    for (let c = 0; c < classes.length; c++) {
+      const s = classSize[c];
+      if (s <= 0 || s > N) continue;
+      const cap = remaining[c] < activeRowsPerClass[c] ? remaining[c] : activeRowsPerClass[c];
+      for (let k = 0; k < cap; k++) {
+        for (let j = N; j >= s; j--) {
+          if (reachableSizes[j - s]) reachableSizes[j] = 1;
+        }
+      }
+    }
+  };
+
+  // uncovered painted 셀들을 flood-fill 로 component 화. 각 component 크기가
+  // reachableSizes 에 없으면 false 반환 → 가지 infeasible.
+  const componentsAllReachable = (): boolean => {
+    ccVisited.fill(0);
+    for (let p = 0; p < paintedCells.length; p++) {
+      const startBit = paintedCells[p];
+      if (cellCovered[startBit] || ccVisited[startBit]) continue;
+      ccVisited[startBit] = 1;
+      ccQueue[0] = startBit;
+      let head = 0;
+      let tail = 1;
+      let size = 0;
+      while (head < tail) {
+        const b = ccQueue[head++];
+        size++;
+        const nbs = cellNeighbors[b];
+        for (let i = 0; i < nbs.length; i++) {
+          const nb = nbs[i];
+          if (!ccVisited[nb] && !cellCovered[nb]) {
+            ccVisited[nb] = 1;
+            ccQueue[tail++] = nb;
+          }
+        }
+      }
+      if (!reachableSizes[size]) return false;
+    }
+    return true;
+  };
 
   /**
    * 배치(Row) 적용. 덮인 셀과 연관된 row 들을 비활성화.
@@ -293,6 +408,7 @@ export const solve = (input: SolverInput): SolverResult => {
           cellValidCount[otherRow.cells[j]]--;
         }
         if (rowIconInCenter[rIdx]) centerCapableCount--;
+        activeRowsPerClass[rowClass[rIdx]]--;
       }
     }
 
@@ -310,14 +426,17 @@ export const solve = (input: SolverInput): SolverResult => {
           cellValidCount[otherRow.cells[j]]--;
         }
         if (rowIconInCenter[rIdx]) centerCapableCount--;
+        activeRowsPerClass[rowClass[rIdx]]--;
       }
     }
+    uncoveredCount -= row.cells.length;
     return deactivated;
   };
 
   const undoRow = (rowIdx: number, deactivated: number[]) => {
     const row = rows[rowIdx];
     remaining[row.classIdx]++;
+    uncoveredCount += row.cells.length;
     // reactivate in reverse order
     for (let i = deactivated.length - 1; i >= 0; i--) {
       const rIdx = deactivated[i];
@@ -327,6 +446,7 @@ export const solve = (input: SolverInput): SolverResult => {
         cellValidCount[otherRow.cells[j]]++;
       }
       if (rowIconInCenter[rIdx]) centerCapableCount++;
+      activeRowsPerClass[rowClass[rIdx]]++;
     }
     for (const b of row.cells) cellCovered[b] = 0;
   };
@@ -368,6 +488,20 @@ export const solve = (input: SolverInput): SolverResult => {
       // requireCenter 조기 가드: 아직 중앙 2×2 에 아이콘이 없는데 그걸 달성할 수
       // 있는 active row 도 전무하다면, 아무리 내려가도 requireCenter 를 만족시킬 수 없음 → 즉시 fail.
       if (requireCenter && iconsInCenter === 0 && centerCapableCount === 0) {
+        undoForcedChain();
+        return false;
+      }
+
+      // Effective capacity 가드: 남은 블록으로 덮을 수 있는 최대 셀 수가
+      // 남은 uncovered 셀 수보다 작으면 해 없음 → 즉시 fail.
+      // class 의 remaining 과 active row 수 둘 중 작은 값이 실제 가용 배치 수.
+      let capacity = 0;
+      for (let c = 0; c < classes.length; c++) {
+        const avail = remaining[c] < activeRowsPerClass[c] ? remaining[c] : activeRowsPerClass[c];
+        capacity += avail * classSize[c];
+        if (capacity >= uncoveredCount) break; // 조기 탈출
+      }
+      if (capacity < uncoveredCount) {
         undoForcedChain();
         return false;
       }
@@ -421,11 +555,16 @@ export const solve = (input: SolverInput): SolverResult => {
       // 다음 MRV 스캔으로 재진입 (더 forced 가 생길 수 있음)
     }
 
-    // 분기 (bestCount >= 2). cellRows 는 피스 크기 내림차순으로 사전 정렬되어 있음.
-    const users = cellRows[bestCell];
-    for (let i = 0; i < users.length; i++) {
-      const rowIdx = users[i];
-      if (!rowActive[rowIdx]) continue;
+    // 분기 직전 CC 가드: uncovered 셀들을 connected component 로 묶은 뒤,
+    // 각 component 크기가 "남은 클래스 capacity 로 만들 수 있는 부분합" 에 속하지 않으면
+    // 이 가지는 결코 해를 가질 수 없음 → 즉시 fail.
+    recomputeReachable();
+    if (!componentsAllReachable()) {
+      undoForcedChain();
+      return false;
+    }
+
+    const tryRow = (rowIdx: number): boolean => {
       const row = rows[rowIdx];
       placements.push({ classKey: classes[row.classIdx].key, orientationId: row.orientationId, anchor: row.anchor });
       const undo = applyRow(rowIdx);
@@ -435,6 +574,32 @@ export const solve = (input: SolverInput): SolverResult => {
       if (isIconInCenter) iconsInCenter--;
       undoRow(rowIdx, undo);
       placements.pop();
+      return false;
+    };
+
+    // 중앙 제약 우선 분기: requireCenter 이고 아직 미충족이면 MRV 무시하고
+    // center-capable active row 만 분기 후보로 사용한다. 1회 성공 시 iconsInCenter>0
+    // 이 되고 이후 분기는 일반 MRV 로 복귀.
+    if (requireCenter && iconsInCenter === 0) {
+      for (let i = 0; i < centerRowsOrdered.length; i++) {
+        const rowIdx = centerRowsOrdered[i];
+        if (!rowActive[rowIdx]) continue;
+        if (tryRow(rowIdx)) return true;
+        if (timedOut) {
+          undoForcedChain();
+          return false;
+        }
+      }
+      undoForcedChain();
+      return false;
+    }
+
+    // 일반 MRV 분기 (bestCount >= 2). cellRows 는 피스 크기 내림차순 정렬됨.
+    const users = cellRows[bestCell];
+    for (let i = 0; i < users.length; i++) {
+      const rowIdx = users[i];
+      if (!rowActive[rowIdx]) continue;
+      if (tryRow(rowIdx)) return true;
       if (timedOut) {
         undoForcedChain();
         return false;

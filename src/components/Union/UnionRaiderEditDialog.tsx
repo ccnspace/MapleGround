@@ -174,14 +174,24 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
 
   // 로컬 블록 상태 (편집 대상). presetData 기준 깊은 복사
   const [localBlocks, setLocalBlocks] = useState<EditableBlock[]>([]);
+  // 블록 z-order (앞쪽 = 아래, 뒤쪽 = 위). 같은 셀에 여러 블록이 겹치면 뒤쪽이 우선.
+  const [blockOrder, setBlockOrder] = useState<number[]>([]);
   const [selectedBlockIndex, setSelectedBlockIndex] = useState<number | null>(null);
   const gridContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const src = presetData?.union_block ?? [];
     setLocalBlocks(src.map((b) => ({ ...b, block_position: b.block_position ? b.block_position.map((p) => ({ ...p })) : null })));
+    setBlockOrder(src.map((_, i) => i));
     setSelectedBlockIndex(null);
   }, [presetData]);
+
+  const bringToTop = (blockIndex: number) => {
+    setBlockOrder((prev) => {
+      if (prev[prev.length - 1] === blockIndex) return prev;
+      return [...prev.filter((i) => i !== blockIndex), blockIndex];
+    });
+  };
 
   const innerStatMap = useMemo(() => {
     const map = new Map<number, string>();
@@ -197,14 +207,21 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
     const labels = new Map<string, string>();
     const cellCounts = new Map<string, number>();
 
-    localBlocks.forEach((block, blockIndex) => {
+    // 등급 카운트는 배열 순서 기준
+    localBlocks.forEach((block) => {
       const level = parseInt(block.block_level, 10);
       const grade = levelToBlockGrade(level);
       if (grade) {
         const key = `${block.block_type}:${grade}`;
         counts.set(key, (counts.get(key) ?? 0) + 1);
       }
-      if (!block.block_position) return;
+    });
+
+    // cellMap / icons 는 z-order(아래→위) 순서로 쌓아 나중에 set한 값이 위에 오도록
+    const orderedIndices = blockOrder.length === localBlocks.length ? blockOrder : localBlocks.map((_, i) => i);
+    orderedIndices.forEach((blockIndex) => {
+      const block = localBlocks[blockIndex];
+      if (!block?.block_position) return;
       block.block_position.forEach((pos) => {
         const k = `${pos.x},${pos.y}`;
         cellMap.set(k, { blockType: block.block_type, blockIndex });
@@ -226,7 +243,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
     OUTER_LABELS.forEach((l) => labels.set(`${l.x},${l.y}`, l.name));
 
     return { grid: cellMap, iconCells: icons, gradeCountMap: counts, allLabels: labels, overlapCells: overlaps };
-  }, [localBlocks, innerStatMap]);
+  }, [localBlocks, blockOrder, innerStatMap]);
 
   // 선택된 블록의 메뉴 위치(그리드 컨테이너 기준 top-left)
   const menuAnchor = useMemo(() => {
@@ -257,16 +274,109 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
       };
       return next;
     });
+    bringToTop(selectedBlockIndex);
   };
 
-  const handleCellClick = (x: number, y: number) => {
+  // ── 드래그 이동 ──
+  // dragRef에 최신 드래그 정보를 담아 window 이벤트 리스너 재등록을 피한다.
+  const dragRef = useRef<{
+    blockIndex: number;
+    grabCellX: number;
+    grabCellY: number;
+    offsets: { dx: number; dy: number }[];
+    cpOffset: { dx: number; dy: number };
+    // 그리드 경계 안에서 잡은 셀이 놓일 수 있는 좌표 범위
+    bounds: { minX: number; maxX: number; minY: number; maxY: number };
+    moved: boolean;
+  } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleCellMouseDown = (e: React.MouseEvent, x: number, y: number) => {
     const cell = grid.get(`${x},${y}`);
     if (!cell) {
       setSelectedBlockIndex(null);
       return;
     }
-    setSelectedBlockIndex((prev) => (prev === cell.blockIndex ? null : cell.blockIndex));
+    const block = localBlocks[cell.blockIndex];
+    if (!block.block_position) return;
+    const offsets = block.block_position.map((p) => ({ dx: p.x - x, dy: p.y - y }));
+    const dxs = offsets.map((o) => o.dx);
+    const dys = offsets.map((o) => o.dy);
+    // 모든 셀이 그리드 안에 들어오도록 잡은 셀이 가질 수 있는 좌표 범위 계산
+    const bounds = {
+      minX: MIN_X - Math.min(...dxs),
+      maxX: MAX_X - Math.max(...dxs),
+      minY: MIN_Y - Math.min(...dys),
+      maxY: MAX_Y - Math.max(...dys),
+    };
+    dragRef.current = {
+      blockIndex: cell.blockIndex,
+      grabCellX: x,
+      grabCellY: y,
+      offsets,
+      cpOffset: { dx: block.block_control_point.x - x, dy: block.block_control_point.y - y },
+      bounds,
+      moved: false,
+    };
+    bringToTop(cell.blockIndex);
+    setIsDragging(true);
+    e.preventDefault();
   };
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMove = (e: MouseEvent) => {
+      const drag = dragRef.current;
+      if (!drag || !gridContainerRef.current) return;
+      const rect = gridContainerRef.current.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      const col = Math.floor(((e.clientX - rect.left) / rect.width) * COLS);
+      const row = Math.floor(((e.clientY - rect.top) / rect.height) * ROWS);
+      const rawX = MIN_X + col;
+      const rawY = MAX_Y - row;
+      // 블록 전체가 그리드 영역 안에 남도록 클램프
+      const newCellX = Math.max(drag.bounds.minX, Math.min(drag.bounds.maxX, rawX));
+      const newCellY = Math.max(drag.bounds.minY, Math.min(drag.bounds.maxY, rawY));
+      if (newCellX === drag.grabCellX && newCellY === drag.grabCellY) return;
+
+      drag.grabCellX = newCellX;
+      drag.grabCellY = newCellY;
+      drag.moved = true;
+
+      setLocalBlocks((prev) => {
+        const next = [...prev];
+        const b = next[drag.blockIndex];
+        if (!b.block_position) return prev;
+        next[drag.blockIndex] = {
+          ...b,
+          block_position: drag.offsets.map((o) => ({ x: newCellX + o.dx, y: newCellY + o.dy })),
+          block_control_point: { x: newCellX + drag.cpOffset.dx, y: newCellY + drag.cpOffset.dy },
+        };
+        return next;
+      });
+    };
+
+    const handleUp = () => {
+      const drag = dragRef.current;
+      if (drag && !drag.moved) {
+        // 드래그 없이 눌렀다 뗀 경우 → 선택 토글
+        setSelectedBlockIndex((prev) => (prev === drag.blockIndex ? null : drag.blockIndex));
+      } else if (drag && drag.moved) {
+        // 이동 후에는 해당 블록을 선택 상태로 유지
+        setSelectedBlockIndex(drag.blockIndex);
+      }
+      dragRef.current = null;
+      setIsDragging(false);
+    };
+
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
+    };
+  }, [isDragging]);
 
   // 경계선 스타일 (UnionRaiderGrid와 동일)
   const borderStyles = useMemo(() => {
@@ -393,9 +503,9 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
                   return (
                     <div
                       key={key}
-                      onClick={() => handleCellClick(x, y)}
-                      className={`relative aspect-square border border-[rgba(255,255,255,0.06)]
-                        ${cell ? `${BLOCK_BASE} cursor-pointer` : ""}
+                      onMouseDown={(e) => handleCellMouseDown(e, x, y)}
+                      className={`relative aspect-square border border-[rgba(255,255,255,0.06)] select-none
+                        ${cell ? `${BLOCK_BASE} cursor-grab active:cursor-grabbing` : ""}
                         ${!cell && isCenter ? "bg-[#4a5060]" : ""}
                         ${!cell && !isCenter ? "bg-[#2e3038]" : ""}
                       `}

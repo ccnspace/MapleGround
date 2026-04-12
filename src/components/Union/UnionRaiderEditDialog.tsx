@@ -482,23 +482,19 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
     if (!canAutoPlace || solveStatus === "running") return;
     workerRef.current?.terminate();
 
-    // activeCounts (직업타입:등급) → 카테고리:등급 단위로 합치기
-    const byCategoryGrade = new Map<string, number>();
-    activeCounts.forEach((cnt, key) => {
-      if (cnt <= 0) return;
+    // classKey 는 원본 jobType:grade 로 유지한다. 이렇게 하면 궁수 vs 메이플M 처럼
+    // 같은 category("궁수_메이플M") 로 묶이는 jobType 도 결과 렌더 시 서로 다른
+    // 아이콘/색상으로 구분할 수 있다. 공유 shape 는 바로 다음의 same-shape 병합 단계에서
+    // 탐색 효율을 위해 자동 그룹화된다.
+    const classes: Array<{ key: string; count: number; orientations: Orientation[] }> = [];
+    activeCounts.forEach((count, key) => {
+      if (count <= 0) return;
       const [jobType, grade] = key.split(":");
       const cat = BLOCK_TYPE_TO_CATEGORY[jobType];
       if (!cat) return;
-      const k = `${cat}:${grade}`;
-      byCategoryGrade.set(k, (byCategoryGrade.get(k) ?? 0) + cnt);
-    });
-
-    const classes: Array<{ key: string; count: number; orientations: Orientation[] }> = [];
-    byCategoryGrade.forEach((count, key) => {
-      const [cat, grade] = key.split(":") as [BlockJobCategory, BlockGrade];
-      const shape = UNION_BLOCK_SHAPES[cat]?.[grade];
+      const shape = UNION_BLOCK_SHAPES[cat]?.[grade as BlockGrade];
       if (!shape) return;
-      classes.push({ key, count, orientations: generateOrientations(shape) });
+      classes.push({ key: `${jobType}:${grade}`, count, orientations: generateOrientations(shape) });
     });
 
     // Same-shape 병합: 서로 다른 (카테고리, 등급) 이지만 orientation 집합이 동일한 클래스를
@@ -609,8 +605,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
 
   // 자동 배치 결과(placements) 를 새 탭 그리드에 시각화하기 위한 cellMap + icon set.
   // localBlocks 는 건드리지 않고 오직 새 탭에서만 렌더용으로 사용한다.
-  const categoryToBlockType = (cat: BlockJobCategory): string => (cat === "궁수_메이플M" ? "궁수" : cat);
-
+  // classKey 는 "jobType:grade" 형식이며, jobType 이 그대로 blockType (아이콘/색상 키) 로 쓰인다.
   const { autoPlaceGrid, autoPlaceIcons, autoPlaceBorders } = useMemo(() => {
     const cellMap = new Map<string, { blockType: string; blockIdx: number }>();
     const icons = new Set<string>();
@@ -618,12 +613,14 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
     if (!autoPlacements) return { autoPlaceGrid: cellMap, autoPlaceIcons: icons, autoPlaceBorders: borders };
 
     autoPlacements.forEach((p, blockIdx) => {
-      const [cat, grade] = p.classKey.split(":") as [BlockJobCategory, BlockGrade];
+      const [jobType, grade] = p.classKey.split(":") as [string, BlockGrade];
+      const cat = BLOCK_TYPE_TO_CATEGORY[jobType];
+      if (!cat) return;
       const shape = UNION_BLOCK_SHAPES[cat]?.[grade];
       if (!shape) return;
       const ori = generateOrientations(shape).find((o) => o.id === p.orientationId);
       if (!ori) return;
-      const blockType = categoryToBlockType(cat);
+      const blockType = jobType;
       const cells = ori.cells.map((c) => ({ x: p.anchor.x + c.dx, y: p.anchor.y + c.dy }));
 
       cells.forEach((c) => cellMap.set(`${c.x},${c.y}`, { blockType, blockIdx }));

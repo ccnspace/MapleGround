@@ -549,23 +549,44 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
   // localBlocks 는 건드리지 않고 오직 새 탭에서만 렌더용으로 사용한다.
   const categoryToBlockType = (cat: BlockJobCategory): string => (cat === "궁수_메이플M" ? "궁수" : cat);
 
-  const { autoPlaceGrid, autoPlaceIcons } = useMemo(() => {
-    const cellMap = new Map<string, { blockType: string }>();
+  const { autoPlaceGrid, autoPlaceIcons, autoPlaceBorders } = useMemo(() => {
+    const cellMap = new Map<string, { blockType: string; blockIdx: number }>();
     const icons = new Set<string>();
-    if (!autoPlacements) return { autoPlaceGrid: cellMap, autoPlaceIcons: icons };
-    for (const p of autoPlacements) {
+    const borders = new Map<string, React.CSSProperties>();
+    if (!autoPlacements) return { autoPlaceGrid: cellMap, autoPlaceIcons: icons, autoPlaceBorders: borders };
+
+    autoPlacements.forEach((p, blockIdx) => {
       const [cat, grade] = p.classKey.split(":") as [BlockJobCategory, BlockGrade];
       const shape = UNION_BLOCK_SHAPES[cat]?.[grade];
-      if (!shape) continue;
+      if (!shape) return;
       const ori = generateOrientations(shape).find((o) => o.id === p.orientationId);
-      if (!ori) continue;
+      if (!ori) return;
       const blockType = categoryToBlockType(cat);
       const cells = ori.cells.map((c) => ({ x: p.anchor.x + c.dx, y: p.anchor.y + c.dy }));
-      cells.forEach((c) => cellMap.set(`${c.x},${c.y}`, { blockType }));
+      cells.forEach((c) => cellMap.set(`${c.x},${c.y}`, { blockType, blockIdx }));
       const last = cells[cells.length - 1];
       icons.add(`${last.x},${last.y}`);
-    }
-    return { autoPlaceGrid: cellMap, autoPlaceIcons: icons };
+    });
+
+    // 각 셀의 4방향 이웃을 보고, 이웃이 같은 블록이 아니면 그 방향에 테두리를 그림
+    const line = "2px solid rgba(255,255,255,0.9)";
+    cellMap.forEach((info, key) => {
+      const [xs, ys] = key.split(",");
+      const x = parseInt(xs, 10);
+      const y = parseInt(ys, 10);
+      const style: React.CSSProperties = {};
+      const sameBlock = (nx: number, ny: number) => {
+        const n = cellMap.get(`${nx},${ny}`);
+        return !!n && n.blockIdx === info.blockIdx;
+      };
+      if (!sameBlock(x, y + 1)) style.borderTop = line;
+      if (!sameBlock(x, y - 1)) style.borderBottom = line;
+      if (!sameBlock(x - 1, y)) style.borderLeft = line;
+      if (!sameBlock(x + 1, y)) style.borderRight = line;
+      borders.set(key, style);
+    });
+
+    return { autoPlaceGrid: cellMap, autoPlaceIcons: icons, autoPlaceBorders: borders };
   }, [autoPlacements]);
 
   // 자동 배치 결과만 지우고 paintedCells 는 유지 (재실행용)
@@ -1124,7 +1145,11 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
                       // 자동 배치 결과 표시 (solveStatus === "ok" 일 때)
                       const placed = solveStatus === "ok" ? autoPlaceGrid.get(key) : null;
                       const placedOverlay = placed ? BLOCK_TYPE_STYLES[placed.blockType]?.overlay ?? "bg-slate-500/30" : "";
-                      const borderStyle = borderStyles.get(key) ?? {};
+                      // 섹터 경계선 + (배치된 셀이면) 블록 외곽 테두리 병합. 블록 테두리가 우선.
+                      const borderStyle: React.CSSProperties = {
+                        ...(borderStyles.get(key) ?? {}),
+                        ...(placed ? autoPlaceBorders.get(key) ?? {} : {}),
+                      };
                       const label = allLabels.get(key);
                       return (
                         <div

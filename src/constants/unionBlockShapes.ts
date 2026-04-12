@@ -9,8 +9,8 @@
 
 export type BlockGrade = "B" | "A" | "S" | "SS" | "SSS";
 
-/** 직업 카테고리 (궁수와 메이플스토리 M은 동일 모양) */
-export type BlockJobCategory = "전사" | "마법사" | "궁수_메이플M" | "도적" | "해적";
+/** 직업 카테고리 (궁수와 메이플스토리 M은 동일 모양, 하이브리드는 SS까지 도적과 동일하고 SSS 만 다름) */
+export type BlockJobCategory = "전사" | "마법사" | "궁수_메이플M" | "도적" | "해적" | "하이브리드";
 
 export const BLOCK_GRADES: BlockGrade[] = ["B", "A", "S", "SS", "SSS"];
 
@@ -75,6 +75,15 @@ export const UNION_BLOCK_SHAPES: Record<BlockJobCategory, Record<BlockGrade, str
     S: ["X.", "X.", "XX"],
     SS: ["X.", "XX", ".X"],
     SSS: [".X", ".X", "XX", "X."],
+  },
+
+  // 하이브리드(제논 등): B~SS 는 도적과 동일 모양 / SSS 만 별도 Z-like 5칸 모양
+  하이브리드: {
+    B: ["X"],
+    A: ["XX"],
+    S: ["XXX"],
+    SS: ["XXX", "..X"],
+    SSS: ["X..", "XXX", "..X"],
   },
 };
 
@@ -147,7 +156,7 @@ export const rotateShapeCounterClockwise = (shape: string[]): string[] => {
  */
 export const transformBlockPositions = (
   positions: { x: number; y: number }[],
-  transform: (shape: string[]) => string[],
+  transform: (shape: string[]) => string[]
 ): { x: number; y: number }[] => {
   if (positions.length === 0) return positions;
   const xs = positions.map((p) => p.x);
@@ -191,25 +200,19 @@ export const transformBlockPositions = (
  *
  * 좌표계: y가 위로 갈수록 증가 (유니온 그리드와 동일)
  */
-export const rotateBlockClockwise = (
-  positions: { x: number; y: number }[],
-  pivot: { x: number; y: number },
-): { x: number; y: number }[] => positions.map((p) => ({ x: pivot.x + (p.y - pivot.y), y: pivot.y - (p.x - pivot.x) }));
+export const rotateBlockClockwise = (positions: { x: number; y: number }[], pivot: { x: number; y: number }): { x: number; y: number }[] =>
+  positions.map((p) => ({ x: pivot.x + (p.y - pivot.y), y: pivot.y - (p.x - pivot.x) }));
 
 export const rotateBlockCounterClockwise = (
   positions: { x: number; y: number }[],
-  pivot: { x: number; y: number },
+  pivot: { x: number; y: number }
 ): { x: number; y: number }[] => positions.map((p) => ({ x: pivot.x - (p.y - pivot.y), y: pivot.y + (p.x - pivot.x) }));
 
-export const flipBlockHorizontal = (
-  positions: { x: number; y: number }[],
-  pivot: { x: number; y: number },
-): { x: number; y: number }[] => positions.map((p) => ({ x: 2 * pivot.x - p.x, y: p.y }));
+export const flipBlockHorizontal = (positions: { x: number; y: number }[], pivot: { x: number; y: number }): { x: number; y: number }[] =>
+  positions.map((p) => ({ x: 2 * pivot.x - p.x, y: p.y }));
 
-export const flipBlockVertical = (
-  positions: { x: number; y: number }[],
-  pivot: { x: number; y: number },
-): { x: number; y: number }[] => positions.map((p) => ({ x: p.x, y: 2 * pivot.y - p.y }));
+export const flipBlockVertical = (positions: { x: number; y: number }[], pivot: { x: number; y: number }): { x: number; y: number }[] =>
+  positions.map((p) => ({ x: p.x, y: 2 * pivot.y - p.y }));
 
 /** 캐릭터 레벨로 블록 등급 판정 (B: 60~99 / A: 100~139 / S: 140~199 / SS: 200~249 / SSS: 250+) */
 export const levelToBlockGrade = (level: number): BlockGrade | null => {
@@ -229,6 +232,6 @@ export const BLOCK_TYPE_TO_CATEGORY: Record<string, BlockJobCategory> = {
   "메이플 M 캐릭터": "궁수_메이플M",
   도적: "도적",
   해적: "해적",
-  // 하이브리드(제논 등)는 도적과 동일한 모양 패밀리 (도적 SS를 90° 회전한 형태 확인됨).
-  하이브리드: "도적",
+  // 하이브리드(제논 등): SS 까지는 도적과 동일하나 SSS 는 별도 모양 → 독립 카테고리
+  하이브리드: "하이브리드",
 };

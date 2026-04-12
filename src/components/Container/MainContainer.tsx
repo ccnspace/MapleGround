@@ -12,6 +12,7 @@ import { SetEffectContainer } from "./SetEffectContainer";
 import { ContainerWrapper } from "./ContainerWrapper";
 import { LoadingContainer } from "./LoadingContainer";
 import { HeroPowerCard } from "./HeroPowerCard";
+import { NoticeMarquee } from "./NoticeMarquee";
 import { UnionSummaryCard } from "./UnionSummaryCard";
 import { useNickname } from "@/hooks/useNickname";
 
@@ -44,6 +45,9 @@ export const MainContainer = () => {
 
   return (
     <div className="main_container w-[1366px]">
+      <div className="[grid-area:notice]">
+        <NoticeMarquee />
+      </div>
       <HeroPowerCard />
       <div className="[grid-area:equip] relative z-10 flex flex-row gap-4 max-[600px]:flex-col">
         <div className="flex-1 min-w-0 relative z-10">

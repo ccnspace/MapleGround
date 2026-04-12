@@ -54,6 +54,7 @@ abbr:where([title]) {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   grid-template-areas:
+    "notice notice notice notice notice notice"
     "hero   hero   hero   hero   hero   hero"
     "equip  equip  equip  equip  stat   stat"
     "equip  equip  equip  equip  stat   stat"
@@ -258,3 +259,4 @@ abbr:where([title]) {
     transform: translate(-50%, -40%) scale(1);
   }
 }
+

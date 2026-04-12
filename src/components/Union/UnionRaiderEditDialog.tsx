@@ -535,7 +535,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
     worker.postMessage({
       paintedKeys: Array.from(paintedCells),
       classes,
-      timeoutMs: 60_000,
+      timeoutMs: 90_000,
       // 성공 조건: 어떤 배치에서든 중앙 2×2 에 적어도 하나의 블록 아이콘이 있어야 함
       requireCenterIcon: true,
     });

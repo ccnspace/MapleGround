@@ -229,7 +229,23 @@ export const flipBlockVertical = (positions: { x: number; y: number }[], pivot: 
   positions.map((p) => ({ x: p.x, y: 2 * pivot.y - p.y }));
 
 /** 캐릭터 레벨로 블록 등급 판정 (B: 60~99 / A: 100~139 / S: 140~199 / SS: 200~249 / SSS: 250+) */
-export const levelToBlockGrade = (level: number): BlockGrade | null => {
+export const levelToBlockGrade = (level: number, blockClass?: string): BlockGrade | null => {
+  if (blockClass === "제로") {
+    if (level < 130) return null;
+    if (level < 160) return "B";
+    if (level < 180) return "A";
+    if (level < 200) return "S";
+    if (level < 250) return "SS";
+    return "SSS";
+  }
+  if (blockClass === "모바일 캐릭터") {
+    if (level < 30) return null;
+    if (level < 50) return "B";
+    if (level < 70) return "A";
+    if (level < 120) return "S";
+    if (level < 250) return "SS";
+    return "SSS";
+  }
   if (level < 60) return null;
   if (level < 100) return "B";
   if (level < 140) return "A";

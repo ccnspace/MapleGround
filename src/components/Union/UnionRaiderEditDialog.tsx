@@ -220,23 +220,15 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
     }
   }, [useManual]);
 
-  // 블록의 "실제 등급" — 배치 셀 수 우선, 없으면 레벨 폴백.
+  // 블록의 "실제 등급" — block의 고유 레벨 우선.
   // 메이플 M 캐릭터처럼 레벨→등급 규칙이 일반 직업과 다른 타입도 올바르게 반영된다.
   const gradeForBlock = (b: {
     block_type: string;
     block_level: string;
     block_position: Array<{ x: number; y: number }> | null;
+    block_class: string;
   }): BlockGrade | null => {
-    if (b.block_position && b.block_position.length > 0) {
-      const n = b.block_position.length;
-      if (n === 1) return "B";
-      if (n === 2) return "A";
-      if (n === 3) return "S";
-      if (n === 4) return "SS";
-      if (n === 5) return "SSS";
-      return null;
-    }
-    return levelToBlockGrade(parseInt(b.block_level, 10));
+    return levelToBlockGrade(parseInt(b.block_level, 10), b.block_class);
   };
 
   // 프리셋 기반 직업×등급 카운트 (union_block 전체)

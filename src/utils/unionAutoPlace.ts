@@ -159,13 +159,18 @@ type Row = {
   iconBit: number; // 이 배치의 아이콘 셀 비트 인덱스 (cells 중 하나)
 };
 
-// 중앙 2×2 비트 인덱스 집합
-const CENTER_BITS: ReadonlySet<number> = new Set<number>([
+// 중앙 2×2 비트 인덱스. hot path 에서 Set.has() 오버헤드를 피하려 Uint8Array 마스크로 유지.
+const CENTER_BIT_IDS: ReadonlyArray<number> = [
   cellToBitIdx(0, 0),
   cellToBitIdx(-1, 0),
   cellToBitIdx(0, 1),
   cellToBitIdx(-1, 1),
-]);
+];
+const CENTER_MASK: Uint8Array = (() => {
+  const m = new Uint8Array(TOTAL_CELLS);
+  for (const b of CENTER_BIT_IDS) m[b] = 1;
+  return m;
+})();
 
 export const solve = (input: SolverInput): SolverResult => {
   const timeoutMs = input.timeoutMs ?? 60_000;
@@ -216,12 +221,30 @@ export const solve = (input: SolverInput): SolverResult => {
     }
   }
 
+  // cellRows 를 피스 크기 내림차순으로 1회 정렬 — 분기 시 "큰 피스 먼저" 순서를
+  // 재귀 노드마다 다시 만들 필요가 없어진다.
+  for (let i = 0; i < TOTAL_CELLS; i++) {
+    const list = cellRows[i];
+    if (list.length > 1) {
+      list.sort((a, b) => rows[b].cells.length - rows[a].cells.length);
+    }
+  }
+
   // 런타임 상태
   const rowActive = new Uint8Array(rows.length);
   rowActive.fill(1);
   const remaining = classes.map((c) => c.count);
   const cellCovered = new Uint8Array(TOTAL_CELLS); // 1 = 이미 덮인 셀
   const cellValidCount = new Int32Array(TOTAL_CELLS); // 해당 셀을 덮을 수 있는 active row 수
+
+  // 각 row 의 iconBit 이 중앙 2×2 에 속하는지 사전 계산 (hot path 룩업 1회 메모리 로드).
+  const rowIconInCenter = new Uint8Array(rows.length);
+  for (let i = 0; i < rows.length; i++) rowIconInCenter[i] = CENTER_MASK[rows[i].iconBit];
+
+  // 중앙 2×2 에 아이콘을 놓을 수 있는 active row 수 (incremental 유지).
+  // requireCenterIcon 이 true 이고 iconsInCenter===0 인 상태에서 이 값이 0 이 되면 해(解)가 없음 → 조기 실패.
+  let centerCapableCount = 0;
+  for (let i = 0; i < rows.length; i++) if (rowIconInCenter[i]) centerCapableCount++;
 
   for (const r of rows) {
     for (const b of r.cells) cellValidCount[b]++;
@@ -234,6 +257,7 @@ export const solve = (input: SolverInput): SolverResult => {
         if (rowActive[rIdx]) {
           rowActive[rIdx] = 0;
           for (const b of rows[rIdx].cells) cellValidCount[b]--;
+          if (rowIconInCenter[rIdx]) centerCapableCount--;
         }
       }
     }
@@ -268,6 +292,7 @@ export const solve = (input: SolverInput): SolverResult => {
         for (let j = 0; j < otherRow.cells.length; j++) {
           cellValidCount[otherRow.cells[j]]--;
         }
+        if (rowIconInCenter[rIdx]) centerCapableCount--;
       }
     }
 
@@ -284,6 +309,7 @@ export const solve = (input: SolverInput): SolverResult => {
         for (let j = 0; j < otherRow.cells.length; j++) {
           cellValidCount[otherRow.cells[j]]--;
         }
+        if (rowIconInCenter[rIdx]) centerCapableCount--;
       }
     }
     return deactivated;
@@ -300,6 +326,7 @@ export const solve = (input: SolverInput): SolverResult => {
       for (let j = 0; j < otherRow.cells.length; j++) {
         cellValidCount[otherRow.cells[j]]++;
       }
+      if (rowIconInCenter[rIdx]) centerCapableCount++;
     }
     for (const b of row.cells) cellCovered[b] = 0;
   };
@@ -308,56 +335,113 @@ export const solve = (input: SolverInput): SolverResult => {
   let iconsInCenter = 0;
 
   const recurse = (): boolean => {
-    if (timedOut) return false;
-    nodes++;
-    if ((nodes & 0xfff) === 0 && Date.now() - startTime > timeoutMs) {
-      timedOut = true;
-      return false;
-    }
+    // Unit propagation: bestCount === 1 인 셀(= 유일 후보만 가능)을 분기 없이
+    // 적용하고 MRV 재스캔. 같은 recurse 프레임 안에서 forced 체인을 전파해 불필요한
+    // 재귀 호출을 줄인다. 성공(return true) 시엔 체인을 유지, 실패 시 역순 undo.
+    const forcedRows: number[] = [];
+    const forcedDeacts: number[][] = [];
+    const forcedIcons: boolean[] = [];
 
-    // MRV: 덮이지 않은 painted 셀 중 cellValidCount 가 가장 작은 셀 선택
-    let bestCell = -1;
-    let bestCount = Infinity;
-    for (let i = 0; i < paintedCells.length; i++) {
-      const c = paintedCells[i];
-      if (cellCovered[c]) continue;
-      const cnt = cellValidCount[c];
-      if (cnt < bestCount) {
-        bestCount = cnt;
-        bestCell = c;
-        if (cnt <= 1) break; // 0 이면 fail, 1 이면 forced — 더 볼 필요 없음
+    const undoForcedChain = () => {
+      for (let k = forcedRows.length - 1; k >= 0; k--) {
+        if (forcedIcons[k]) iconsInCenter--;
+        undoRow(forcedRows[k], forcedDeacts[k]);
+        placements.pop();
       }
-    }
-    if (bestCell === -1) {
-      // 모두 덮임 → 성공. 단, requireCenter 라면 중앙 2×2 에 아이콘이 있어야 함.
-      if (requireCenter && iconsInCenter === 0) return false;
-      return true;
-    }
-    if (bestCount === 0) return false; // 덮을 방법 없음 → fail
+    };
 
-    // 후보 row 들 시도. 큰 피스 먼저(제약 강함 → 실패 빠름).
+    let bestCell = -1;
+    let bestCount = 0;
+
+    while (true) {
+      if (timedOut) {
+        undoForcedChain();
+        return false;
+      }
+      nodes++;
+      if ((nodes & 0xfff) === 0 && Date.now() - startTime > timeoutMs) {
+        timedOut = true;
+        undoForcedChain();
+        return false;
+      }
+
+      // requireCenter 조기 가드: 아직 중앙 2×2 에 아이콘이 없는데 그걸 달성할 수
+      // 있는 active row 도 전무하다면, 아무리 내려가도 requireCenter 를 만족시킬 수 없음 → 즉시 fail.
+      if (requireCenter && iconsInCenter === 0 && centerCapableCount === 0) {
+        undoForcedChain();
+        return false;
+      }
+
+      // MRV: 덮이지 않은 painted 셀 중 cellValidCount 가 가장 작은 셀 선택
+      bestCell = -1;
+      bestCount = Infinity;
+      for (let i = 0; i < paintedCells.length; i++) {
+        const c = paintedCells[i];
+        if (cellCovered[c]) continue;
+        const cnt = cellValidCount[c];
+        if (cnt < bestCount) {
+          bestCount = cnt;
+          bestCell = c;
+          if (cnt <= 1) break; // 0 이면 fail, 1 이면 forced — 더 볼 필요 없음
+        }
+      }
+
+      if (bestCell === -1) {
+        // 모두 덮임 → 성공. requireCenter 라면 중앙 2×2 에 아이콘이 있어야 함.
+        if (requireCenter && iconsInCenter === 0) {
+          undoForcedChain();
+          return false;
+        }
+        return true; // 성공 — forced 체인 유지
+      }
+      if (bestCount === 0) {
+        undoForcedChain();
+        return false; // 덮을 방법 없음 → fail
+      }
+      if (bestCount > 1) break; // 분기 단계로
+
+      // Forced: bestCell 을 덮는 유일 active row 를 찾아 적용
+      const fUsers = cellRows[bestCell];
+      let fRowIdx = -1;
+      for (let i = 0; i < fUsers.length; i++) {
+        if (rowActive[fUsers[i]]) {
+          fRowIdx = fUsers[i];
+          break;
+        }
+      }
+      // cellValidCount === 1 이면 반드시 active row 하나가 존재
+      const fRow = rows[fRowIdx];
+      placements.push({ classKey: classes[fRow.classIdx].key, orientationId: fRow.orientationId, anchor: fRow.anchor });
+      const fDeac = applyRow(fRowIdx);
+      const fIconCenter = rowIconInCenter[fRowIdx] === 1;
+      if (fIconCenter) iconsInCenter++;
+      forcedRows.push(fRowIdx);
+      forcedDeacts.push(fDeac);
+      forcedIcons.push(fIconCenter);
+      // 다음 MRV 스캔으로 재진입 (더 forced 가 생길 수 있음)
+    }
+
+    // 분기 (bestCount >= 2). cellRows 는 피스 크기 내림차순으로 사전 정렬되어 있음.
     const users = cellRows[bestCell];
-    // 미리 필터링 + 정렬 (그 노드에서만 유효)
-    const candidates: number[] = [];
     for (let i = 0; i < users.length; i++) {
-      if (rowActive[users[i]]) candidates.push(users[i]);
-    }
-    candidates.sort((a, b) => rows[b].cells.length - rows[a].cells.length);
-
-    for (let i = 0; i < candidates.length; i++) {
-      const rowIdx = candidates[i];
-      if (!rowActive[rowIdx]) continue; // 내부 분기로 비활성 됐을 수 있음 (같은 루프 내 다른 iter 에선 불가지만 안전)
+      const rowIdx = users[i];
+      if (!rowActive[rowIdx]) continue;
       const row = rows[rowIdx];
       placements.push({ classKey: classes[row.classIdx].key, orientationId: row.orientationId, anchor: row.anchor });
       const undo = applyRow(rowIdx);
-      const isIconInCenter = CENTER_BITS.has(row.iconBit);
+      const isIconInCenter = rowIconInCenter[rowIdx] === 1;
       if (isIconInCenter) iconsInCenter++;
       if (recurse()) return true;
       if (isIconInCenter) iconsInCenter--;
       undoRow(rowIdx, undo);
       placements.pop();
-      if (timedOut) return false;
+      if (timedOut) {
+        undoForcedChain();
+        return false;
+      }
     }
+
+    undoForcedChain();
     return false;
   };
 

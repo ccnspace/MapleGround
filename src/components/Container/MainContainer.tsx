@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { memo } from "react";
 import { EquipContainer } from "@/components/Container/EquipContainer";
 import { AbilityContainer } from "@/components/Container/AbilityContainer";
 import { StatContainer } from "@/components/Container/StatContainer";
@@ -13,6 +12,7 @@ import { SetEffectContainer } from "./SetEffectContainer";
 import { ContainerWrapper } from "./ContainerWrapper";
 import { UnionContainer } from "./UnionContainer";
 import { LoadingContainer } from "./LoadingContainer";
+import { HeroPowerCard } from "./HeroPowerCard";
 import { useNickname } from "@/hooks/useNickname";
 
 const ChartContainer = dynamic(() => import("./ChartContainer"), {
@@ -32,24 +32,6 @@ const ChartContainer = dynamic(() => import("./ChartContainer"), {
 const StarforceContainer = dynamic(() => import("./StarforceContainer"), { ssr: false, loading: () => <DimmedLayer spinner /> });
 const CubeContainer = dynamic(() => import("./CubeContainer"), { ssr: false, loading: () => <DimmedLayer spinner /> });
 
-const RightSideGridContainer = memo(() => (
-  <div className="right_sideBar grid">
-    <AbilityContainer />
-    <SetEffectContainer />
-    <UnionContainer />
-  </div>
-));
-
-RightSideGridContainer.displayName = "RightSideGridContainer";
-
-const BottomGridContainer = memo(({ nickname }: { nickname: string }) => (
-  <div className="col-span-2">
-    <ChartContainer nickname={nickname} />
-  </div>
-));
-
-BottomGridContainer.displayName = "BottomGridContainer";
-
 export const MainContainer = () => {
   const nickname = useNickname();
   const fetchStatus = useCharacterStore((state) => state.fetchStatus);
@@ -61,11 +43,30 @@ export const MainContainer = () => {
   }
 
   return (
-    <div className="main_container w-[1366px] gap-4">
-      <StatContainer />
-      <EquipContainer />
-      <RightSideGridContainer />
-      <BottomGridContainer nickname={nickname} />
+    <div className="main_container w-[1366px]">
+      <HeroPowerCard />
+      <div className="[grid-area:equip] relative z-10 flex flex-row gap-4 max-[600px]:flex-col">
+        <div className="flex-1 min-w-0 relative z-10">
+          <EquipContainer />
+        </div>
+        <div className="w-[380px] shrink-0 flex flex-col max-[600px]:w-full relative z-0">
+          <StatContainer />
+        </div>
+      </div>
+      <div className="[grid-area:stat] min-h-0 flex flex-col gap-4">
+        <div className="flex-1 min-h-0">
+          <SetEffectContainer />
+        </div>
+        <div className="flex-1 min-h-0">
+          <AbilityContainer />
+        </div>
+      </div>
+      <div className="[grid-area:abil]">
+        <UnionContainer />
+      </div>
+      <div className="[grid-area:chart]">
+        <ChartContainer nickname={nickname} />
+      </div>
       {cubeTargetItem && <CubeContainer />}
       {starforceTargetItem && <StarforceContainer targetItem={starforceTargetItem} />}
     </div>

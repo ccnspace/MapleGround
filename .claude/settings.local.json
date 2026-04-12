@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la /c/Users/xptmx/DOT/src/components/Header*)",
+      "Bash(npm run:*)",
+      "Bash(npx tsc:*)",
+      "Bash(find /c/Users/xptmx/DOT -type f -name *api* -o -name *service*)",
+      "Bash(cat /c/Users/xptmx/DOT/.env*)",
+      "Bash(find /c/Users/xptmx/DOT/src/app -name *route* -o -name *api*)",
+      "WebFetch(domain:openapi.nexon.com)"
+    ]
+  }
+}

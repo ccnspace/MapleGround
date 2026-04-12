@@ -52,8 +52,13 @@ abbr:where([title]) {
 
 .main_container {
   display: grid;
-  grid-template-columns: repeat(3, minmax(420px, 1fr));
-  grid-auto-flow: row;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-areas:
+    "hero   hero   hero   hero   hero   hero"
+    "equip  equip  equip  equip  stat   stat"
+    "equip  equip  equip  equip  stat   stat"
+    "abil   abil   abil   chart  chart  chart";
+  gap: 16px;
   padding-top: 24px;
   height: fit-content;
   padding-bottom: 12px;
@@ -74,12 +79,6 @@ abbr:where([title]) {
   padding: 3px;
 }
 
-.right_sideBar {
-  display: grid;
-  grid-row: span 2;
-  grid-template-rows: 240px 300px 600px;
-  gap: 12px;
-}
 
 /** 반응형 **/
 @media (max-width: 600px) {
@@ -90,10 +89,6 @@ abbr:where([title]) {
     gap: 1px;
   }
 
-  .right_sideBar {
-    gap: 16px;
-    grid-template-rows: 240px 300px 380px;
-  }
 }
 
 @media (max-width: 600px) {

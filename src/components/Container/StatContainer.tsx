@@ -2,45 +2,8 @@
 
 import { useCharacterInfo } from "@/hooks/useCharacterInfo";
 import { type PropsWithChildren, useMemo } from "react";
-import { formatKoreanNumber } from "@/utils/formatKoreanNum";
 import { StatName } from "@/types/CharacterStat";
 import { ContainerWrapper } from "./ContainerWrapper";
-
-const getCombatPowerBgColor = (combatPower: number) => {
-  if (combatPower < 50_000_000) {
-    return "bg-slate-500";
-  }
-  if (combatPower < 100_000_000) {
-    return "bg-gradient-to-r from-gray-800/80 to-sky-600/80";
-  }
-  if (combatPower < 400_000_000) {
-    return "bg-gradient-to-r from-lime-500/90 to-cyan-600/90";
-  }
-  if (combatPower < 800_000_000) {
-    return "bg-gradient-to-r from-cyan-400/90 via-blue-600/90 to-indigo-900/90";
-  }
-  return "bg-gradient-to-r from-yellow-500/80 via-red-600/80 to-purple-600/90";
-};
-
-const getCombatDescription = (combatPower: number) => {
-  if (combatPower < 30_000_000) return "";
-  if (combatPower < 90_000_000) {
-    return "군단장에 대항하는 자";
-  }
-  if (combatPower < 150_000_000) {
-    return "검은마법사에 대항하는 자";
-  }
-  if (combatPower < 300_000_000) {
-    return "그란디스 사도와 대항하는 자";
-  }
-  if (combatPower < 500_000_000) {
-    return "그란디스 사도들이 무서워하는 자";
-  }
-  if (combatPower < 800_000_000) {
-    return "극한의 메이플러버";
-  }
-  return "💗메이플의 전설 그 자체💗";
-};
 
 const getUnit = (statName: string) => {
   const percent = [
@@ -197,35 +160,17 @@ export const StatContainer = () => {
     }, object);
   }, [final_stat]);
 
-  const combatPower = parseInt(statObject["전투력"]);
-  const formattedCombatPower = formatKoreanNumber(combatPower);
-  const combatPowerBgColor = getCombatPowerBgColor(combatPower);
-  const combatDescription = getCombatDescription(combatPower);
-
   return (
-    <ContainerWrapper>
+    <ContainerWrapper className="h-full !min-w-0" innerClassName="h-full overflow-y-auto">
       {characterInfo?.stat ? (
         <div className="flex flex-col gap-3">
           <p
-            className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5 
+            className="flex font-extrabold text-base mb-2 px-2 pb-0.5 pt-0.5
               border-l-4 border-l-sky-400
              "
           >
             캐릭터 능력치
           </p>
-
-          <div className="flex flex-col mb">
-            <div
-              className={`flex gap-2 justify-center items-center ${combatPowerBgColor}
-        px-3 pt-2 pb-2 rounded-lg`}
-            >
-              <p className="font-bold text-lg text-white">전투력</p>
-              <p className="font-extrabold text-3xl text-white [text-shadow:_1px_2px_4px_rgb(0_0_0/_0.4)]">{formattedCombatPower}</p>
-            </div>
-            {!!combatDescription && (
-              <p className="flex justify-center pt-1 font-bold text-sm text-gray-600 dark:text-gray-300">{combatDescription}</p>
-            )}
-          </div>
 
           <div className="grid grid-cols-2 rounded-md px-2 pt-2 pb-3 gap-2 text-sm">
             <div className="flex items-center rounded-md px-1.5 pt-1 pb-1 col-span-2 font-bold bg-slate-400/20">

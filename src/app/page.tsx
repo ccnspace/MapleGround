@@ -91,34 +91,26 @@ export default function Home() {
           </form>
           {/* 북마크 리스트 */}
           {bookmarks && bookmarks.length > 0 && (
-            <div className="mt-8 w-full max-w-md z-10 rounded-lg bg-white/30 p-1">
-              <div className="flex items-center gap-1 mb-2">
-                <h3
-                  className="flex w-full justify-between gap-2 items-center font-extrabold text-black/80 
-                "
+            <div className="mt-6 w-full max-w-md z-10 bg-slate-900/60 backdrop-blur-sm rounded-xl p-3">
+              <div className="flex items-center justify-between px-1 mb-2.5">
+                <span className="text-[13px] font-bold text-white/90 tracking-tight">⭐ 즐겨찾기</span>
+                <button
+                  onClick={handleRemoveAllClick}
+                  className="text-[11px] font-medium text-white/50 hover:text-white/80 transition-colors"
                 >
-                  <span className="text-[14px]">⭐ 즐겨찾기한 캐릭터</span>
-                  <button
-                    onClick={handleRemoveAllClick}
-                    className="text-xs font-extrabold text-white/80 bg-black/30 hover:bg-black/50 p-1 rounded-md"
-                  >
-                    모두 제거
-                  </button>
-                </h3>
+                  모두 제거
+                </button>
               </div>
-              <div className="max-h-24 overflow-y-auto">
-                <div className="grid grid-cols-3 gap-2 pr-1">
+              <div className="max-h-28 overflow-y-auto">
+                <div className="grid grid-cols-3 gap-1.5">
                   {bookmarks.map((bookmarkName, index) => (
                     <button
                       key={`${bookmarkName}-${index}`}
                       onClick={() => handleBookmarkClick(bookmarkName)}
-                      className="group relative overflow-hidden p-1 bg-slate-900/60 hover:bg-slate-900/70
-                      rounded-lg border border-slate-600/50"
+                      className="group px-3 py-2 bg-white/10 hover:bg-white/20
+                        rounded-lg border border-white/10 transition-all duration-200"
                     >
-                      <span
-                        className="relative text-xs font-medium text-white/70 group-hover:text-white 
-                      truncate block"
-                      >
+                      <span className="text-[12px] font-semibold text-white/80 group-hover:text-white truncate block">
                         {bookmarkName}
                       </span>
                     </button>

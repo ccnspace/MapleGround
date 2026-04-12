@@ -57,7 +57,7 @@ abbr:where([title]) {
     "hero   hero   hero   hero   hero   hero"
     "equip  equip  equip  equip  stat   stat"
     "equip  equip  equip  equip  stat   stat"
-    "abil   abil   abil   chart  chart  chart";
+    "union  union  union  chart  chart  chart";
   gap: 16px;
   padding-top: 24px;
   height: fit-content;

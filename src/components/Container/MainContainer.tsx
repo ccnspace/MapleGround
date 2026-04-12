@@ -10,9 +10,9 @@ import { useStarforceStore } from "@/stores/starforce";
 import { DimmedLayer } from "../DimmedLayer";
 import { SetEffectContainer } from "./SetEffectContainer";
 import { ContainerWrapper } from "./ContainerWrapper";
-import { UnionContainer } from "./UnionContainer";
 import { LoadingContainer } from "./LoadingContainer";
 import { HeroPowerCard } from "./HeroPowerCard";
+import { UnionSummaryCard } from "./UnionSummaryCard";
 import { useNickname } from "@/hooks/useNickname";
 
 const ChartContainer = dynamic(() => import("./ChartContainer"), {
@@ -61,8 +61,8 @@ export const MainContainer = () => {
           <AbilityContainer />
         </div>
       </div>
-      <div className="[grid-area:abil]">
-        <UnionContainer />
+      <div className="[grid-area:union]">
+        <UnionSummaryCard />
       </div>
       <div className="[grid-area:chart]">
         <ChartContainer nickname={nickname} />

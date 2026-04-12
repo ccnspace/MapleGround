@@ -14,7 +14,7 @@ const commonHeader: RequestInit = {
   next: { revalidate: 0 },
 };
 
-const endpoints = ["union", "union-raider", "union-artifact", "union-champion"] as const;
+const endpoints = ["union", "union-artifact", "union-champion"] as const;
 
 const makeRequestUrls = (ocid: string, date: string | null) => {
   return endpoints.map((endpoint) => {
@@ -66,13 +66,11 @@ export async function GET(request: NextRequest, { params }: { params: { name: st
     }
 
     const union = responses.find((res) => res.name === "union")?.data;
-    const unionRaider = responses.find((res) => res.name === "union-raider")?.data;
     const unionArtifact = responses.find((res) => res.name === "union-artifact")?.data;
     const unionChampion = responses.find((res) => res.name === "union-champion")?.data;
 
     return Response.json({
       union,
-      unionRaider,
       unionArtifact,
       unionChampion,
     });

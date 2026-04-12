@@ -1,9 +1,8 @@
-import type { Union, UnionRaider, UnionArtifact, UnionChampion } from "@/types/Union";
+import type { Union, UnionArtifact, UnionChampion } from "@/types/Union";
 import { apiFetcher } from "./apiFetcher";
 
 export type UnionAttributes = {
   union: Union;
-  unionRaider: UnionRaider;
   unionArtifact: UnionArtifact;
   unionChampion: UnionChampion;
 };

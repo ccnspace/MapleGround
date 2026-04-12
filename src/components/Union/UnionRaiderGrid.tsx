@@ -4,6 +4,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import Image from "next/image";
 import type { UnionRaider, UnionRaiderPreset } from "@/types/Union";
+import { UnionRaiderEditDialog } from "@/components/Union/UnionRaiderEditDialog";
 import warriorIcon from "@/images/warrior.png";
 import magicianIcon from "@/images/magician.png";
 import archerIcon from "@/images/archer.png";
@@ -177,6 +178,7 @@ type Props = { raider: UnionRaider };
 export const UnionRaiderGrid = ({ raider }: Props) => {
   const [hoveredBlock, setHoveredBlock] = useState<number | null>(null);
   const [selectedPreset, setSelectedPreset] = useState<number>(0);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
 
   const handleSaveImage = useCallback(async () => {
@@ -313,14 +315,23 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
         </div>
         {selectedPreset === 0 && <span className="text-[11px] text-gray-400 dark:text-gray-500">(프리셋 {raider.use_preset_no})</span>}
         <button
+          onClick={() => setIsEditOpen(true)}
+          className="ml-auto px-3 py-1 rounded-md text-[12px] font-semibold text-white
+            bg-sky-500 hover:bg-sky-600 transition-colors"
+        >
+          편집
+        </button>
+        <button
           onClick={handleSaveImage}
-          className="ml-auto px-3 py-1 rounded-md text-[12px] font-semibold text-gray-500 dark:text-gray-400
+          className="px-3 py-1 rounded-md text-[12px] font-semibold text-gray-500 dark:text-gray-400
             bg-slate-200 dark:bg-color-950/50 border border-slate-200 dark:border-white/5
             hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
         >
           이미지 저장
         </button>
       </div>
+
+      {isEditOpen && <UnionRaiderEditDialog raider={raider} presetNo={selectedPreset} onClose={() => setIsEditOpen(false)} />}
 
       <div className="flex justify-center" ref={gridRef}>
         <div

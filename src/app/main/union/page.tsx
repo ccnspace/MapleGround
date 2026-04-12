@@ -101,8 +101,8 @@ const UnionInfoPanel = ({ union, artifact }: { union: Union; artifact: UnionArti
 
       {/* 상세 스탯 카드 */}
       <div
-        className="flex flex-col bg-slate-50 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl
-          border border-slate-200 dark:border-white/5 overflow-hidden"
+        className="flex flex-col bg-slate-50 dark:bg-color-950/50 backdrop-blur-sm rounded-2xl
+          border border-slate-200/80 dark:border-white/5 overflow-hidden"
       >
         <StatRow label="아티팩트 EXP" value={union.union_artifact_exp.toLocaleString()} />
         <StatRow label="아티팩트 포인트" value={union.union_artifact_point.toLocaleString()} />
@@ -137,7 +137,7 @@ const ArtifactTab = ({ artifact }: { artifact: UnionArtifact }) => (
           >
             <div
               className={`flex flex-col gap-2.5 p-3.5 rounded-[10px] h-full
-              ${isValid ? "bg-slate-50 dark:bg-color-950/80" : "bg-slate-100 dark:bg-color-950/60"}`}
+              ${isValid ? "bg-slate-50 dark:bg-color-950/50" : "bg-slate-50 dark:bg-color-950/30"}`}
             >
               {/* 레벨(별) + 상태 */}
               <div className="flex items-center justify-between">
@@ -171,8 +171,8 @@ const ArtifactTab = ({ artifact }: { artifact: UnionArtifact }) => (
     {/* 아티팩트 효과 목록 */}
     {artifact.union_artifact_effect.length > 0 && (
       <div
-        className="flex flex-col bg-slate-50 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl
-          border border-slate-200 dark:border-white/5 overflow-hidden"
+        className="flex flex-col bg-slate-50 dark:bg-color-950/50 backdrop-blur-sm rounded-2xl
+          border border-slate-200/80 dark:border-white/5 overflow-hidden"
       >
         <div className="px-4 pt-3.5 pb-2">
           <p className="font-bold text-sm text-violet-600 dark:text-violet-400">아티팩트 효과</p>
@@ -202,7 +202,7 @@ const ChampionTab = ({ champion }: { champion: UnionChampion }) => (
       {champion.union_champion.map((champ, i) => (
         <div
           key={i}
-          className={`flex flex-col gap-3 p-4 rounded-xl border bg-slate-50 dark:bg-color-950/80 ${getChampionCardBorder(
+          className={`flex flex-col gap-3 p-4 rounded-xl border bg-slate-50 dark:bg-color-950/50 ${getChampionCardBorder(
             champ.champion_grade
           )}`}
         >
@@ -239,8 +239,8 @@ const ChampionTab = ({ champion }: { champion: UnionChampion }) => (
     {/* 총 휘장 효과 */}
     {champion.champion_badge_total_info.length > 0 && (
       <div
-        className="flex flex-col bg-slate-50 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl
-          border border-slate-200 dark:border-white/5 overflow-hidden"
+        className="flex flex-col bg-slate-50 dark:bg-color-950/50 backdrop-blur-sm rounded-2xl
+          border border-slate-200/80 dark:border-white/5 overflow-hidden"
       >
         <div className="px-4 pt-3.5 pb-2">
           <p className="font-bold text-sm text-amber-600 dark:text-amber-400">챔피언 휘장 효과</p>
@@ -314,14 +314,14 @@ const UnionPageContent = () => {
             <div className="flex-1 min-w-0 flex flex-col gap-4">
               {/* 탭 버튼 */}
               <div
-                className="flex gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-900/60
+                className="flex gap-1 p-1 rounded-xl bg-slate-200 dark:bg-color-950/50
                   border border-slate-200 dark:border-white/5 self-start"
               >
                 <button
                   onClick={() => setActiveTab("champion")}
                   className={`px-4 py-1.5 rounded-lg text-[13px] font-semibold transition-all ${
                     activeTab === "champion"
-                      ? "bg-white dark:bg-slate-700 text-black dark:text-white shadow-sm"
+                      ? "bg-white dark:bg-color-800 text-black dark:text-white shadow-sm"
                       : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                   }`}
                 >
@@ -331,7 +331,7 @@ const UnionPageContent = () => {
                   onClick={() => setActiveTab("artifact")}
                   className={`px-4 py-1.5 rounded-lg text-[13px] font-semibold transition-all ${
                     activeTab === "artifact"
-                      ? "bg-white dark:bg-slate-700 text-black dark:text-white shadow-sm"
+                      ? "bg-white dark:bg-color-800 text-black dark:text-white shadow-sm"
                       : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                   }`}
                 >

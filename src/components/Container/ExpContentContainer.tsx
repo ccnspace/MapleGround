@@ -29,11 +29,17 @@ const formatExpRate = (exp: number, maxExp: number) => {
 };
 
 const ExpItemWrapper = ({ children }: { children: React.ReactNode }) => {
-  return <div className="bg-slate-200/60 dark:bg-color-800 rounded-lg p-3">{children}</div>;
+  return (
+    <div className="bg-slate-100 dark:bg-color-950/50 backdrop-blur-sm rounded-xl p-4 border border-slate-200/80 dark:border-white/5">
+      {children}
+    </div>
+  );
 };
 
 const ExpDetailWrapper = ({ children }: { children: React.ReactNode }) => {
-  return <div className="flex justify-between items-center py-1.5 px-3 rounded-md bg-white dark:bg-black/50">{children}</div>;
+  return (
+    <div className="flex justify-between items-center py-2 px-3 rounded-lg bg-slate-200/40 dark:bg-white/5">{children}</div>
+  );
 };
 
 const LevelInput = ({ value, onChange, characterLevel }: { value: string; onChange: (value: string) => void; characterLevel?: number }) => {
@@ -55,9 +61,9 @@ const LevelInput = ({ value, onChange, characterLevel }: { value: string; onChan
         value={value}
         onChange={handleChange}
         placeholder={characterLevel ? String(characterLevel) : "레벨 입력"}
-        className="w-24 px-3 py-2 text-center text-lg font-bold rounded-lg border-2 border-slate-300 dark:border-slate-500 
+        className="w-24 px-3 py-2 text-center text-lg font-bold rounded-lg border border-slate-300 dark:border-slate-600
                    bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100
-                   focus:border-slate-600 dark:focus:border-blue-400 focus:outline-none transition-colors"
+                   focus:border-slate-500 dark:focus:border-slate-400 focus:outline-none transition-colors"
       />
       <span className="text-xs text-gray-500 dark:text-gray-400">
         ({MIN_LEVEL}~{MAX_LEVEL})
@@ -128,13 +134,13 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
       <div className="flex flex-col justify-center gap-5">
         {/* 레벨 입력 섹션 */}
         {showLevelInput && (
-          <div className="min-[600px]:px-[120px]">
+          <div className="min-[600px]:px-0">
             <LevelInput value={manualLevel} onChange={setManualLevel} characterLevel={character_level} />
           </div>
         )}
 
         <div className="flex flex-col">
-          <div className="grid grid-cols-1 min-[600px]:grid-cols-2 gap-4 min-[600px]:px-[120px]">
+          <div className="grid grid-cols-1 min-[600px]:grid-cols-2 gap-4 min-[600px]:px-0">
             {/* Normal EXP Voucher Section */}
             <ExpItemWrapper>
               <div className="text-md font-bold mb-2 text-sky-700 dark:text-sky-300 flex items-center gap-2">
@@ -159,8 +165,8 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
                         type="text"
                         value={normalVoucherCount}
                         onChange={(e) => handleVoucherCountChange(e, setNormalVoucherCount)}
-                        className="w-24 px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 
-                                 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                        className="w-24 px-2 py-1 text-sm rounded-lg border border-slate-300 dark:border-slate-600
+                                 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-slate-500 dark:focus:border-slate-400 transition-colors"
                         placeholder="개수 입력"
                       />
                     </div>
@@ -210,8 +216,8 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
                         type="text"
                         value={advancedVoucherCount}
                         onChange={(e) => handleVoucherCountChange(e, setAdvancedVoucherCount)}
-                        className="w-24 px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 
-                                 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                        className="w-24 px-2 py-1 text-sm rounded-lg border border-slate-300 dark:border-slate-600
+                                 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-slate-500 dark:focus:border-slate-400 transition-colors"
                         placeholder="개수 입력"
                       />
                     </div>
@@ -254,8 +260,8 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
                         type="text"
                         value={vipRestCount}
                         onChange={handleVipRestCountChange}
-                        className="w-24 px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 
-                                 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                        className="w-24 px-2 py-1 text-sm rounded-lg border border-slate-300 dark:border-slate-600
+                                 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-slate-500 dark:focus:border-slate-400 transition-colors"
                         placeholder="개수 입력"
                       />
                     </div>
@@ -276,7 +282,7 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
 
             {/* Extreme Monster Park Section */}
             <ExpItemWrapper>
-              <div className="text-md font-semibold mb-2 text-teal-600 dark:text-teal-400 flex items-center gap-2">
+              <div className="text-md font-bold mb-2 text-teal-600 dark:text-teal-400 flex items-center gap-2">
                 <Image
                   src={monpaIcon}
                   alt="익스트림 몬스터파크"
@@ -315,7 +321,7 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
 
             {/* High Mountain Section */}
             <ExpItemWrapper>
-              <div className="text-md font-semibold mb-2 text-lime-600 dark:text-lime-400 flex items-center gap-2">
+              <div className="text-md font-bold mb-2 text-lime-600 dark:text-lime-400 flex items-center gap-2">
                 <Image src={highIcon} alt="하이 마운틴" width={32} height={32} unoptimized style={{ imageRendering: "pixelated" }} />
                 하이 마운틴 <span className="text-xs font-normal">(레벨 260 이상 참여 가능)</span>
               </div>
@@ -356,7 +362,7 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
 
             {/* Angler Company Section */}
             <ExpItemWrapper>
-              <div className="text-md font-semibold mb-2 text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+              <div className="text-md font-bold mb-2 text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
                 <Image src={anglerIcon} alt="앵글러 컴퍼니" width={32} height={32} unoptimized style={{ imageRendering: "pixelated" }} />
                 앵글러 컴퍼니 <span className="text-xs font-normal">(레벨 270 이상 참여 가능)</span>
               </div>
@@ -397,7 +403,7 @@ export const ExpContentContainer = ({ nickname }: { nickname: string | null }) =
 
             {/* Nightmare Section (악몽선경) */}
             <ExpItemWrapper>
-              <div className="text-md font-semibold mb-2 text-rose-600 dark:text-rose-300 flex items-center gap-2">
+              <div className="text-md font-bold mb-2 text-rose-600 dark:text-rose-300 flex items-center gap-2">
                 <Image src={nightmareIcon} alt="앵글러 컴퍼니" width={32} height={32} unoptimized style={{ imageRendering: "pixelated" }} />
                 악몽선경 <span className="text-xs font-normal">(레벨 280 이상 참여 가능)</span>
               </div>

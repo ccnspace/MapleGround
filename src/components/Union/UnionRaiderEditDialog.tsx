@@ -15,11 +15,14 @@ import maplemIcon from "@/images/maplem.png";
 import {
   BLOCK_GRADES,
   BLOCK_GRADE_CELL_COUNT,
+  BLOCK_TYPE_TO_CATEGORY,
+  UNION_BLOCK_SHAPES,
   flipBlockHorizontal,
   flipBlockVertical,
   levelToBlockGrade,
   rotateBlockClockwise,
   rotateBlockCounterClockwise,
+  shapeToOffsets,
   type BlockGrade,
 } from "@/constants/unionBlockShapes";
 
@@ -110,6 +113,18 @@ const OUTER_LABELS: { name: string; x: number; y: number }[] = [
   { name: "크리티컬 데미지", x: -9, y: 4 },
 ];
 
+// 외부 영역 1칸 당 부여되는 효과 값 (인덱스 = sector id)
+const OUTER_REGION_PER_CELL: { value: number; unit: string }[] = [
+  { value: 1, unit: "%" }, // 상태이상내성
+  { value: 1, unit: "%" }, // 획득경험치
+  { value: 1, unit: "%" }, // 크리티컬 확률
+  { value: 1, unit: "%" }, // 보스데미지
+  { value: 1, unit: "%" }, // 일반데미지
+  { value: 1, unit: "%" }, // 버프지속시간
+  { value: 1, unit: "%" }, // 방어율무시
+  { value: 1, unit: "%" }, // 크리티컬 데미지
+];
+
 const BLOCK_BASE = "bg-[#bb996f]";
 const BLOCK_TYPE_STYLES: Record<string, { overlay: string }> = {
   전사: { overlay: "bg-red-500/30" },
@@ -133,15 +148,7 @@ type Props = {
 // 편집 가능한 블록 로컬 타입
 type EditableBlock = UnionRaiderPreset["union_block"][number];
 
-const ContextMenuButton = ({
-  children,
-  label,
-  onClick,
-}: {
-  children: React.ReactNode;
-  label: string;
-  onClick: () => void;
-}) => (
+const ContextMenuButton = ({ children, label, onClick }: { children: React.ReactNode; label: string; onClick: () => void }) => (
   <button
     type="button"
     title={label}
@@ -169,7 +176,10 @@ const getPresetData = (raider: UnionRaider, presetNo: number) => {
   return { union_block: preset.union_block, union_inner_stat: preset.union_inner_stat };
 };
 
+type EditTab = "edit" | "new";
+
 export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
+  const [activeTab, setActiveTab] = useState<EditTab>("edit");
   const presetData = useMemo(() => getPresetData(raider, presetNo), [raider, presetNo]);
 
   // 로컬 블록 상태 (편집 대상). presetData 기준 깊은 복사
@@ -304,6 +314,19 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
 
   const hasDisconnected = disconnectedCells.size > 0;
 
+  // 외부 8영역별 점령 칸 수
+  const outerRegionCounts = useMemo(() => {
+    const counts = new Array<number>(8).fill(0);
+    grid.forEach((_, key) => {
+      const [x, y] = key.split(",").map(Number);
+      if (isInnerArea(x, y)) return;
+      const sector = getOuterRegion(x, y);
+      if (sector === null) return;
+      counts[sector]++;
+    });
+    return counts;
+  }, [grid]);
+
   // 선택된 블록의 메뉴 위치(그리드 컨테이너 기준 top-left)
   const menuAnchor = useMemo(() => {
     if (selectedBlockIndex === null) return null;
@@ -320,7 +343,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
   }, [selectedBlockIndex, localBlocks]);
 
   const applyTransform = (
-    transformer: (positions: { x: number; y: number }[], pivot: { x: number; y: number }) => { x: number; y: number }[],
+    transformer: (positions: { x: number; y: number }[], pivot: { x: number; y: number }) => { x: number; y: number }[]
   ) => {
     if (selectedBlockIndex === null) return;
     setLocalBlocks((prev) => {
@@ -335,6 +358,62 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
     });
     bringToTop(selectedBlockIndex);
   };
+
+  // 선택된 블록을 그리드에서 제거 (엔티티 자체는 남기고 block_position만 null)
+  const handleDeleteSelected = () => {
+    if (selectedBlockIndex === null) return;
+    setLocalBlocks((prev) => {
+      const next = [...prev];
+      const b = next[selectedBlockIndex];
+      next[selectedBlockIndex] = { ...b, block_position: null };
+      return next;
+    });
+    setSelectedBlockIndex(null);
+  };
+
+  // 미배치 블록을 기본 위치로 되돌림 (원본 위치가 있으면 원본, 없으면 shape 기반 상단 중앙 placement)
+  const computeFallbackPlacement = (block: EditableBlock) => {
+    const level = parseInt(block.block_level, 10);
+    const grade = levelToBlockGrade(level);
+    const category = BLOCK_TYPE_TO_CATEGORY[block.block_type];
+    const shape = grade && category ? UNION_BLOCK_SHAPES[category][grade] : ["X"];
+    const offsets = shapeToOffsets(shape);
+    // 상단(y=8 부근)에 왼쪽부터 배치: 그리드 y는 위로 갈수록 +, matrix row 0 = top
+    const topY = 8;
+    const leftX = -2;
+    const positions = offsets.map((o) => ({ x: leftX + o.dx, y: topY - o.dy }));
+    return { positions, controlPoint: { x: leftX, y: topY } };
+  };
+
+  const handleAddBlock = (index: number) => {
+    const original = presetData?.union_block[index];
+    setLocalBlocks((prev) => {
+      const next = [...prev];
+      const b = next[index];
+      if (original?.block_position && original.block_position.length > 0) {
+        next[index] = {
+          ...b,
+          block_position: original.block_position.map((p) => ({ ...p })),
+          block_control_point: { ...original.block_control_point },
+        };
+      } else {
+        const fb = computeFallbackPlacement(b);
+        next[index] = { ...b, block_position: fb.positions, block_control_point: fb.controlPoint };
+      }
+      return next;
+    });
+    bringToTop(index);
+    setSelectedBlockIndex(index);
+  };
+
+  // 미배치 블록 목록
+  const unplacedBlocks = useMemo(
+    () =>
+      localBlocks
+        .map((block, index) => ({ block, index }))
+        .filter(({ block }) => !block.block_position || block.block_position.length === 0),
+    [localBlocks]
+  );
 
   // ── 드래그 이동 ──
   // dragRef에 최신 드래그 정보를 담아 window 이벤트 리스너 재등록을 피한다.
@@ -538,206 +617,340 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
             </button>
           </div>
 
-          {/* 그리드 (편집 모드) */}
-          <div className="flex justify-center">
-            <div
-              ref={gridContainerRef}
-              className="relative w-full max-w-[624px] grid
-                border border-[#c0c4cc] dark:border-[#3a3e48] rounded-lg overflow-visible"
-              style={{
-                gridTemplateColumns: `repeat(${COLS}, 1fr)`,
-                gridTemplateRows: `repeat(${ROWS}, 1fr)`,
-              }}
+          {/* 탭 */}
+          <div
+            className="flex gap-1 p-1 rounded-xl bg-slate-100 dark:bg-color-950/60
+              border border-slate-200 dark:border-white/5 self-start"
+          >
+            <button
+              type="button"
+              onClick={() => setActiveTab("edit")}
+              className={`px-4 py-1.5 rounded-lg text-[13px] font-semibold transition-all ${
+                activeTab === "edit"
+                  ? "bg-white dark:bg-color-800 text-black dark:text-white shadow-sm"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+              }`}
             >
-              {rows.map((y) =>
-                cols.map((x) => {
-                  const key = `${x},${y}`;
-                  const cell = grid.get(key);
-                  const isCenter = (x === 0 && y === 0) || (x === -1 && y === 0) || (x === 0 && y === 1) || (x === -1 && y === 1);
-                  const overlay = cell ? BLOCK_TYPE_STYLES[cell.blockType]?.overlay ?? "bg-slate-500/30" : "";
-                  const borderStyle = borderStyles.get(key) ?? {};
-                  const label = allLabels.get(key);
-                  const isSelected = cell && cell.blockIndex === selectedBlockIndex;
-                  const isOverlap = overlapCells.has(key);
-                  const isDisconnected = disconnectedCells.has(key);
-                  return (
-                    <div
-                      key={key}
-                      onMouseDown={(e) => handleCellMouseDown(e, x, y)}
-                      className={`relative aspect-square border border-[rgba(255,255,255,0.06)] select-none
+              현재 프리셋 편집
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("new")}
+              className={`px-4 py-1.5 rounded-lg text-[13px] font-semibold transition-all ${
+                activeTab === "new"
+                  ? "bg-white dark:bg-color-800 text-black dark:text-white shadow-sm"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+              }`}
+            >
+              새로 그리드 배치
+            </button>
+          </div>
+
+          {activeTab === "new" && (
+            <div className="flex flex-col gap-3">
+              <p className="text-[12px] text-gray-500 dark:text-gray-400 px-1">
+                직업별/등급별로 배치할 블록 개수를 선택한 뒤, 자동 배치 실행 버튼을 누르세요.
+              </p>
+              <div
+                className="rounded-xl border border-slate-200/80 dark:border-white/10
+                  bg-slate-50 dark:bg-color-950/40 overflow-x-auto"
+              >
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200/80 dark:border-white/10">
+                      <th className="text-left px-3 py-2 text-[12px] font-bold text-gray-500 dark:text-gray-400 w-[140px]">직업</th>
+                      {BLOCK_GRADES.map((g) => (
+                        <th key={g} className="px-2 py-2 text-[12px] font-bold text-center">
+                          <span>{g}</span>
+                          <span className="ml-1 text-[10px] font-medium text-gray-400">({BLOCK_GRADE_CELL_COUNT[g]}칸)</span>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {JOB_ORDER.map((job, i) => (
+                      <tr key={job} className={i < JOB_ORDER.length - 1 ? "border-b border-slate-100 dark:border-white/5" : ""}>
+                        <td className="px-3 py-2">
+                          <div className="flex items-center gap-2">
+                            {BLOCK_ICONS[job] && <Image src={BLOCK_ICONS[job]} alt={job} width={16} height={16} unoptimized />}
+                            <span className="font-bold text-[13px]">{job}</span>
+                          </div>
+                        </td>
+                        {BLOCK_GRADES.map((grade) => {
+                          const count = getCount(job, grade);
+                          return (
+                            <td key={grade} className="px-2 py-2 text-center">
+                              <select
+                                value={count}
+                                onChange={() => {
+                                  /* 현재는 동작 없음 */
+                                }}
+                                className="w-[56px] text-center rounded-md border text-[12px] font-semibold
+                                  bg-white dark:bg-color-900 border-slate-300 dark:border-white/10
+                                  text-gray-700 dark:text-gray-200
+                                  focus:outline-none focus:ring-2 focus:ring-sky-300 dark:focus:ring-sky-600
+                                  py-1"
+                              >
+                                {Array.from({ length: 11 }).map((_, n) => (
+                                  <option key={n} value={n}>
+                                    {n}
+                                  </option>
+                                ))}
+                              </select>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "edit" && (
+            <>
+              {/* 그리드 (편집 모드) */}
+              <div className="flex justify-center">
+                <div
+                  ref={gridContainerRef}
+                  className="relative w-full max-w-[624px] grid
+                border border-[#c0c4cc] dark:border-[#3a3e48] rounded-lg overflow-visible"
+                  style={{
+                    gridTemplateColumns: `repeat(${COLS}, 1fr)`,
+                    gridTemplateRows: `repeat(${ROWS}, 1fr)`,
+                  }}
+                >
+                  {rows.map((y) =>
+                    cols.map((x) => {
+                      const key = `${x},${y}`;
+                      const cell = grid.get(key);
+                      const isCenter = (x === 0 && y === 0) || (x === -1 && y === 0) || (x === 0 && y === 1) || (x === -1 && y === 1);
+                      const overlay = cell ? BLOCK_TYPE_STYLES[cell.blockType]?.overlay ?? "bg-slate-500/30" : "";
+                      const borderStyle = borderStyles.get(key) ?? {};
+                      const label = allLabels.get(key);
+                      const isSelected = cell && cell.blockIndex === selectedBlockIndex;
+                      const isOverlap = overlapCells.has(key);
+                      const isDisconnected = disconnectedCells.has(key);
+                      return (
+                        <div
+                          key={key}
+                          onMouseDown={(e) => handleCellMouseDown(e, x, y)}
+                          className={`relative aspect-square border border-[rgba(255,255,255,0.06)] select-none
                         ${cell ? `${BLOCK_BASE} cursor-grab active:cursor-grabbing` : ""}
                         ${!cell && isCenter ? "bg-[#4a5060]" : ""}
                         ${!cell && !isCenter ? "bg-[#2e3038]" : ""}
                       `}
-                      style={borderStyle}
-                    >
-                      {cell && <div className={`absolute inset-0 ${overlay} pointer-events-none`} />}
-                      {isSelected && (
-                        <div className="absolute inset-0 ring-2 ring-sky-400 ring-inset bg-sky-300/20 pointer-events-none z-20" />
-                      )}
-                      {isOverlap && (
-                        <div className="absolute inset-0 ring-2 ring-red-500 ring-inset bg-red-500/40 pointer-events-none z-[25]" />
-                      )}
-                      {isDisconnected && !isOverlap && (
-                        <div
-                          className="absolute inset-0 ring-2 ring-red-500 ring-inset bg-red-500/30 pointer-events-none z-[24]"
-                          style={{ outline: "1px dashed rgba(255,255,255,0.6)", outlineOffset: -4 }}
-                        />
-                      )}
-                      {cell && iconCells.has(key) && BLOCK_ICONS[cell.blockType] && (
-                        <div className="absolute inset-[3px] max-[600px]:inset-[2px] pointer-events-none z-10 flex items-center justify-center">
-                          <Image
-                            src={BLOCK_ICONS[cell.blockType]}
-                            alt={cell.blockType}
-                            width={18}
-                            height={18}
-                            className="w-full h-full object-contain"
-                            unoptimized
-                          />
-                        </div>
-                      )}
-                      {label && (
-                        <span
-                          className="absolute z-30 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap
+                          style={borderStyle}
+                        >
+                          {cell && <div className={`absolute inset-0 ${overlay} pointer-events-none`} />}
+                          {isSelected && (
+                            <div className="absolute inset-0 ring-2 ring-sky-400 ring-inset bg-sky-300/20 pointer-events-none z-20" />
+                          )}
+                          {isOverlap && (
+                            <div className="absolute inset-0 ring-2 ring-red-500 ring-inset bg-red-500/40 pointer-events-none z-[25]" />
+                          )}
+                          {isDisconnected && !isOverlap && (
+                            <div
+                              className="absolute inset-0 ring-2 ring-red-500 ring-inset bg-red-500/30 pointer-events-none z-[24]"
+                              style={{ outline: "1px dashed rgba(255,255,255,0.6)", outlineOffset: -4 }}
+                            />
+                          )}
+                          {cell && iconCells.has(key) && BLOCK_ICONS[cell.blockType] && (
+                            <div className="absolute inset-[3px] max-[600px]:inset-[2px] pointer-events-none z-10 flex items-center justify-center">
+                              <Image
+                                src={BLOCK_ICONS[cell.blockType]}
+                                alt={cell.blockType}
+                                width={18}
+                                height={18}
+                                className="w-full h-full object-contain"
+                                unoptimized
+                              />
+                            </div>
+                          )}
+                          {label && (
+                            <span
+                              className="absolute z-30 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap
                             text-[11px] max-[600px]:text-[8px] font-bold text-white pointer-events-none
                             bg-black/30 px-1.5 rounded-md opacity-80"
-                        >
-                          {label}
-                        </span>
-                      )}
-                    </div>
-                  );
-                })
-              )}
+                            >
+                              {label}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
 
-              {/* 선택된 블록 컨텍스트 메뉴 */}
-              {menuAnchor && (
-                <div
-                  className="absolute z-40 -translate-x-1/2 -translate-y-[calc(100%+6px)]
+                  {/* 선택된 블록 컨텍스트 메뉴 */}
+                  {menuAnchor && (
+                    <div
+                      className="absolute z-40 -translate-x-1/2 -translate-y-[calc(100%+6px)]
                     flex items-center gap-0.5 px-1 py-1 rounded-lg
                     bg-white/95 dark:bg-[#2c2e38]/95 border border-slate-200 dark:border-white/10
                     shadow-lg backdrop-blur-sm"
-                  style={{
-                    left: `${((menuAnchor.centerCol + 0.5) / COLS) * 100}%`,
-                    top: `${(menuAnchor.topRow / ROWS) * 100}%`,
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <ContextMenuButton label="좌우 대칭" onClick={() => applyTransform(flipBlockHorizontal)}>
-                    ↔
-                  </ContextMenuButton>
-                  <ContextMenuButton label="상하 대칭" onClick={() => applyTransform(flipBlockVertical)}>
-                    ↕
-                  </ContextMenuButton>
-                  <ContextMenuButton label="반시계 90°" onClick={() => applyTransform(rotateBlockCounterClockwise)}>
-                    ↺
-                  </ContextMenuButton>
-                  <ContextMenuButton label="시계 90°" onClick={() => applyTransform(rotateBlockClockwise)}>
-                    ↻
-                  </ContextMenuButton>
+                      style={{
+                        left: `${((menuAnchor.centerCol + 0.5) / COLS) * 100}%`,
+                        top: `${(menuAnchor.topRow / ROWS) * 100}%`,
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <ContextMenuButton label="좌우 대칭" onClick={() => applyTransform(flipBlockHorizontal)}>
+                        ↔
+                      </ContextMenuButton>
+                      <ContextMenuButton label="상하 대칭" onClick={() => applyTransform(flipBlockVertical)}>
+                        ↕
+                      </ContextMenuButton>
+                      <ContextMenuButton label="반시계 90°" onClick={() => applyTransform(rotateBlockCounterClockwise)}>
+                        ↺
+                      </ContextMenuButton>
+                      <ContextMenuButton label="시계 90°" onClick={() => applyTransform(rotateBlockClockwise)}>
+                        ↻
+                      </ContextMenuButton>
+                      <div className="w-px h-5 bg-slate-200 dark:bg-white/10 mx-0.5" aria-hidden />
+                      <button
+                        type="button"
+                        title="삭제"
+                        aria-label="삭제"
+                        onClick={handleDeleteSelected}
+                        className="w-7 h-7 flex items-center justify-center rounded-md text-[14px] font-bold
+                      text-red-600 dark:text-red-400
+                      hover:bg-red-100 dark:hover:bg-red-900/40
+                      transition-colors"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
 
-          {/* 직업 × 등급 블록 개수 선택 */}
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between px-1 gap-2 min-h-[28px]">
-              {/* 좌측: 규칙 경고 칩들 (없으면 공간만 차지). 끊어짐이 우선 표시. */}
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {hasDisconnected && (
-                  <span
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
-                      text-[11px] font-bold
-                      bg-red-50 dark:bg-red-950/40
-                      text-red-600 dark:text-red-300
-                      border border-red-200 dark:border-red-800/60"
-                    title="중앙 2×2와 이어지지 않은 블록 구역이 존재합니다."
-                  >
-                    <span aria-hidden>⚠</span>
-                    <span>끊어진 영역이 있습니다</span>
+              {/* 경고 칩 + 총합 (현재 프리셋 편집에서만 노출) */}
+              <div className="flex items-center justify-between px-1 gap-2 min-h-[28px]">
+                {/* 좌측: 규칙 경고 칩들 (없으면 공간만 차지). 끊어짐이 우선 표시. */}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {hasDisconnected && (
+                    <span
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
+                    text-[11px] font-bold
+                    bg-red-50 dark:bg-red-950/40
+                    text-red-600 dark:text-red-300
+                    border border-red-200 dark:border-red-800/60"
+                      title="중앙 2×2와 이어지지 않은 블록 구역이 존재합니다."
+                    >
+                      <span aria-hidden>⚠</span>
+                      <span>끊어진 영역이 있습니다</span>
+                    </span>
+                  )}
+                  {!hasCenterBlock && (
+                    <span
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
+                    text-[11px] font-bold
+                    bg-red-50 dark:bg-red-950/40
+                    text-red-600 dark:text-red-300
+                    border border-red-200 dark:border-red-800/60"
+                      title="중앙 2×2 영역 중 최소 한 칸은 블록으로 점유해야 합니다."
+                    >
+                      <span aria-hidden>⚠</span>
+                      <span>중앙 2×2 영역이 비어 있음</span>
+                    </span>
+                  )}
+                </div>
+                {/* 우측: 총합 */}
+                <div className="flex items-center gap-3 text-md">
+                  <span className="text-gray-500 dark:text-gray-400">
+                    총 블록 수 <span className="font-bold text-gray-800 dark:text-gray-100">{totalBlocks}</span>개
                   </span>
-                )}
-                {!hasCenterBlock && (
-                  <span
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
-                      text-[11px] font-bold
-                      bg-red-50 dark:bg-red-950/40
-                      text-red-600 dark:text-red-300
-                      border border-red-200 dark:border-red-800/60"
-                    title="중앙 2×2 영역 중 최소 한 칸은 블록으로 점유해야 합니다."
-                  >
-                    <span aria-hidden>⚠</span>
-                    <span>중앙 2×2 영역이 비어 있음</span>
+                  <span className="text-gray-500 dark:text-gray-400">
+                    총 칸 수 <span className="font-extrabold text-sky-600 dark:text-sky-400">{totalCells}</span>
+                    <span className="ml-0.5">칸</span>
                   </span>
-                )}
+                </div>
               </div>
-              {/* 우측: 총합 */}
-              <div className="flex items-center gap-3 text-md">
-                <span className="text-gray-500 dark:text-gray-400">
-                  총 블록 수 <span className="font-bold text-gray-800 dark:text-gray-100">{totalBlocks}</span>개
-                </span>
-                <span className="text-gray-500 dark:text-gray-400">
-                  총 칸 수 <span className="font-extrabold text-sky-600 dark:text-sky-400">{totalCells}</span>
-                  <span className="ml-0.5">칸</span>
-                </span>
+
+              {/* 점령 효과 (외부 8영역) */}
+              <div className="flex flex-col gap-2">
+                <p className="text-[12px] font-bold text-gray-500 dark:text-gray-400 px-1">점령 효과</p>
+                <div
+                  className="grid grid-cols-2 min-[600px]:grid-cols-4 gap-1.5 p-2 rounded-xl
+                bg-slate-50 dark:bg-color-950/40 border border-slate-200/80 dark:border-white/10"
+                >
+                  {OUTER_LABELS.map((label, i) => {
+                    const cells = outerRegionCounts[i] ?? 0;
+                    const per = OUTER_REGION_PER_CELL[i];
+                    const value = cells * per.value;
+                    const active = cells > 0;
+                    return (
+                      <div
+                        key={label.name}
+                        className={`flex items-center justify-between px-2.5 py-2 rounded-md text-[13px] ${
+                          active
+                            ? "bg-white dark:bg-color-950/70 border border-slate-200 dark:border-white/10"
+                            : "bg-transparent border border-dashed border-slate-200 dark:border-white/10 opacity-60"
+                        }`}
+                      >
+                        <span className="text-gray-600 dark:text-gray-300">{label.name}</span>
+                        <span
+                          className={`font-extrabold ${
+                            active ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400 dark:text-gray-500"
+                          }`}
+                        >
+                          {active ? "+" : ""}
+                          {value}
+                          {per.unit}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-            <div
-              className="rounded-xl border border-slate-200/80 dark:border-white/10
-                bg-slate-50 dark:bg-color-950/40 overflow-x-auto"
-            >
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="border-b border-slate-200/80 dark:border-white/10">
-                    <th className="text-left px-3 py-2 text-[12px] font-bold text-gray-500 dark:text-gray-400 w-[140px]">직업</th>
-                    {BLOCK_GRADES.map((g) => (
-                      <th key={g} className="px-2 py-2 text-[12px] font-bold text-center">
-                        <span>{g}</span>
-                        <span className="ml-1 text-[10px] font-medium text-gray-400">({BLOCK_GRADE_CELL_COUNT[g]}칸)</span>
-                      </th>
+
+              {/* 미배치 블록 리스트 */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between px-1">
+                  <p className="text-[12px] font-bold text-gray-500 dark:text-gray-400">미배치 블록</p>
+                  <span className="text-[11px] text-gray-400">
+                    {unplacedBlocks.length}개 / 총 {localBlocks.length}개
+                  </span>
+                </div>
+                {unplacedBlocks.length === 0 ? (
+                  <div
+                    className="px-3 py-2 rounded-lg text-[12px] text-gray-500 dark:text-gray-400
+                  bg-slate-50 dark:bg-color-950/40 border border-slate-200/80 dark:border-white/10"
+                  >
+                    모든 블록이 그리드에 배치되어 있습니다.
+                  </div>
+                ) : (
+                  <div
+                    className="flex flex-wrap gap-1.5 p-2 rounded-lg
+                  bg-slate-50 dark:bg-color-950/40 border border-slate-200/80 dark:border-white/10
+                  max-h-[140px] overflow-y-auto"
+                  >
+                    {unplacedBlocks.map(({ block, index }) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => handleAddBlock(index)}
+                        className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[12px] font-semibold
+                      bg-white dark:bg-color-900 border border-slate-200 dark:border-white/10
+                      hover:bg-sky-50 hover:border-sky-300
+                      dark:hover:bg-sky-900/30 dark:hover:border-sky-700
+                      transition-colors"
+                        title="그리드에 추가"
+                      >
+                        {BLOCK_ICONS[block.block_type] && (
+                          <Image src={BLOCK_ICONS[block.block_type]} alt="" width={14} height={14} unoptimized />
+                        )}
+                        <span>{block.block_class}</span>
+                        <span className="text-[10px] text-gray-400">Lv.{block.block_level}</span>
+                        <span className="text-sky-500 dark:text-sky-400 ml-0.5">＋</span>
+                      </button>
                     ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {JOB_ORDER.map((job, i) => (
-                    <tr key={job} className={i < JOB_ORDER.length - 1 ? "border-b border-slate-100 dark:border-white/5" : ""}>
-                      <td className="px-3 py-2">
-                        <div className="flex items-center gap-2">
-                          {BLOCK_ICONS[job] && <Image src={BLOCK_ICONS[job]} alt={job} width={16} height={16} unoptimized />}
-                          <span className="font-bold text-[13px]">{job}</span>
-                        </div>
-                      </td>
-                      {BLOCK_GRADES.map((grade) => {
-                        const count = getCount(job, grade);
-                        return (
-                          <td key={grade} className="px-2 py-2 text-center">
-                            <select
-                              value={count}
-                              onChange={() => {
-                                /* 현재는 동작 없음 */
-                              }}
-                              className="w-[56px] text-center rounded-md border text-[12px] font-semibold
-                                bg-white dark:bg-color-900 border-slate-300 dark:border-white/10
-                                text-gray-700 dark:text-gray-200
-                                focus:outline-none focus:ring-2 focus:ring-sky-300 dark:focus:ring-sky-600
-                                py-1"
-                            >
-                              {Array.from({ length: 11 }).map((_, n) => (
-                                <option key={n} value={n}>
-                                  {n}
-                                </option>
-                              ))}
-                            </select>
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
 
           {/* 하단 버튼 (추후 동작 연결) */}
           <div className="flex justify-end gap-2 pt-1">

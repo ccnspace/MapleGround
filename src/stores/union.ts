@@ -12,6 +12,7 @@ type UnionAction = {
   setFetchStatus: (status: UnionState["fetchStatus"]) => void;
   setUnionAttributes: (data: UnionAttributes, nickname: string) => void;
   fetchUnionInfo: (nickname: string, signal?: AbortSignal) => Promise<void>;
+  resetUnionInfo: (nickname: string) => void;
 };
 
 const initialState: UnionState = {
@@ -34,6 +35,12 @@ export const useUnionStore = create<UnionState & UnionAction>()(
         },
         setFetchStatus: (fetchStatus) => {
           set({ fetchStatus });
+        },
+        resetUnionInfo: (nickname: string) => {
+          const unionAttributes = get().unionAttributes;
+          if (!unionAttributes) return;
+          const { [nickname]: _, ...rest } = unionAttributes;
+          set({ unionAttributes: { ...rest } });
         },
         fetchUnionInfo: async (nickname: string, signal?: AbortSignal) => {
           const { unionAttributes, setFetchStatus, setUnionAttributes } = get();

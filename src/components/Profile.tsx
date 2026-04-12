@@ -9,6 +9,7 @@ import { useShallow } from "zustand/shallow";
 import { CharacterAttributes } from "@/apis/getCharacterAttributes";
 import { useModalStore } from "@/stores/modal";
 import { useCharacterPowerStore } from "@/stores/characterPower";
+import { useUnionStore } from "@/stores/union";
 import { useNickname } from "@/hooks/useNickname";
 import { useRouter } from "next/navigation";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
@@ -37,11 +38,14 @@ const Profile = ({ characterAttributes }: ProfileProps) => {
 
         const { setFetchStatus, resetCharacterData } = useCharacterStore.getState();
         const { setFetchStatus: setCharacterPowerFetchStatus, resetCharacterPower } = useCharacterPowerStore.getState();
+        const { setFetchStatus: setUnionFetchStatus, resetUnionInfo } = useUnionStore.getState();
 
         setFetchStatus("loading");
         setCharacterPowerFetchStatus("loading");
+        setUnionFetchStatus("loading");
         resetCharacterData(character_name);
         resetCharacterPower(character_name);
+        resetUnionInfo(character_name);
 
         if (typeof window !== "undefined") {
           location.href = `/main?name=${character_name}`;

@@ -61,6 +61,11 @@ const TestBlocksPage = () => {
 
   // 아이콘은 모양의 첫 번째 "X" 위치에 얹음
   const iconPos = useMemo(() => {
+    // "$" 가 있으면 그 위치, 없으면 첫 "X" 위치
+    for (let r = 0; r < shape.length; r++) {
+      const c = shape[r].indexOf("$");
+      if (c >= 0) return { row: r, col: c };
+    }
     for (let r = 0; r < shape.length; r++) {
       const c = shape[r].indexOf("X");
       if (c >= 0) return { row: r, col: c };
@@ -185,7 +190,8 @@ const TestBlocksPage = () => {
           {Array.from({ length: PREVIEW_SIZE * PREVIEW_SIZE }).map((_, i) => {
             const row = Math.floor(i / PREVIEW_SIZE);
             const col = i % PREVIEW_SIZE;
-            const inShape = row < rows && col < cols && shape[row]?.[col] === "X";
+            const ch = row < rows && col < cols ? shape[row]?.[col] : undefined;
+            const inShape = ch === "X" || ch === "$";
             const isIcon = inShape && row === iconPos.row && col === iconPos.col;
             return (
               <div

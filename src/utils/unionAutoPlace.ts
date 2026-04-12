@@ -37,6 +37,8 @@ const boardHasBit = (b: BitBoard, idx: number): boolean => (b[idx >>> 5] & (1 <<
 export type Orientation = {
   id: number;
   cells: Array<{ dx: number; dy: number }>;
+  /** cells 배열에서 "아이콘이 위치한 셀" 의 인덱스. shape 문자열의 "$" 셀을 추적. */
+  iconCellIdx: number;
 };
 
 export type SolverClass = {
@@ -76,35 +78,62 @@ const canonicalKey = (cells: Cell[]): string => cells.map((c) => `${c.dx},${c.dy
 const rotateCW = (cells: Cell[]): Cell[] => cells.map((c) => ({ dx: c.dy, dy: -c.dx }));
 const flipH = (cells: Cell[]): Cell[] => cells.map((c) => ({ dx: -c.dx, dy: c.dy }));
 
+// 단일 Cell 에 같은 변환을 적용하는 헬퍼 (아이콘 셀 추적용)
+const rotateCWCell = (c: Cell): Cell => ({ dx: c.dy, dy: -c.dx });
+const flipHCell = (c: Cell): Cell => ({ dx: -c.dx, dy: c.dy });
+
 export const generateOrientations = (shape: string[]): Orientation[] => {
   // matrix row 0 = top = 가장 큰 y → grid y = -row
+  // "X" 와 "$" 모두 색칠된 칸으로 인정하고, "$" 는 아이콘 위치로 추가 기록.
   const base: Cell[] = [];
+  let baseIcon: Cell | null = null;
   for (let r = 0; r < shape.length; r++) {
     for (let c = 0; c < shape[r].length; c++) {
-      if (shape[r][c] === "X") base.push({ dx: c, dy: -r });
+      const ch = shape[r][c];
+      if (ch === "X" || ch === "$") {
+        const cell = { dx: c, dy: -r };
+        base.push(cell);
+        if (ch === "$") baseIcon = cell;
+      }
     }
   }
-  const variants: Cell[][] = [];
-  let curr = base;
+
+  const variants: Array<{ cells: Cell[]; icon: Cell | null }> = [];
+  let currCells = base;
+  let currIcon = baseIcon;
   for (let rot = 0; rot < 4; rot++) {
-    variants.push(curr);
-    variants.push(flipH(curr));
-    curr = rotateCW(curr);
+    variants.push({ cells: currCells, icon: currIcon });
+    variants.push({ cells: currCells.map(flipHCell), icon: currIcon ? flipHCell(currIcon) : null });
+    currCells = currCells.map(rotateCWCell);
+    currIcon = currIcon ? rotateCWCell(currIcon) : null;
   }
+
   const seen = new Set<string>();
   const result: Orientation[] = [];
   for (const v of variants) {
-    const norm = normalizeCells(v);
-    const key = canonicalKey(norm);
+    // 이동 정규화
+    const minDx = Math.min(...v.cells.map((c) => c.dx));
+    const minDy = Math.min(...v.cells.map((c) => c.dy));
+    const shifted = v.cells.map((c) => ({ dx: c.dx - minDx, dy: c.dy - minDy }));
+    const shiftedIcon = v.icon ? { dx: v.icon.dx - minDx, dy: v.icon.dy - minDy } : null;
+    const sorted = [...shifted].sort((a, b) => (a.dy !== b.dy ? a.dy - b.dy : a.dx - b.dx));
+    const key = canonicalKey(sorted);
     if (seen.has(key)) continue;
     seen.add(key);
     // pivot = grid scan-order 첫 셀 = (y desc, x asc) = (dy desc, dx asc)
-    let pivot = norm[0];
-    for (const c of norm) {
+    let pivot = sorted[0];
+    for (const c of sorted) {
       if (c.dy > pivot.dy || (c.dy === pivot.dy && c.dx < pivot.dx)) pivot = c;
     }
-    const cells = norm.map((c) => ({ dx: c.dx - pivot.dx, dy: c.dy - pivot.dy }));
-    result.push({ id: result.length, cells });
+    const cells = sorted.map((c) => ({ dx: c.dx - pivot.dx, dy: c.dy - pivot.dy }));
+    // iconCellIdx: shiftedIcon 을 pivot 기준 좌표로 바꿔 cells 에서 같은 위치 찾기
+    let iconCellIdx = 0;
+    if (shiftedIcon) {
+      const iconRel = { dx: shiftedIcon.dx - pivot.dx, dy: shiftedIcon.dy - pivot.dy };
+      const found = cells.findIndex((c) => c.dx === iconRel.dx && c.dy === iconRel.dy);
+      if (found >= 0) iconCellIdx = found;
+    }
+    result.push({ id: result.length, cells, iconCellIdx });
   }
   return result;
 };

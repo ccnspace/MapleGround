@@ -34,71 +34,85 @@ export const BLOCK_GRADE_CELL_COUNT: Record<BlockGrade, number> = {
 export const UNION_BLOCK_SHAPES: Record<BlockJobCategory, Record<BlockGrade, string[]>> = {
   // 전사: 뭉쳐있는 정사각/계단형
   전사: {
-    B: ["X"],
-    A: ["XX"],
-    S: ["X.", "XX"],
-    SS: ["XX", "XX"],
-    SSS: ["XX.", "XXX"],
+    B: ["$"],
+    A: ["$X"],
+    S: ["$.", "XX"],
+    SS: ["$X", "XX"],
+    SSS: ["$XX", "XX."],
   },
 
   // 마법사: 가로 직선 → T자 → 십자(+)
   마법사: {
-    B: ["X"],
-    A: ["XX"],
-    S: ["XXX"],
-    SS: ["XXX", ".X."],
-    SSS: [".X.", "XXX", ".X."],
+    B: ["$"],
+    A: ["$X"],
+    S: ["X$X"],
+    SS: ["X$X", ".X."],
+    SSS: [".X.", "X$X", ".X."],
   },
 
   // 궁수 / 메이플스토리 M: 일자(가로 직선) 고정
   궁수_메이플M: {
-    B: ["X"],
-    A: ["XX"],
-    S: ["XXX"],
-    SS: ["XXXX"],
-    SSS: ["XXXXX"],
+    B: ["$"],
+    A: ["$X"],
+    S: ["X$X"],
+    SS: ["X$XX"],
+    SSS: ["XX$XX"],
   },
 
   // 도적: 가로 직선 → L자(우측 하단 돌출)
   도적: {
-    B: ["X"],
-    A: ["XX"],
-    S: ["XXX"],
-    SS: ["XXX", "..X"],
-    SSS: ["..X", "XXX", "..X"],
+    B: ["$"],
+    A: ["$X"],
+    S: ["X$X"],
+    SS: ["X$X", "..X"],
+    SSS: ["..X", "X$X", "..X"],
   },
 
   // 해적: 세로 L / Z 형태
   해적: {
-    B: ["X"],
-    A: ["XX"],
-    S: ["X.", "X.", "XX"],
-    SS: ["X.", "XX", ".X"],
-    SSS: [".X", ".X", "XX", "X."],
+    B: ["$"],
+    A: ["$X"],
+    S: ["$X", "X."],
+    SS: [".X", "$X", "X."],
+    SSS: [".X", ".X", "$X", "X."],
   },
 
   // 하이브리드(제논 등): B~SS 는 도적과 동일 모양 / SSS 만 별도 Z-like 5칸 모양
   하이브리드: {
-    B: ["X"],
-    A: ["XX"],
-    S: ["XXX"],
-    SS: ["XXX", "..X"],
-    SSS: ["X..", "XXX", "..X"],
+    B: ["$"],
+    A: ["$X"],
+    S: ["X$X"],
+    SS: ["X$X", "..X"],
+    SSS: ["X..", "X$X", "..X"],
   },
 };
 
 /** 좌표 오프셋 표현 (좌상단을 원점으로, dx=오른쪽+, dy=아래+) */
 export type BlockOffset = { dx: number; dy: number };
 
-/** 모양 매트릭스를 (dx, dy) 오프셋 배열로 변환 */
+/**
+ * 모양 매트릭스를 (dx, dy) 오프셋 배열로 변환.
+ * - "X" = 색칠된 칸
+ * - "$" = 색칠된 칸이면서 아이콘이 위치한 칸 (둘 다 "색칠" 로 취급)
+ */
 export const shapeToOffsets = (shape: string[]): BlockOffset[] => {
   const offsets: BlockOffset[] = [];
   for (let row = 0; row < shape.length; row++) {
     for (let col = 0; col < shape[row].length; col++) {
-      if (shape[row][col] === "X") offsets.push({ dx: col, dy: row });
+      const ch = shape[row][col];
+      if (ch === "X" || ch === "$") offsets.push({ dx: col, dy: row });
     }
   }
   return offsets;
+};
+
+/** 모양 내 아이콘 위치("$") 의 (dx, dy) 오프셋. 없으면 null. */
+export const shapeIconOffset = (shape: string[]): BlockOffset | null => {
+  for (let row = 0; row < shape.length; row++) {
+    const col = shape[row].indexOf("$");
+    if (col >= 0) return { dx: col, dy: row };
+  }
+  return null;
 };
 
 /**

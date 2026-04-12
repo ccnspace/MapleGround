@@ -563,9 +563,12 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
       if (!ori) return;
       const blockType = categoryToBlockType(cat);
       const cells = ori.cells.map((c) => ({ x: p.anchor.x + c.dx, y: p.anchor.y + c.dy }));
+
       cells.forEach((c) => cellMap.set(`${c.x},${c.y}`, { blockType, blockIdx }));
-      const last = cells[cells.length - 1];
-      icons.add(`${last.x},${last.y}`);
+      // 아이콘 위치는 shape 의 "$" 셀 (orientation.iconCellIdx 가 가리키는 cells 의 인덱스).
+      // 회전/대칭 후에도 정상적으로 "$" 에서 변환된 셀을 추적한다.
+      const iconCell = cells[ori.iconCellIdx] ?? cells[0];
+      icons.add(`${iconCell.x},${iconCell.y}`);
     });
 
     // 각 셀의 4방향 이웃을 보고, 이웃이 같은 블록이 아니면 그 방향에 테두리를 그림
@@ -1294,7 +1297,9 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
                   <table className="min-w-full text-sm">
                     <thead>
                       <tr className="border-b border-slate-200/80 dark:border-white/10">
-                        <th className="text-left px-3 py-2 text-[12px] font-bold text-gray-500 dark:text-gray-400 w-[140px] max-[600px]:w-auto">직업</th>
+                        <th className="text-left px-3 py-2 text-[12px] font-bold text-gray-500 dark:text-gray-400 w-[140px] max-[600px]:w-auto">
+                          직업
+                        </th>
                         {BLOCK_GRADES.map((g) => (
                           <th key={g} className="px-2 py-2 text-[12px] font-bold text-center">
                             <span>{g}</span>

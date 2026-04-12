@@ -51,6 +51,8 @@ export type SolverInput = {
   paintedKeys: string[];
   classes: SolverClass[];
   timeoutMs?: number;
+  /** true 면 "어떤 배치에서든 적어도 하나의 블록 아이콘이 중앙 2×2 에 있어야 한다" 는 제약을 적용 */
+  requireCenterIcon?: boolean;
 };
 
 export type Placement = {
@@ -154,7 +156,16 @@ type Row = {
   orientationId: number;
   anchor: { x: number; y: number };
   cells: number[]; // bit indices
+  iconBit: number; // 이 배치의 아이콘 셀 비트 인덱스 (cells 중 하나)
 };
+
+// 중앙 2×2 비트 인덱스 집합
+const CENTER_BITS: ReadonlySet<number> = new Set<number>([
+  cellToBitIdx(0, 0),
+  cellToBitIdx(-1, 0),
+  cellToBitIdx(0, 1),
+  cellToBitIdx(-1, 1),
+]);
 
 export const solve = (input: SolverInput): SolverResult => {
   const timeoutMs = input.timeoutMs ?? 60_000;
@@ -194,7 +205,10 @@ export const solve = (input: SolverInput): SolverResult => {
         }
         if (valid) {
           const rowIdx = rows.length;
-          rows.push({ classIdx, orientationId: ori.id, anchor, cells });
+          // 아이콘 셀(shape 의 "$") 의 비트 인덱스 계산
+          const iconOff = ori.cells[ori.iconCellIdx] ?? ori.cells[0];
+          const iconBit = cellToBitIdx(anchor.x + iconOff.dx, anchor.y + iconOff.dy);
+          rows.push({ classIdx, orientationId: ori.id, anchor, cells, iconBit });
           for (const b of cells) cellRows[b].push(rowIdx);
           classRows[classIdx].push(rowIdx);
         }
@@ -290,6 +304,9 @@ export const solve = (input: SolverInput): SolverResult => {
     for (const b of row.cells) cellCovered[b] = 0;
   };
 
+  const requireCenter = input.requireCenterIcon ?? false;
+  let iconsInCenter = 0;
+
   const recurse = (): boolean => {
     if (timedOut) return false;
     nodes++;
@@ -311,7 +328,11 @@ export const solve = (input: SolverInput): SolverResult => {
         if (cnt <= 1) break; // 0 이면 fail, 1 이면 forced — 더 볼 필요 없음
       }
     }
-    if (bestCell === -1) return true; // 모두 덮임 → 성공
+    if (bestCell === -1) {
+      // 모두 덮임 → 성공. 단, requireCenter 라면 중앙 2×2 에 아이콘이 있어야 함.
+      if (requireCenter && iconsInCenter === 0) return false;
+      return true;
+    }
     if (bestCount === 0) return false; // 덮을 방법 없음 → fail
 
     // 후보 row 들 시도. 큰 피스 먼저(제약 강함 → 실패 빠름).
@@ -329,7 +350,10 @@ export const solve = (input: SolverInput): SolverResult => {
       const row = rows[rowIdx];
       placements.push({ classKey: classes[row.classIdx].key, orientationId: row.orientationId, anchor: row.anchor });
       const undo = applyRow(rowIdx);
+      const isIconInCenter = CENTER_BITS.has(row.iconBit);
+      if (isIconInCenter) iconsInCenter++;
       if (recurse()) return true;
+      if (isIconInCenter) iconsInCenter--;
       undoRow(rowIdx, undo);
       placements.pop();
       if (timedOut) return false;

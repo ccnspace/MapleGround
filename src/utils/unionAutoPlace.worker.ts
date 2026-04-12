@@ -13,14 +13,15 @@ type WorkerInput = {
     orientations: Orientation[];
   }>;
   timeoutMs?: number;
+  requireCenterIcon?: boolean;
 };
 
 type WorkerOutput = SolverResult;
 
 self.onmessage = (e: MessageEvent<WorkerInput>) => {
-  const { paintedKeys, classes, timeoutMs } = e.data;
+  const { paintedKeys, classes, timeoutMs, requireCenterIcon } = e.data;
   try {
-    const result = solve({ paintedKeys, classes, timeoutMs });
+    const result = solve({ paintedKeys, classes, timeoutMs, requireCenterIcon });
     (self as unknown as Worker).postMessage(result satisfies WorkerOutput);
   } catch (err) {
     (self as unknown as Worker).postMessage({

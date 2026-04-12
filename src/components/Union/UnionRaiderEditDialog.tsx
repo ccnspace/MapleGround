@@ -532,7 +532,13 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
       worker.terminate();
       workerRef.current = null;
     };
-    worker.postMessage({ paintedKeys: Array.from(paintedCells), classes, timeoutMs: 60_000 });
+    worker.postMessage({
+      paintedKeys: Array.from(paintedCells),
+      classes,
+      timeoutMs: 60_000,
+      // 성공 조건: 어떤 배치에서든 중앙 2×2 에 적어도 하나의 블록 아이콘이 있어야 함
+      requireCenterIcon: true,
+    });
   };
 
   const handleCancelAutoPlace = () => {
@@ -658,11 +664,11 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
     return { grid: cellMap, iconCells: icons, gradeCountMap: counts, allLabels: labels, overlapCells: overlaps };
   }, [localBlocks, blockOrder, innerStatMap]);
 
-  // 중앙 2x2 (0,0)/(-1,0)/(0,1)/(-1,1) 중 하나라도 점유되어야 함
+  // 중앙 2x2 (0,0)/(-1,0)/(0,1)/(-1,1) 중 한 칸에 "직업 아이콘 칸" 이 반드시 와야 점령됐다고 본다
   const hasCenterBlock = useMemo(() => {
     const centerKeys = ["0,0", "-1,0", "0,1", "-1,1"];
-    return centerKeys.some((k) => grid.has(k));
-  }, [grid]);
+    return centerKeys.some((k) => iconCells.has(k));
+  }, [iconCells]);
 
   // 끊어진 영역(메인 컴포넌트에 속하지 않는 모든 셀) 계산.
   // 중앙 2x2에 닿은 컴포넌트를 메인으로 선택하고, 중앙이 비었으면 가장 큰 컴포넌트를 메인으로 본다.
@@ -1571,7 +1577,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
                       title="중앙 2×2 영역 중 최소 한 칸은 블록으로 점유해야 합니다."
                     >
                       <span aria-hidden>⚠</span>
-                      <span>중앙 2×2 영역이 비어 있음</span>
+                      <span>중앙 2×2 영역에 직업 아이콘 배치 필수</span>
                     </span>
                   )}
                 </div>

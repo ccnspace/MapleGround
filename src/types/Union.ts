@@ -6,7 +6,9 @@ type UnionBlockPosition = {
 
 /** 유니온 공격대 배치 */
 type UnionInnerStat = {
+  /** 공격대 배치 위치 (11시 방향부터 시계 방향 순서대로 0~7) */
   stat_field_id: string;
+  /** 해당 지역 점령 효과 */
   stat_field_effect: string;
 };
 
@@ -15,12 +17,21 @@ type UnionBlock = {
   block_type: string;
   block_class: string;
   block_level: string;
+  /** 블록 기준점 좌표
+중앙 4칸 중 오른쪽 아래 칸이 x : 0, y : 0 포지션
+좌측으로 1칸씩 이동하면 x가 1씩 감소
+우측으로 1칸씩 이동하면 x가 1씩 증가
+아래로 1칸씩 이동하면 y가 1씩 감소
+위로 1칸씩 이동하면 y가 1씩 증가 */
   block_control_point: UnionBlockPosition;
+  /**
+   * 블록이 차지하고 있는 영역 좌표들 (null:미 배치 시)
+   */
   block_position: UnionBlockPosition[] | null;
 };
 
 /** 유니온 공격대 프리셋 공통 구조 */
-type UnionRaiderPreset = {
+export type UnionRaiderPreset = {
   union_raider_stat: string[];
   union_occupied_stat: string[];
   union_inner_stat: UnionInnerStat[];

@@ -6,6 +6,7 @@ import { useUnionStore } from "@/stores/union";
 import { useNickname } from "@/hooks/useNickname";
 import { ContainerWrapper } from "./ContainerWrapper";
 import Link from "next/link";
+import { Spinner } from "../svg/Spinner";
 
 const getChampionGradeStyle = (grade: string) => {
   if (grade === "SSS") return "bg-gradient-to-br from-red-500 to-rose-600 text-white";
@@ -48,7 +49,7 @@ export const UnionSummaryCard = () => {
 
   return (
     <ContainerWrapper className="!min-w-0" innerClassName="h-[410px] overflow-y-auto">
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 h-full">
         <div className="flex items-center justify-between">
           <p className="flex font-extrabold text-base px-2 pb-0.5 pt-0.5 border-l-4 border-l-purple-400/80 max-[600px]:text-sm">
             유니온 정보
@@ -63,13 +64,11 @@ export const UnionSummaryCard = () => {
           )}
         </div>
 
-        {fetchStatus === "success" && union ? (
+        {fetchStatus === "success" && !!union ? (
           <div className="flex flex-col gap-3">
             {/* 등급 + 레벨 */}
             <div className="flex items-center gap-3 px-3 py-4 rounded-lg bg-slate-200/50 dark:bg-white/5">
-              <span className={`text-xs font-bold px-3 py-1.5 rounded-md ${getGradeBg(union.union_grade)}`}>
-                {union.union_grade}
-              </span>
+              <span className={`text-xs font-bold px-3 py-1.5 rounded-md ${getGradeBg(union.union_grade)}`}>{union.union_grade}</span>
               <span className="font-extrabold text-2xl">Lv.{union.union_level.toLocaleString()}</span>
             </div>
 
@@ -100,7 +99,11 @@ export const UnionSummaryCard = () => {
                       className="flex items-center gap-2 px-2.5 py-2 rounded-lg
                         bg-slate-200/60 dark:bg-white/5"
                     >
-                      <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded shrink-0 ${getChampionGradeStyle(champ.champion_grade)}`}>
+                      <span
+                        className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded shrink-0 ${getChampionGradeStyle(
+                          champ.champion_grade
+                        )}`}
+                      >
                         {champ.champion_grade}
                       </span>
                       <div className="flex flex-col min-w-0">
@@ -114,9 +117,9 @@ export const UnionSummaryCard = () => {
             )}
           </div>
         ) : (
-          <div className="flex items-center justify-center py-6">
+          <div className="flex items-center justify-center flex-1">
             <p className="font-bold text-sm text-slate-950/50 dark:text-white/60">
-              {fetchStatus === "error" ? "유니온 정보를 불러올 수 없습니다." : "불러오는 중..."}
+              {fetchStatus === "error" ? "유니온 정보를 불러올 수 없습니다." : <Spinner width="3em" height="3em" color="currentColor" />}
             </p>
           </div>
         )}

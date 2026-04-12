@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import Image from "next/image";
 import { useShallow } from "zustand/shallow";
 import { useUnionStore } from "@/stores/union";
 import { useCharacterStore } from "@/stores/character";
@@ -9,9 +10,17 @@ import { formatKoreanNumber } from "@/utils/formatKoreanNum";
 import { CommonWrapper } from "@/components/Container/CommonWrapper";
 import { CommonTitle } from "@/components/Container/CommonTitle";
 import { LoadingContainer } from "@/components/Container/LoadingContainer";
+import { UnionRaiderGrid } from "@/components/Union/UnionRaiderGrid";
 import type { Union, UnionArtifact, UnionChampion } from "@/types/Union";
+import championBadge1 from "@/images/c1.png";
+import championBadge2 from "@/images/c2.png";
+import championBadge3 from "@/images/c3.png";
+import championBadge4 from "@/images/c4.png";
+import championBadge5 from "@/images/c5.png";
 
-type TabType = "artifact" | "champion";
+const CHAMPION_BADGE_IMAGES = [championBadge1, championBadge2, championBadge3, championBadge4, championBadge5];
+
+type TabType = "artifact" | "champion" | "raider";
 
 // ── 등급 스타일 ──
 const getUnionGradeBg = (grade: string) => {
@@ -202,34 +211,53 @@ const ChampionTab = ({ champion }: { champion: UnionChampion }) => (
       {champion.union_champion.map((champ, i) => (
         <div
           key={i}
-          className={`flex flex-col gap-3 p-4 rounded-xl border bg-slate-50 dark:bg-color-950/50 ${getChampionCardBorder(
+          className={`flex flex-col gap-2 px-3 py-2.5 rounded-xl border bg-slate-50 dark:bg-color-950/50 ${getChampionCardBorder(
             champ.champion_grade
           )}`}
         >
-          {/* 등급 + 레벨 */}
+          {/* 등급 */}
           <div className="flex items-baseline justify-between">
-            <span className={`text-xl font-extrabold ${getChampionGradeText(champ.champion_grade)}`}>{champ.champion_grade}</span>
+            <span className={`text-base font-extrabold ${getChampionGradeText(champ.champion_grade)}`}>{champ.champion_grade}</span>
           </div>
 
           {/* 이름 + 직업 */}
-          <div className="flex flex-col gap-0.5 items-center py-2">
-            <p className="font-bold text-sm">{champ.champion_class}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{champ.champion_name}</p>
+          <div className="flex flex-col gap-0.5 items-center">
+            <p className="font-bold text-[13px] leading-tight">{champ.champion_class}</p>
+            <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-tight">{champ.champion_name}</p>
           </div>
 
           {/* 휘장 */}
           {champ.champion_badge_info.length > 0 && (
-            <div className="flex flex-wrap gap-1 justify-center">
-              {champ.champion_badge_info.map((badge, j) => (
-                <span
-                  key={j}
-                  className="text-[10px] font-medium px-1.5 py-1 rounded
-                    bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400
-                    border border-amber-200/60 dark:border-amber-800/30"
-                >
-                  {badge.stat}
-                </span>
-              ))}
+            <div className="flex flex-row items-end justify-center gap-1.5 mt-auto">
+              {champ.champion_badge_info.map((badge, j) => {
+                const badgeImage = CHAMPION_BADGE_IMAGES[j];
+                if (!badgeImage) return null;
+                return (
+                  <div key={j} className="relative group">
+                    <Image
+                      src={badgeImage}
+                      alt={badge.stat}
+                      width={22}
+                      height={30}
+                      className="shrink-0 drop-shadow-sm transition-transform group-hover:-translate-y-0.5"
+                    />
+                    <div
+                      className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-20
+                        opacity-0 group-hover:opacity-100 transition-opacity
+                        whitespace-nowrap px-2 py-1 rounded-md
+                        bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900
+                        text-[11px] font-medium shadow-lg"
+                    >
+                      {badge.stat}
+                      <span
+                        className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0
+                          border-x-4 border-x-transparent
+                          border-t-4 border-t-slate-900/95 dark:border-t-white/95"
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -264,7 +292,7 @@ const UnionPageContent = () => {
   const nickname = useNickname();
   const fetchCharacterAttributes = useCharacterStore((state) => state.fetchCharacterAttributes);
   const characterFetchStatus = useCharacterStore((state) => state.fetchStatus);
-  const [activeTab, setActiveTab] = useState<TabType>("champion");
+  const [activeTab, setActiveTab] = useState<TabType>("raider");
 
   const {
     fetchStatus: unionFetchStatus,
@@ -318,14 +346,14 @@ const UnionPageContent = () => {
                   border border-slate-200 dark:border-white/5 self-start"
               >
                 <button
-                  onClick={() => setActiveTab("champion")}
+                  onClick={() => setActiveTab("raider")}
                   className={`px-4 py-1.5 rounded-lg text-[13px] font-semibold transition-all ${
-                    activeTab === "champion"
+                    activeTab === "raider"
                       ? "bg-white dark:bg-color-800 text-black dark:text-white shadow-sm"
                       : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                   }`}
                 >
-                  챔피언 전장
+                  공격대
                 </button>
                 <button
                   onClick={() => setActiveTab("artifact")}
@@ -337,10 +365,21 @@ const UnionPageContent = () => {
                 >
                   아티팩트
                 </button>
+                <button
+                  onClick={() => setActiveTab("champion")}
+                  className={`px-4 py-1.5 rounded-lg text-[13px] font-semibold transition-all ${
+                    activeTab === "champion"
+                      ? "bg-white dark:bg-color-800 text-black dark:text-white shadow-sm"
+                      : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                  }`}
+                >
+                  챔피언 전장
+                </button>
               </div>
 
               {activeTab === "champion" && champion && <ChampionTab champion={champion} />}
               {activeTab === "artifact" && artifact && <ArtifactTab artifact={artifact} />}
+              {activeTab === "raider" && unionData?.unionRaider && <UnionRaiderGrid raider={unionData.unionRaider} />}
             </div>
 
             {/* 우측: 유니온 정보 패널 */}

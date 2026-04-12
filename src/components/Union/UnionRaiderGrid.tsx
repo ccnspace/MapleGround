@@ -118,7 +118,7 @@ const OUTER_LABELS: { name: string; x: number; y: number }[] = [
 ];
 
 // 블록 베이스 색상 (베이지-금색)
-const BLOCK_BASE = "bg-[#c8b078]";
+const BLOCK_BASE = "bg-[#bb996f]";
 
 // block_type별 오버레이 색상 + 아이콘 도트 색상
 const BLOCK_TYPE_STYLES: Record<string, { overlay: string; dot: string }> = {
@@ -217,14 +217,8 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
           blockIndex,
         });
       });
-      // 두 번째 칸에 아이콘 표시 (없으면 첫 번째)
-      if (block.block_position.length > 2) {
-        const second = block.block_position[2];
-        icons.add(`${second.x},${second.y}`);
-      } else if (block.block_position.length > 0) {
-        const first = block.block_position[0];
-        icons.add(`${first.x},${first.y}`);
-      }
+      const pos = block.block_position[block.block_position.length - 1];
+      icons.add(`${pos.x},${pos.y}`);
     });
 
     // 내부 영역 라벨 (union_inner_stat)
@@ -342,7 +336,6 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
               const cell = grid.get(key);
               const isCenter = (x === 0 && y === 0) || (x === -1 && y === 0) || (x === 0 && y === 1) || (x === -1 && y === 1);
               const isHovered = cell && cell.blockIndex === hoveredBlock;
-              const color = cell ? getBlockColor(cell.blockType) : null;
               const borderStyle = borderStyles.get(key) ?? {};
               const label = allLabels.get(key);
               return (
@@ -376,7 +369,7 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
                     <span
                       className="absolute z-30 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap
                       text-[11px] max-[600px]:text-[8px] font-bold text-white pointer-events-none
-                      bg-black/50 px-1 rounded-sm"
+                      bg-black/30 px-1.5 rounded-md opacity-80"
                     >
                       {label}
                     </span>

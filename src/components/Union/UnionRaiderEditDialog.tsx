@@ -245,6 +245,12 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
     return { grid: cellMap, iconCells: icons, gradeCountMap: counts, allLabels: labels, overlapCells: overlaps };
   }, [localBlocks, blockOrder, innerStatMap]);
 
+  // 중앙 2x2 (0,0)/(-1,0)/(0,1)/(-1,1) 중 하나라도 점유되어야 함
+  const hasCenterBlock = useMemo(() => {
+    const centerKeys = ["0,0", "-1,0", "0,1", "-1,1"];
+    return centerKeys.some((k) => grid.has(k));
+  }, [grid]);
+
   // 선택된 블록의 메뉴 위치(그리드 컨테이너 기준 top-left)
   const menuAnchor = useMemo(() => {
     if (selectedBlockIndex === null) return null;
@@ -576,7 +582,24 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
 
           {/* 직업 × 등급 블록 개수 선택 */}
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between px-1">
+            <div className="flex items-center justify-between px-1 gap-2 min-h-[28px]">
+              {/* 좌측: 규칙 경고 칩 (없으면 공간만 차지) */}
+              {!hasCenterBlock ? (
+                <span
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
+                    text-[11px] font-bold
+                    bg-red-50 dark:bg-red-950/40
+                    text-red-600 dark:text-red-300
+                    border border-red-200 dark:border-red-800/60"
+                  title="중앙 2×2 영역 중 최소 한 칸은 블록으로 점유해야 합니다."
+                >
+                  <span aria-hidden>⚠</span>
+                  <span>중앙 2×2 영역이 비어 있음</span>
+                </span>
+              ) : (
+                <span />
+              )}
+              {/* 우측: 총합 */}
               <div className="flex items-center gap-3 text-md">
                 <span className="text-gray-500 dark:text-gray-400">
                   총 블록 수 <span className="font-bold text-gray-800 dark:text-gray-100">{totalBlocks}</span>개

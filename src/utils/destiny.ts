@@ -59,6 +59,7 @@ export const bossList: Boss[] = [
   },
   { name: "림보", type: "weekly", rewards: { 노멀: 120, 하드: 360 }, availableDifficulties: ["노멀", "하드"] },
   { name: "발드릭스", type: "weekly", rewards: { 노멀: 150, 하드: 450 }, availableDifficulties: ["노멀", "하드"] },
+  { name: "유피테르", type: "weekly", rewards: { 노멀: 160, 하드: 500 }, availableDifficulties: ["노멀", "하드"] },
 ];
 
 export function calculateBossTrace(config: BossConfig, boss: Boss): number {

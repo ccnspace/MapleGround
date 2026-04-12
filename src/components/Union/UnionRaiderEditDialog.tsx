@@ -894,12 +894,12 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
     const offsets = block.block_position.map((p) => ({ dx: p.x - x, dy: p.y - y }));
     const dxs = offsets.map((o) => o.dx);
     const dys = offsets.map((o) => o.dy);
-    // 모든 셀이 그리드 안에 들어오도록 잡은 셀이 가질 수 있는 좌표 범위 계산
+    // 블록의 모든 셀이 밖으로 나가는 것만 금지 (축별로 최소 한 셀이 그리드 안에 남도록)
     const bounds = {
-      minX: MIN_X - Math.min(...dxs),
-      maxX: MAX_X - Math.max(...dxs),
-      minY: MIN_Y - Math.min(...dys),
-      maxY: MAX_Y - Math.max(...dys),
+      minX: MIN_X - Math.max(...dxs),
+      maxX: MAX_X - Math.min(...dxs),
+      minY: MIN_Y - Math.max(...dys),
+      maxY: MAX_Y - Math.min(...dys),
     };
     dragRef.current = {
       blockIndex: cell.blockIndex,
@@ -927,7 +927,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
       const row = Math.floor(((e.clientY - rect.top) / rect.height) * ROWS);
       const rawX = MIN_X + col;
       const rawY = MAX_Y - row;
-      // 블록 전체가 그리드 영역 안에 남도록 클램프
+      // 블록의 모든 셀이 밖으로 나가지 않도록 클램프 (일부 셀은 밖으로 나갈 수 있음)
       const newCellX = Math.max(drag.bounds.minX, Math.min(drag.bounds.maxX, rawX));
       const newCellY = Math.max(drag.bounds.minY, Math.min(drag.bounds.maxY, rawY));
       if (newCellX === drag.grabCellX && newCellY === drag.grabCellY) return;

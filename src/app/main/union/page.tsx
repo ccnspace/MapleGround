@@ -373,7 +373,7 @@ const UnionPageContent = () => {
                       : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                   }`}
                 >
-                  챔피언 전장
+                  챔피언
                 </button>
               </div>
 

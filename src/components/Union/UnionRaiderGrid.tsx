@@ -397,7 +397,7 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
         <button
           type="button"
           onClick={() => setEditDialogTab("new")}
-          className="px-5 py-2.5 rounded-lg text-lg font-extrabold text-white transition-all
+          className="px-5 py-2.5 rounded-lg text-lg max-[600px]:text-sm font-extrabold text-white transition-all
             bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-600 hover:to-indigo-600
             shadow-md shadow-sky-500/30 hover:-translate-y-1"
         >
@@ -406,7 +406,7 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
         <button
           type="button"
           onClick={() => setEditDialogTab("edit")}
-          className="px-5 py-2.5 rounded-lg text-lg font-bold
+          className="px-5 py-2.5 rounded-lg text-lg max-[600px]:text-sm font-bold
             bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20
             text-gray-700 dark:text-gray-100 transition-colors"
         >

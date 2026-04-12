@@ -206,6 +206,15 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
   const [groupMode, setGroupMode] = useState(false);
   const paintModeRef = useRef<"add" | "remove" | null>(null);
   const [isPainting, setIsPainting] = useState(false);
+  // 보유 블록 목록 섹션 펼침 상태 (기본: 접힘, useManual 전환 시 자동 펼침)
+  const [isBlockListExpanded, setIsBlockListExpanded] = useState(false);
+  const prevUseManualRef = useRef(useManual);
+  useEffect(() => {
+    if (prevUseManualRef.current !== useManual) {
+      setIsBlockListExpanded(true);
+      prevUseManualRef.current = useManual;
+    }
+  }, [useManual]);
 
   // 블록의 "실제 등급" — 배치 셀 수 우선, 없으면 레벨 폴백.
   // 메이플 M 캐릭터처럼 레벨→등급 규칙이 일반 직업과 다른 타입도 올바르게 반영된다.
@@ -275,11 +284,29 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
       if (groupMode) {
         const rk = getRegionKey(x, y);
         if (!rk) return prev;
-        (regionCellsMap.get(rk) ?? []).forEach((c) => (mode === "add" ? next.add(c) : next.delete(c)));
+        const cells = regionCellsMap.get(rk) ?? [];
+        if (mode === "add") {
+          // 보유 총 칸을 초과하지 않는 선에서만 추가 (일부만 들어갈 수도 있음)
+          let budget = Math.max(0, totalAvailableCells - prev.size);
+          if (budget === 0) return prev;
+          for (const c of cells) {
+            if (next.has(c)) continue;
+            if (budget <= 0) break;
+            next.add(c);
+            budget--;
+          }
+        } else {
+          cells.forEach((c) => next.delete(c));
+        }
       } else {
         const k = `${x},${y}`;
-        if (mode === "add") next.add(k);
-        else next.delete(k);
+        if (mode === "add") {
+          // 이미 보유 총 칸에 도달했으면 더 이상 추가 X
+          if (!next.has(k) && prev.size >= totalAvailableCells) return prev;
+          next.add(k);
+        } else {
+          next.delete(k);
+        }
       }
       return next;
     });
@@ -441,9 +468,11 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
   }, [paintedCells, activeCounts]);
 
   // 자동 배치 결과 (새 탭 그리드에만 시각화, localBlocks 는 건드리지 않음)
-  const [autoPlacements, setAutoPlacements] = useState<
-    Array<{ classKey: string; orientationId: number; anchor: { x: number; y: number } }> | null
-  >(null);
+  const [autoPlacements, setAutoPlacements] = useState<Array<{
+    classKey: string;
+    orientationId: number;
+    anchor: { x: number; y: number };
+  }> | null>(null);
 
   const handleAutoPlace = () => {
     if (!canAutoPlace || solveStatus === "running") return;
@@ -955,7 +984,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
                 className="text-[11px] font-semibold text-sky-600 dark:text-sky-400
                   bg-sky-50 dark:bg-sky-950/40 px-2 py-0.5 rounded-full"
               >
-                {presetNo === 0 ? "적용 중인 프리셋" : `프리셋 ${presetNo}`}
+                {presetNo === 0 ? "기본 프리셋" : `프리셋 ${presetNo}`}
               </span>
             </div>
             <button
@@ -1061,7 +1090,16 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
                   </span>
                 )}
                 <span className="ml-auto text-md text-gray-500 dark:text-gray-400">
-                  칠한 칸 <span className="font-extrabold text-sky-600 dark:text-sky-400">{paintedCells.size}</span>
+                  칠한 칸{" "}
+                  <span
+                    className={`font-extrabold ${
+                      paintedCells.size >= totalAvailableCells && totalAvailableCells > 0
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-sky-600 dark:text-sky-400"
+                    }`}
+                  >
+                    {paintedCells.size}
+                  </span>
                   <span className="text-gray-400 mx-1">/</span>
                   보유 총 칸 <span className="font-bold text-gray-800 dark:text-gray-100">{totalAvailableCells}</span>
                 </span>
@@ -1093,12 +1131,17 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
                           key={key}
                           onMouseDown={(e) => handlePaintCellMouseDown(e, x, y)}
                           onMouseEnter={() => handlePaintCellMouseEnter(x, y)}
-                          className={`relative aspect-square border border-[rgba(255,255,255,0.06)] select-none cursor-crosshair
+                          className={`relative group aspect-square border border-[rgba(255,255,255,0.06)] select-none cursor-crosshair
                             ${placed ? BLOCK_BASE : isPainted ? "bg-sky-400/80" : isCenter ? "bg-[#4a5060]" : "bg-[#2e3038]"}
                           `}
                           style={borderStyle}
                         >
                           {placed && <div className={`absolute inset-0 ${placedOverlay} pointer-events-none`} />}
+                          {/* hover 힌트: 그리지 않은 셀에선 살짝 밝아지게, 칠해진 셀에선 살짝 어두워지게 */}
+                          <div
+                            className={`absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 z-[5]
+                              ${isPainted ? "bg-black/20" : "bg-white/15"}`}
+                          />
                           {placed && autoPlaceIcons.has(key) && BLOCK_ICONS[placed.blockType] && (
                             <div className="absolute inset-[3px] max-[600px]:inset-[2px] pointer-events-none z-10 flex items-center justify-center">
                               <Image
@@ -1132,90 +1175,147 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
 
               {/* 블록 목록 컨트롤 (소스 / 리셋·복구) */}
               <div className="flex flex-wrap items-center gap-3 px-1 text-md">
-                <p className="font-bold text-gray-500 dark:text-gray-400">보유 블록 목록</p>
-                <div className="flex items-center gap-1.5">
-                  <span className={`font-bold ${useManual ? "text-amber-600 dark:text-amber-400" : "text-sky-600 dark:text-sky-400"}`}>
-                    {useManual ? "수동 선택" : `${presetNo === 0 ? "적용 중인 프리셋" : `프리셋 ${presetNo}`}`}
+                <button
+                  type="button"
+                  onClick={() => setIsBlockListExpanded((v) => !v)}
+                  aria-expanded={isBlockListExpanded}
+                  title={isBlockListExpanded ? "접기" : "펼치기"}
+                  className={`group flex items-center gap-2 pl-2.5 pr-3 py-1.5 rounded-lg border text-sm font-bold transition-colors
+                    ${
+                      isBlockListExpanded
+                        ? "bg-sky-50 dark:bg-sky-950/30 border-sky-200 dark:border-sky-800/60 text-sky-700 dark:text-sky-300"
+                        : "bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 text-gray-700 dark:text-gray-200 hover:bg-slate-200 dark:hover:bg-white/10"
+                    }`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden
+                    className="w-4 h-4 transition-transform"
+                    style={{ transform: isBlockListExpanded ? "rotate(90deg)" : "rotate(0deg)" }}
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>보유 블록 목록</span>
+                  <span
+                    className={`text-[11px] font-semibold px-1.5 py-0.5 rounded
+                      ${
+                        isBlockListExpanded
+                          ? "bg-sky-100 dark:bg-sky-900/50"
+                          : "bg-white/60 dark:bg-white/10 text-gray-500 dark:text-gray-400"
+                      }`}
+                  >
+                    {isBlockListExpanded ? "접기" : "펼치기"}
                   </span>
-                  {useManual ? (
-                    <button
-                      type="button"
-                      onClick={handleManualRestore}
-                      className="ml-1 px-2 py-0.5 text-sm font-semibold rounded-md
-                        bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20"
-                    >
-                      프리셋 데이터 복구
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={handleManualReset}
-                      className="ml-1 px-2 py-0.5 text-sm font-semibold rounded-md
-                        bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20"
-                    >
-                      수동 선택으로 전환
-                    </button>
-                  )}
+                </button>
+                {/* 세그먼트 컨트롤: 프리셋 ↔ 직접 선택 */}
+                <div
+                  role="tablist"
+                  aria-label="블록 데이터 소스"
+                  className="flex gap-0.5 p-0.5 rounded-lg bg-slate-200 dark:bg-color-950/60 border border-slate-200 dark:border-white/5"
+                >
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={!useManual}
+                    onClick={handleManualRestore}
+                    className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors ${
+                      !useManual
+                        ? "bg-white dark:bg-color-800 text-sky-700 dark:text-sky-300 shadow-sm"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                    }`}
+                    title="현재 진입한 프리셋에 저장된 블록 구성을 사용합니다"
+                  >
+                    프리셋 ({presetNo === 0 ? "기본" : `${presetNo}번`})
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={useManual}
+                    onClick={handleManualReset}
+                    className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors ${
+                      useManual
+                        ? "bg-white dark:bg-color-800 text-amber-700 dark:text-amber-300 shadow-sm"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                    }`}
+                    title="원하는 블록 개수를 직접 입력합니다"
+                  >
+                    직접 선택
+                  </button>
                 </div>
                 <span className="ml-auto text-sm text-gray-500 dark:text-gray-400">
                   보유 총 칸 <span className="font-bold text-gray-800 dark:text-gray-100">{totalAvailableCells}</span>
                 </span>
               </div>
 
-              {/* 직업 × 등급 카운트 테이블 (수동 모드에서 편집 가능) */}
-              <div
-                className="rounded-xl border border-slate-200/80 dark:border-white/10
-                  bg-slate-50 dark:bg-color-950/40 overflow-x-auto"
-              >
-                <table className="min-w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-slate-200/80 dark:border-white/10">
-                      <th className="text-left px-3 py-2 text-[12px] font-bold text-gray-500 dark:text-gray-400 w-[140px]">직업</th>
-                      {BLOCK_GRADES.map((g) => (
-                        <th key={g} className="px-2 py-2 text-[12px] font-bold text-center">
-                          <span>{g}</span>
-                          <span className="ml-1 text-[10px] font-medium text-gray-400">({BLOCK_GRADE_CELL_COUNT[g]}칸)</span>
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {JOB_ORDER.map((job, i) => (
-                      <tr key={job} className={i < JOB_ORDER.length - 1 ? "border-b border-slate-100 dark:border-white/5" : ""}>
-                        <td className="px-3 py-2">
-                          <div className="flex items-center gap-2">
-                            {BLOCK_ICONS[job] && <Image src={BLOCK_ICONS[job]} alt={job} width={16} height={16} unoptimized />}
-                            <span className="font-bold text-[13px]">{job}</span>
-                          </div>
-                        </td>
-                        {BLOCK_GRADES.map((grade) => {
-                          const count = activeCounts.get(`${job}:${grade}`) ?? 0;
-                          return (
-                            <td key={grade} className="px-2 py-2 text-center">
-                              <select
-                                value={count}
-                                disabled={!useManual}
-                                onChange={(e) => handleManualCountChange(job, grade, parseInt(e.target.value, 10))}
-                                className={`w-[56px] text-center rounded-md border text-[12px] font-semibold
+              {/* 모드 설명 (접힘/펼침 상관없이 항상 노출) */}
+              <p className="px-1 text-sm text-gray-500 dark:text-gray-400">
+                {useManual
+                  ? "ⓘ 직접 선택 — 각 직업/등급별로 사용할 블록 개수를 입력하세요."
+                  : "ⓘ 프리셋 — 현재 진입한 프리셋에 저장된 블록 구성을 그대로 사용합니다."}
+              </p>
+
+              {/* 직업 × 등급 카운트 테이블 (수동 모드에서 편집 가능). 펼침/접힘 가능 */}
+              {isBlockListExpanded && (
+                <div
+                  className="rounded-xl border border-slate-200/80 dark:border-white/10
+                bg-slate-50 dark:bg-color-950/40 overflow-x-auto"
+                >
+                  <table className="min-w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-200/80 dark:border-white/10">
+                        <th className="text-left px-3 py-2 text-[12px] font-bold text-gray-500 dark:text-gray-400 w-[140px] max-[600px]:w-auto">직업</th>
+                        {BLOCK_GRADES.map((g) => (
+                          <th key={g} className="px-2 py-2 text-[12px] font-bold text-center">
+                            <span>{g}</span>
+                            <span className="ml-1 text-[10px] font-medium text-gray-400">({BLOCK_GRADE_CELL_COUNT[g]}칸)</span>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {JOB_ORDER.map((job, i) => (
+                        <tr key={job} className={i < JOB_ORDER.length - 1 ? "border-b border-slate-100 dark:border-white/5" : ""}>
+                          <td className="px-3 py-2 max-[600px]:px-2">
+                            <div className="flex items-center gap-2">
+                              {BLOCK_ICONS[job] && <Image src={BLOCK_ICONS[job]} alt={job} width={16} height={16} unoptimized />}
+                              <span className="font-bold text-[13px] max-[600px]:hidden">{job}</span>
+                            </div>
+                          </td>
+                          {BLOCK_GRADES.map((grade) => {
+                            const count = activeCounts.get(`${job}:${grade}`) ?? 0;
+                            return (
+                              <td key={grade} className="px-2 py-2 text-center">
+                                <select
+                                  value={count}
+                                  disabled={!useManual}
+                                  onChange={(e) => handleManualCountChange(job, grade, parseInt(e.target.value, 10))}
+                                  className={`w-[56px] text-center rounded-md border text-[12px] font-semibold
                                   bg-white dark:bg-color-900 border-slate-300 dark:border-white/10
                                   text-gray-700 dark:text-gray-200
                                   focus:outline-none focus:ring-2 focus:ring-sky-300 dark:focus:ring-sky-600
                                   py-1 ${!useManual ? "opacity-60 cursor-not-allowed" : ""}`}
-                              >
-                                {Array.from({ length: 11 }).map((_, n) => (
-                                  <option key={n} value={n}>
-                                    {n}
-                                  </option>
-                                ))}
-                              </select>
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                                >
+                                  {Array.from({ length: 11 }).map((_, n) => (
+                                    <option key={n} value={n}>
+                                      {n}
+                                    </option>
+                                  ))}
+                                </select>
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
 
               {/* 자동 배치 영역 (배지 + 버튼, 중앙정렬) + 상태 메시지 */}
               <div className="flex flex-col items-center gap-2">
@@ -1241,37 +1341,45 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
                     className={`px-6 py-2.5 rounded-lg text-xl font-extrabold text-white transition-all ${
                       canAutoPlace && solveStatus !== "running"
                         ? "bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-600 hover:to-indigo-600"
+                        : solveStatus === "running"
+                        ? "bg-gradient-to-r from-sky-500 to-indigo-500 opacity-90 cursor-wait"
                         : "bg-slate-400 dark:bg-slate-600 opacity-50 cursor-not-allowed"
                     }`}
                     title={
-                      canAutoPlace
+                      solveStatus === "running"
+                        ? "자동 배치 탐색 중"
+                        : canAutoPlace
                         ? "칠한 구역에 블록 자동 배치"
                         : "칠한 칸 수가 보유 총 칸과 일치하고, 중앙 2×2 점유 + 끊어진 영역이 없어야 합니다."
                     }
                   >
-                    ⚡ 자동 배치
+                    {solveStatus === "running" ? (
+                      <span className="inline-flex items-center gap-2">
+                        <span
+                          className="inline-block w-4 h-4 rounded-full border-[3px] border-white/80 border-t-transparent animate-spin"
+                          aria-hidden
+                        />
+                        <span>탐색 중…</span>
+                        <span className="tabular-nums text-[14px] font-bold opacity-80">{(solveElapsedMs / 1000).toFixed(1)}s</span>
+                      </span>
+                    ) : (
+                      <>자동 배치 시작!</>
+                    )}
                   </button>
-                </div>
-
-                {/* 솔버 상태 메시지 */}
-                {solveStatus === "running" && (
-                  <div className="flex items-center gap-2 text-[13px] text-sky-600 dark:text-sky-400">
-                    <span
-                      className="inline-block w-3 h-3 rounded-full border-2 border-sky-400 border-t-transparent animate-spin"
-                      aria-hidden
-                    />
-                    <span className="font-semibold">자동 배치 탐색 중…</span>
-                    <span className="tabular-nums text-gray-500 dark:text-gray-400">{(solveElapsedMs / 1000).toFixed(1)}s</span>
+                  {solveStatus === "running" && (
                     <button
                       type="button"
                       onClick={handleCancelAutoPlace}
-                      className="ml-2 px-2 py-0.5 text-[11px] font-semibold rounded-md
-                        bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20"
+                      className="px-3 py-2 rounded-lg text-[13px] font-semibold
+                        bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20
+                        text-gray-700 dark:text-gray-200"
                     >
                       취소
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
+
+                {/* 솔버 상태 메시지 (실패/시간초과/오류) */}
                 {solveStatus === "unsolvable" && (
                   <div className="text-[13px] font-bold text-red-600 dark:text-red-400">
                     ✕ 선택한 블록 구성으로는 이 구역을 정확히 채울 수 없습니다.
@@ -1532,24 +1640,6 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", o
               </div>
             </>
           )}
-
-          {/* 하단 버튼 (추후 동작 연결) */}
-          <div className="flex justify-end gap-2 pt-1">
-            <button
-              onClick={onClose}
-              className="px-3 py-1.5 text-[13px] font-semibold rounded-md
-                bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20"
-            >
-              취소
-            </button>
-            <button
-              disabled
-              className="px-3 py-1.5 text-[13px] font-semibold rounded-md text-white
-                bg-sky-500 hover:bg-sky-600 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              저장
-            </button>
-          </div>
         </div>
       </div>
 

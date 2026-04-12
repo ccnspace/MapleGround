@@ -392,6 +392,28 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
         </div>
       </div>
 
+      {/* 유니온 편집 / 자동 배치 진입 버튼 */}
+      <div className="flex items-center justify-center gap-3">
+        <button
+          type="button"
+          onClick={() => setEditDialogTab("new")}
+          className="px-5 py-2.5 rounded-lg text-lg font-extrabold text-white transition-all
+            bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-600 hover:to-indigo-600
+            shadow-md shadow-sky-500/30 hover:-translate-y-1"
+        >
+          ⚡ 유니온 자동 배치
+        </button>
+        <button
+          type="button"
+          onClick={() => setEditDialogTab("edit")}
+          className="px-5 py-2.5 rounded-lg text-lg font-bold
+            bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20
+            text-gray-700 dark:text-gray-100 transition-colors"
+        >
+          현재 유니온 편집
+        </button>
+      </div>
+
       {/* 호버 정보 or 범례 */}
       {hoveredBlockInfo ? (
         <div className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-slate-50 dark:bg-color-950/50 border border-slate-200/80 dark:border-white/5">
@@ -416,28 +438,6 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
           ))}
         </div>
       )}
-
-      {/* 유니온 편집 / 자동 배치 진입 버튼 */}
-      <div className="flex items-center justify-center gap-3">
-        <button
-          type="button"
-          onClick={() => setEditDialogTab("new")}
-          className="px-5 py-2.5 rounded-lg text-[14px] font-extrabold text-white transition-all
-            bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-600 hover:to-indigo-600
-            shadow-md shadow-sky-500/30 hover:-translate-y-0.5"
-        >
-          ⚡ 유니온 자동 배치
-        </button>
-        <button
-          type="button"
-          onClick={() => setEditDialogTab("edit")}
-          className="px-5 py-2.5 rounded-lg text-[14px] font-bold
-            bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20
-            text-gray-700 dark:text-gray-100 transition-colors"
-        >
-          현재 유니온 편집
-        </button>
-      </div>
 
       {/* 공격대원 효과 + 점령 효과 */}
       <div className="grid grid-cols-1 min-[600px]:grid-cols-2 gap-4">

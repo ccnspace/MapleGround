@@ -319,7 +319,7 @@ const UnionPageContent = () => {
   const champion = unionData?.unionChampion;
   const fetchStatus = unionFetchStatus;
 
-  if (characterFetchStatus !== "success") {
+  if (characterFetchStatus !== "success" || fetchStatus === "loading" || fetchStatus === "idle") {
     return <LoadingContainer />;
   }
 

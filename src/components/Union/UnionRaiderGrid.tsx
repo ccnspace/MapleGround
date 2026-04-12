@@ -324,7 +324,7 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
 
       <div className="flex justify-center" ref={gridRef}>
         <div
-          className="relative inline-grid border border-[#c0c4cc] dark:border-[#3a3e48] rounded-lg overflow-hidden"
+          className="relative w-full max-w-[624px] grid border border-[#c0c4cc] dark:border-[#3a3e48] rounded-lg overflow-hidden"
           style={{
             gridTemplateColumns: `repeat(${COLS}, 1fr)`,
             gridTemplateRows: `repeat(${ROWS}, 1fr)`,
@@ -341,7 +341,7 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
               return (
                 <div
                   key={key}
-                  className={`relative w-[24px] h-[24px] max-[600px]:w-[17px] max-[600px]:h-[17px] border border-[rgba(255,255,255,0.06)]
+                  className={`relative aspect-square border border-[rgba(255,255,255,0.06)]
                     ${cell ? `${BLOCK_BASE} cursor-pointer` : ""}
                     ${!cell && isCenter ? "bg-[#4a5060]" : ""}
                     ${!cell && !isCenter ? "bg-[#2e3038]" : ""}

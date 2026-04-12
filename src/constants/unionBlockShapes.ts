@@ -229,4 +229,6 @@ export const BLOCK_TYPE_TO_CATEGORY: Record<string, BlockJobCategory> = {
   "메이플 M 캐릭터": "궁수_메이플M",
   도적: "도적",
   해적: "해적",
+  // 하이브리드(제논 등)는 도적과 동일한 모양 패밀리 (도적 SS를 90° 회전한 형태 확인됨).
+  하이브리드: "도적",
 };

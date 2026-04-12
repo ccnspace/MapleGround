@@ -4,7 +4,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import Image from "next/image";
 import type { UnionRaider, UnionRaiderPreset } from "@/types/Union";
-import { UnionRaiderEditDialog } from "@/components/Union/UnionRaiderEditDialog";
+import { UnionRaiderEditDialog, type EditDialogTab } from "@/components/Union/UnionRaiderEditDialog";
 import warriorIcon from "@/images/warrior.png";
 import magicianIcon from "@/images/magician.png";
 import archerIcon from "@/images/archer.png";
@@ -178,7 +178,7 @@ type Props = { raider: UnionRaider };
 export const UnionRaiderGrid = ({ raider }: Props) => {
   const [hoveredBlock, setHoveredBlock] = useState<number | null>(null);
   const [selectedPreset, setSelectedPreset] = useState<number>(0);
-  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editDialogTab, setEditDialogTab] = useState<EditDialogTab | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
   const handleSaveImage = useCallback(async () => {
@@ -315,15 +315,8 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
         </div>
         {selectedPreset === 0 && <span className="text-[11px] text-gray-400 dark:text-gray-500">(프리셋 {raider.use_preset_no})</span>}
         <button
-          onClick={() => setIsEditOpen(true)}
-          className="ml-auto px-3 py-1 rounded-md text-[12px] font-semibold text-white
-            bg-sky-500 hover:bg-sky-600 transition-colors"
-        >
-          편집
-        </button>
-        <button
           onClick={handleSaveImage}
-          className="px-3 py-1 rounded-md text-[12px] font-semibold text-gray-500 dark:text-gray-400
+          className="ml-auto px-3 py-1 rounded-md text-[12px] font-semibold text-gray-500 dark:text-gray-400
             bg-slate-200 dark:bg-color-950/50 border border-slate-200 dark:border-white/5
             hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
         >
@@ -331,7 +324,14 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
         </button>
       </div>
 
-      {isEditOpen && <UnionRaiderEditDialog raider={raider} presetNo={selectedPreset} onClose={() => setIsEditOpen(false)} />}
+      {editDialogTab && (
+        <UnionRaiderEditDialog
+          raider={raider}
+          presetNo={selectedPreset}
+          initialTab={editDialogTab}
+          onClose={() => setEditDialogTab(null)}
+        />
+      )}
 
       <div className="flex justify-center" ref={gridRef}>
         <div
@@ -416,6 +416,28 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
           ))}
         </div>
       )}
+
+      {/* 유니온 편집 / 자동 배치 진입 버튼 */}
+      <div className="flex items-center justify-center gap-3">
+        <button
+          type="button"
+          onClick={() => setEditDialogTab("new")}
+          className="px-5 py-2.5 rounded-lg text-[14px] font-extrabold text-white transition-all
+            bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-600 hover:to-indigo-600
+            shadow-md shadow-sky-500/30 hover:-translate-y-0.5"
+        >
+          ⚡ 유니온 자동 배치
+        </button>
+        <button
+          type="button"
+          onClick={() => setEditDialogTab("edit")}
+          className="px-5 py-2.5 rounded-lg text-[14px] font-bold
+            bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20
+            text-gray-700 dark:text-gray-100 transition-colors"
+        >
+          현재 유니온 편집
+        </button>
+      </div>
 
       {/* 공격대원 효과 + 점령 효과 */}
       <div className="grid grid-cols-1 min-[600px]:grid-cols-2 gap-4">

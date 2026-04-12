@@ -24,7 +24,9 @@ import {
   rotateBlockCounterClockwise,
   shapeToOffsets,
   type BlockGrade,
+  type BlockJobCategory,
 } from "@/constants/unionBlockShapes";
+import { generateOrientations, type Orientation, type SolverResult } from "@/utils/unionAutoPlace";
 
 const BLOCK_ICONS: Record<string, StaticImageData> = {
   전사: warriorIcon,
@@ -127,21 +129,24 @@ const OUTER_REGION_PER_CELL: { value: number; unit: string }[] = [
 
 const BLOCK_BASE = "bg-[#bb996f]";
 const BLOCK_TYPE_STYLES: Record<string, { overlay: string }> = {
-  전사: { overlay: "bg-red-500/30" },
-  마법사: { overlay: "bg-blue-500/30" },
-  궁수: { overlay: "bg-green-500/30" },
+  전사: { overlay: "bg-red-600/30" },
+  마법사: { overlay: "bg-cyan-600/40" },
+  궁수: { overlay: "bg-lime-300/30" },
   도적: { overlay: "bg-purple-500/30" },
-  해적: { overlay: "bg-gray-700/30" },
-  하이브리드: { overlay: "bg-cyan-500/30" },
+  해적: { overlay: "bg-gray-600/40" },
+  하이브리드: { overlay: "bg-purple-500/30" },
   "메이플 M 캐릭터": { overlay: "bg-orange-500/30" },
 };
 
 // 등급 선택 영역에 나열할 직업 순서
 const JOB_ORDER = ["전사", "마법사", "궁수", "도적", "해적", "하이브리드", "메이플 M 캐릭터"] as const;
 
+export type EditDialogTab = "edit" | "new";
+
 type Props = {
   raider: UnionRaider;
   presetNo: number;
+  initialTab?: EditDialogTab;
   onClose: () => void;
 };
 
@@ -176,10 +181,8 @@ const getPresetData = (raider: UnionRaider, presetNo: number) => {
   return { union_block: preset.union_block, union_inner_stat: preset.union_inner_stat };
 };
 
-type EditTab = "edit" | "new";
-
-export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
-  const [activeTab, setActiveTab] = useState<EditTab>("edit");
+export const UnionRaiderEditDialog = ({ raider, presetNo, initialTab = "edit", onClose }: Props) => {
+  const [activeTab, setActiveTab] = useState<EditDialogTab>(initialTab);
   const presetData = useMemo(() => getPresetData(raider, presetNo), [raider, presetNo]);
 
   // 로컬 블록 상태 (편집 대상). presetData 기준 깊은 복사
@@ -195,6 +198,353 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
     setBlockOrder(src.map((_, i) => i));
     setSelectedBlockIndex(null);
   }, [presetData]);
+
+  // ── 새로 그리드 배치 탭 상태 ──
+  const [useManual, setUseManual] = useState(false);
+  const [manualCounts, setManualCounts] = useState<Map<string, number>>(new Map());
+  const [paintedCells, setPaintedCells] = useState<Set<string>>(new Set());
+  const [groupMode, setGroupMode] = useState(false);
+  const paintModeRef = useRef<"add" | "remove" | null>(null);
+  const [isPainting, setIsPainting] = useState(false);
+
+  // 블록의 "실제 등급" — 배치 셀 수 우선, 없으면 레벨 폴백.
+  // 메이플 M 캐릭터처럼 레벨→등급 규칙이 일반 직업과 다른 타입도 올바르게 반영된다.
+  const gradeForBlock = (b: {
+    block_type: string;
+    block_level: string;
+    block_position: Array<{ x: number; y: number }> | null;
+  }): BlockGrade | null => {
+    if (b.block_position && b.block_position.length > 0) {
+      const n = b.block_position.length;
+      if (n === 1) return "B";
+      if (n === 2) return "A";
+      if (n === 3) return "S";
+      if (n === 4) return "SS";
+      if (n === 5) return "SSS";
+      return null;
+    }
+    return levelToBlockGrade(parseInt(b.block_level, 10));
+  };
+
+  // 프리셋 기반 직업×등급 카운트 (union_block 전체)
+  const presetBlockCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    (presetData?.union_block ?? []).forEach((b) => {
+      const grade = gradeForBlock(b);
+      if (!grade) return;
+      counts.set(`${b.block_type}:${grade}`, (counts.get(`${b.block_type}:${grade}`) ?? 0) + 1);
+    });
+    return counts;
+  }, [presetData]);
+
+  const activeCounts = useManual ? manualCounts : presetBlockCounts;
+
+  const totalAvailableCells = useMemo(() => {
+    let sum = 0;
+    activeCounts.forEach((n, key) => {
+      const g = key.split(":")[1] as BlockGrade;
+      sum += n * (BLOCK_GRADE_CELL_COUNT[g] ?? 0);
+    });
+    return sum;
+  }, [activeCounts]);
+
+  // 섹터 키 → 해당 섹터 모든 셀 키 배열
+  const regionCellsMap = useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (let y = MIN_Y; y <= MAX_Y; y++) {
+      for (let x = MIN_X; x <= MAX_X; x++) {
+        const sector = isInnerArea(x, y) ? getInnerRegion(x, y) : getOuterRegion(x, y);
+        if (sector === null) continue;
+        const rk = isInnerArea(x, y) ? `inner-${sector}` : `outer-${sector}`;
+        if (!map.has(rk)) map.set(rk, []);
+        map.get(rk)!.push(`${x},${y}`);
+      }
+    }
+    return map;
+  }, []);
+
+  const getRegionKey = (x: number, y: number): string | null => {
+    const sector = isInnerArea(x, y) ? getInnerRegion(x, y) : getOuterRegion(x, y);
+    if (sector === null) return null;
+    return isInnerArea(x, y) ? `inner-${sector}` : `outer-${sector}`;
+  };
+
+  const applyPaint = (x: number, y: number, mode: "add" | "remove") => {
+    setPaintedCells((prev) => {
+      const next = new Set(prev);
+      if (groupMode) {
+        const rk = getRegionKey(x, y);
+        if (!rk) return prev;
+        (regionCellsMap.get(rk) ?? []).forEach((c) => (mode === "add" ? next.add(c) : next.delete(c)));
+      } else {
+        const k = `${x},${y}`;
+        if (mode === "add") next.add(k);
+        else next.delete(k);
+      }
+      return next;
+    });
+  };
+
+  const handlePaintCellMouseDown = (e: React.MouseEvent, x: number, y: number) => {
+    let currentlyPainted: boolean;
+    if (groupMode) {
+      const rk = getRegionKey(x, y);
+      if (!rk) return;
+      const cells = regionCellsMap.get(rk) ?? [];
+      // 섹터 전체가 칠해져 있으면 "제거 모드", 아니면 "추가 모드"
+      currentlyPainted = cells.length > 0 && cells.every((c) => paintedCells.has(c));
+    } else {
+      currentlyPainted = paintedCells.has(`${x},${y}`);
+    }
+    const mode: "add" | "remove" = currentlyPainted ? "remove" : "add";
+    paintModeRef.current = mode;
+    applyPaint(x, y, mode);
+    setIsPainting(true);
+    e.preventDefault();
+  };
+
+  const handlePaintCellMouseEnter = (x: number, y: number) => {
+    if (!isPainting || !paintModeRef.current) return;
+    // 그룹 모드에서는 같은 섹터를 중복 적용하지 않도록 개별 셀만 토글 방식으로
+    if (groupMode) {
+      applyPaint(x, y, paintModeRef.current);
+    } else {
+      applyPaint(x, y, paintModeRef.current);
+    }
+  };
+
+  useEffect(() => {
+    if (!isPainting) return;
+    const up = () => {
+      setIsPainting(false);
+      paintModeRef.current = null;
+    };
+    window.addEventListener("mouseup", up);
+    return () => window.removeEventListener("mouseup", up);
+  }, [isPainting]);
+
+  const handleManualReset = () => {
+    setManualCounts(new Map(presetBlockCounts));
+    setUseManual(true);
+  };
+  const handleManualRestore = () => {
+    setUseManual(false);
+  };
+
+  const handleManualCountChange = (job: string, grade: BlockGrade, n: number) => {
+    setManualCounts((prev) => {
+      const next = new Map(prev);
+      if (n <= 0) next.delete(`${job}:${grade}`);
+      else next.set(`${job}:${grade}`, n);
+      return next;
+    });
+  };
+
+  // 카테고리 → 해당 카테고리에 속한 직업타입 목록
+  const CATEGORY_TO_JOB_TYPES = useMemo(() => {
+    const map = new Map<BlockJobCategory, string[]>();
+    for (const [type, cat] of Object.entries(BLOCK_TYPE_TO_CATEGORY)) {
+      if (!map.has(cat)) map.set(cat, []);
+      map.get(cat)!.push(type);
+    }
+    return map;
+  }, []);
+
+  // 프리셋 로스터의 (직업타입:등급) → 블록 배열 인덱스 목록
+  const rosterIndexByClass = useMemo(() => {
+    const m = new Map<string, number[]>();
+    (presetData?.union_block ?? []).forEach((b, idx) => {
+      const grade = gradeForBlock(b);
+      if (!grade) return;
+      const key = `${b.block_type}:${grade}`;
+      if (!m.has(key)) m.set(key, []);
+      m.get(key)!.push(idx);
+    });
+    return m;
+  }, [presetData]);
+
+  // 색칠한 영역 검증: 중앙 2×2 점유 + 끊어진 영역 없음 (편집 탭과 동일 규칙)
+  const hasPaintedCenter = useMemo(() => {
+    const centerKeys = ["0,0", "-1,0", "0,1", "-1,1"];
+    return centerKeys.some((k) => paintedCells.has(k));
+  }, [paintedCells]);
+
+  const paintedDisconnectedCells = useMemo(() => {
+    const result = new Set<string>();
+    if (paintedCells.size === 0) return result;
+
+    const visited = new Set<string>();
+    const components: Set<string>[] = [];
+    paintedCells.forEach((start) => {
+      if (visited.has(start)) return;
+      const comp = new Set<string>();
+      const queue: string[] = [start];
+      visited.add(start);
+      comp.add(start);
+      while (queue.length) {
+        const cur = queue.shift()!;
+        const [sx, sy] = cur.split(",").map(Number);
+        const neighbors: [number, number][] = [
+          [sx + 1, sy],
+          [sx - 1, sy],
+          [sx, sy + 1],
+          [sx, sy - 1],
+        ];
+        for (const [nx, ny] of neighbors) {
+          const nk = `${nx},${ny}`;
+          if (paintedCells.has(nk) && !visited.has(nk)) {
+            visited.add(nk);
+            comp.add(nk);
+            queue.push(nk);
+          }
+        }
+      }
+      components.push(comp);
+    });
+
+    if (components.length <= 1) return result;
+
+    const centerKeys = ["0,0", "-1,0", "0,1", "-1,1"];
+    let main = components.find((c) => centerKeys.some((k) => c.has(k)));
+    if (!main) main = components.reduce((best, c) => (c.size > best.size ? c : best), components[0]);
+    components.forEach((c) => {
+      if (c === main) return;
+      c.forEach((k) => result.add(k));
+    });
+    return result;
+  }, [paintedCells]);
+
+  const hasPaintedDisconnected = paintedDisconnectedCells.size > 0;
+
+  const canAutoPlace = paintedCells.size > 0 && hasPaintedCenter && !hasPaintedDisconnected;
+
+  // ── 자동 배치 솔버 실행 상태 / Worker 관리 ──
+  type SolveStatus = "idle" | "running" | "timeout" | "unsolvable" | "ok" | "error";
+  const [solveStatus, setSolveStatus] = useState<SolveStatus>("idle");
+  const [solveElapsedMs, setSolveElapsedMs] = useState<number>(0);
+  const workerRef = useRef<Worker | null>(null);
+  const solveStartRef = useRef<number>(0);
+  const solveTickerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      workerRef.current?.terminate();
+      workerRef.current = null;
+      if (solveTickerRef.current !== null) window.clearInterval(solveTickerRef.current);
+    };
+  }, []);
+
+  // 입력이 바뀌면 이전 결과 메시지/배치 초기화 (running 은 유지)
+  useEffect(() => {
+    setSolveStatus((s) => (s === "running" ? s : "idle"));
+    setAutoPlacements(null);
+  }, [paintedCells, activeCounts]);
+
+  // 자동 배치 결과 (새 탭 그리드에만 시각화, localBlocks 는 건드리지 않음)
+  const [autoPlacements, setAutoPlacements] = useState<
+    Array<{ classKey: string; orientationId: number; anchor: { x: number; y: number } }> | null
+  >(null);
+
+  const handleAutoPlace = () => {
+    if (!canAutoPlace || solveStatus === "running") return;
+    workerRef.current?.terminate();
+
+    // activeCounts (직업타입:등급) → 카테고리:등급 단위로 합치기
+    const byCategoryGrade = new Map<string, number>();
+    activeCounts.forEach((cnt, key) => {
+      if (cnt <= 0) return;
+      const [jobType, grade] = key.split(":");
+      const cat = BLOCK_TYPE_TO_CATEGORY[jobType];
+      if (!cat) return;
+      const k = `${cat}:${grade}`;
+      byCategoryGrade.set(k, (byCategoryGrade.get(k) ?? 0) + cnt);
+    });
+
+    const classes: Array<{ key: string; count: number; orientations: Orientation[] }> = [];
+    byCategoryGrade.forEach((count, key) => {
+      const [cat, grade] = key.split(":") as [BlockJobCategory, BlockGrade];
+      const shape = UNION_BLOCK_SHAPES[cat]?.[grade];
+      if (!shape) return;
+      classes.push({ key, count, orientations: generateOrientations(shape) });
+    });
+
+    setSolveStatus("running");
+    setSolveElapsedMs(0);
+    solveStartRef.current = Date.now();
+    if (solveTickerRef.current !== null) window.clearInterval(solveTickerRef.current);
+    solveTickerRef.current = window.setInterval(() => {
+      setSolveElapsedMs(Date.now() - solveStartRef.current);
+    }, 100);
+
+    const worker = new Worker(new URL("@/utils/unionAutoPlace.worker.ts", import.meta.url));
+    workerRef.current = worker;
+    worker.onmessage = (e: MessageEvent<SolverResult>) => {
+      const result = e.data;
+      if (solveTickerRef.current !== null) {
+        window.clearInterval(solveTickerRef.current);
+        solveTickerRef.current = null;
+      }
+      setSolveElapsedMs(Date.now() - solveStartRef.current);
+      if (result.status === "timeout") setSolveStatus("timeout");
+      else if (result.status === "unsolvable") setSolveStatus("unsolvable");
+      else if (result.status === "ok") {
+        setAutoPlacements(result.placements);
+        setSolveStatus("ok");
+      }
+      worker.terminate();
+      workerRef.current = null;
+    };
+    worker.onerror = () => {
+      setSolveStatus("error");
+      if (solveTickerRef.current !== null) {
+        window.clearInterval(solveTickerRef.current);
+        solveTickerRef.current = null;
+      }
+      worker.terminate();
+      workerRef.current = null;
+    };
+    worker.postMessage({ paintedKeys: Array.from(paintedCells), classes, timeoutMs: 60_000 });
+  };
+
+  const handleCancelAutoPlace = () => {
+    workerRef.current?.terminate();
+    workerRef.current = null;
+    if (solveTickerRef.current !== null) {
+      window.clearInterval(solveTickerRef.current);
+      solveTickerRef.current = null;
+    }
+    setSolveStatus("idle");
+  };
+
+  // 자동 배치 결과(placements) 를 새 탭 그리드에 시각화하기 위한 cellMap + icon set.
+  // localBlocks 는 건드리지 않고 오직 새 탭에서만 렌더용으로 사용한다.
+  const categoryToBlockType = (cat: BlockJobCategory): string => (cat === "궁수_메이플M" ? "궁수" : cat);
+
+  const { autoPlaceGrid, autoPlaceIcons } = useMemo(() => {
+    const cellMap = new Map<string, { blockType: string }>();
+    const icons = new Set<string>();
+    if (!autoPlacements) return { autoPlaceGrid: cellMap, autoPlaceIcons: icons };
+    for (const p of autoPlacements) {
+      const [cat, grade] = p.classKey.split(":") as [BlockJobCategory, BlockGrade];
+      const shape = UNION_BLOCK_SHAPES[cat]?.[grade];
+      if (!shape) continue;
+      const ori = generateOrientations(shape).find((o) => o.id === p.orientationId);
+      if (!ori) continue;
+      const blockType = categoryToBlockType(cat);
+      const cells = ori.cells.map((c) => ({ x: p.anchor.x + c.dx, y: p.anchor.y + c.dy }));
+      cells.forEach((c) => cellMap.set(`${c.x},${c.y}`, { blockType }));
+      const last = cells[cells.length - 1];
+      icons.add(`${last.x},${last.y}`);
+    }
+    return { autoPlaceGrid: cellMap, autoPlaceIcons: icons };
+  }, [autoPlacements]);
+
+  // 자동 배치 결과만 지우고 paintedCells 는 유지 (재실행용)
+  const handleResetAutoPlaceResult = () => {
+    setAutoPlacements(null);
+    setSolveStatus("idle");
+    setSolveElapsedMs(0);
+  };
 
   const bringToTop = (blockIndex: number) => {
     setBlockOrder((prev) => {
@@ -605,7 +955,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
                 className="text-[11px] font-semibold text-sky-600 dark:text-sky-400
                   bg-sky-50 dark:bg-sky-950/40 px-2 py-0.5 rounded-full"
               >
-                {presetNo === 0 ? "적용 중" : `프리셋 ${presetNo}`}
+                {presetNo === 0 ? "적용 중인 프리셋" : `프리셋 ${presetNo}`}
               </span>
             </div>
             <button
@@ -642,15 +992,177 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
                   : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               }`}
             >
-              새로 그리드 배치
+              유니온 자동 배치
             </button>
           </div>
 
           {activeTab === "new" && (
             <div className="flex flex-col gap-3">
-              <p className="text-[12px] text-gray-500 dark:text-gray-400 px-1">
-                직업별/등급별로 배치할 블록 개수를 선택한 뒤, 자동 배치 실행 버튼을 누르세요.
+              <p className="text-sm text-gray-500 dark:text-gray-400 px-1">
+                아래 그리드에서 원하는 구역을 직접 칠한 뒤, 보유한 블록으로 자동 배치를 실행하세요.
               </p>
+
+              {/* 그리드 컨트롤 (그룹 선택) */}
+              <div className="flex flex-wrap items-center gap-3 px-1 text-md">
+                <p className="font-bold text-gray-500 dark:text-gray-400">그리드</p>
+                <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                  <input type="checkbox" checked={groupMode} onChange={(e) => setGroupMode(e.target.checked)} className="accent-sky-500" />
+                  <span className="text-gray-600 dark:text-gray-300 font-semibold">그룹 선택</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setPaintedCells(new Set())}
+                  disabled={paintedCells.size === 0}
+                  className="px-2 py-0.5 text-sm font-semibold rounded-md
+                    bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20
+                    disabled:opacity-40 disabled:cursor-not-allowed"
+                  title="색칠한 칸 전부 해제"
+                >
+                  전체 해제
+                </button>
+                {solveStatus === "ok" && (
+                  <button
+                    type="button"
+                    onClick={handleResetAutoPlaceResult}
+                    className="px-2 py-0.5 text-sm font-semibold rounded-md
+                      bg-amber-100 hover:bg-amber-200 text-amber-700
+                      dark:bg-amber-900/30 dark:hover:bg-amber-900/50 dark:text-amber-300
+                      border border-amber-300/60 dark:border-amber-700/60"
+                    title="자동 배치 결과 되돌리기"
+                  >
+                    결과 리셋
+                  </button>
+                )}
+                {/* 규칙 경고 칩 — 이 행에 inline 으로 들어가 layout shift 방지. 끊어짐 우선. */}
+                {hasPaintedDisconnected && (
+                  <span
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
+                      text-[11px] font-bold
+                      bg-red-50 dark:bg-red-950/40
+                      text-red-600 dark:text-red-300
+                      border border-red-200 dark:border-red-800/60"
+                    title="중앙 2×2와 이어지지 않은 색칠 구역이 존재합니다."
+                  >
+                    <span aria-hidden>⚠</span>
+                    <span>끊어진 영역 있음</span>
+                  </span>
+                )}
+                {paintedCells.size > 0 && !hasPaintedCenter && (
+                  <span
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
+                      text-[11px] font-bold
+                      bg-red-50 dark:bg-red-950/40
+                      text-red-600 dark:text-red-300
+                      border border-red-200 dark:border-red-800/60"
+                    title="중앙 2×2 영역 중 최소 한 칸은 색칠해야 합니다."
+                  >
+                    <span aria-hidden>⚠</span>
+                    <span>중앙 2×2 비어 있음</span>
+                  </span>
+                )}
+                <span className="ml-auto text-md text-gray-500 dark:text-gray-400">
+                  칠한 칸 <span className="font-extrabold text-sky-600 dark:text-sky-400">{paintedCells.size}</span>
+                  <span className="text-gray-400 mx-1">/</span>
+                  보유 총 칸 <span className="font-bold text-gray-800 dark:text-gray-100">{totalAvailableCells}</span>
+                </span>
+              </div>
+
+              {/* 페인트 가능한 빈 그리드 */}
+              <div className="flex justify-center">
+                <div
+                  className="relative w-full max-w-[624px] grid
+                    border border-[#c0c4cc] dark:border-[#3a3e48] rounded-lg overflow-visible"
+                  style={{
+                    gridTemplateColumns: `repeat(${COLS}, 1fr)`,
+                    gridTemplateRows: `repeat(${ROWS}, 1fr)`,
+                  }}
+                >
+                  {rows.map((y) =>
+                    cols.map((x) => {
+                      const key = `${x},${y}`;
+                      const isCenter = (x === 0 && y === 0) || (x === -1 && y === 0) || (x === 0 && y === 1) || (x === -1 && y === 1);
+                      const isPainted = paintedCells.has(key);
+                      const isPaintedDisconnected = paintedDisconnectedCells.has(key);
+                      // 자동 배치 결과 표시 (solveStatus === "ok" 일 때)
+                      const placed = solveStatus === "ok" ? autoPlaceGrid.get(key) : null;
+                      const placedOverlay = placed ? BLOCK_TYPE_STYLES[placed.blockType]?.overlay ?? "bg-slate-500/30" : "";
+                      const borderStyle = borderStyles.get(key) ?? {};
+                      const label = allLabels.get(key);
+                      return (
+                        <div
+                          key={key}
+                          onMouseDown={(e) => handlePaintCellMouseDown(e, x, y)}
+                          onMouseEnter={() => handlePaintCellMouseEnter(x, y)}
+                          className={`relative aspect-square border border-[rgba(255,255,255,0.06)] select-none cursor-crosshair
+                            ${placed ? BLOCK_BASE : isPainted ? "bg-sky-400/80" : isCenter ? "bg-[#4a5060]" : "bg-[#2e3038]"}
+                          `}
+                          style={borderStyle}
+                        >
+                          {placed && <div className={`absolute inset-0 ${placedOverlay} pointer-events-none`} />}
+                          {placed && autoPlaceIcons.has(key) && BLOCK_ICONS[placed.blockType] && (
+                            <div className="absolute inset-[3px] max-[600px]:inset-[2px] pointer-events-none z-10 flex items-center justify-center">
+                              <Image
+                                src={BLOCK_ICONS[placed.blockType]}
+                                alt={placed.blockType}
+                                width={18}
+                                height={18}
+                                className="w-full h-full object-contain"
+                                unoptimized
+                              />
+                            </div>
+                          )}
+                          {isPaintedDisconnected && (
+                            <div className="absolute inset-0 ring-2 ring-red-500 ring-inset bg-red-500/40 pointer-events-none z-[25]" />
+                          )}
+                          {label && (
+                            <span
+                              className="absolute z-30 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap
+                                text-[11px] max-[600px]:text-[8px] font-bold text-white pointer-events-none
+                                bg-black/30 px-1.5 rounded-md opacity-80"
+                            >
+                              {label}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* 블록 목록 컨트롤 (소스 / 리셋·복구) */}
+              <div className="flex flex-wrap items-center gap-3 px-1 text-md">
+                <p className="font-bold text-gray-500 dark:text-gray-400">보유 블록 목록</p>
+                <div className="flex items-center gap-1.5">
+                  <span className={`font-bold ${useManual ? "text-amber-600 dark:text-amber-400" : "text-sky-600 dark:text-sky-400"}`}>
+                    {useManual ? "수동 선택" : `${presetNo === 0 ? "적용 중인 프리셋" : `프리셋 ${presetNo}`}`}
+                  </span>
+                  {useManual ? (
+                    <button
+                      type="button"
+                      onClick={handleManualRestore}
+                      className="ml-1 px-2 py-0.5 text-sm font-semibold rounded-md
+                        bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20"
+                    >
+                      프리셋 데이터 복구
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleManualReset}
+                      className="ml-1 px-2 py-0.5 text-sm font-semibold rounded-md
+                        bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20"
+                    >
+                      수동 선택으로 전환
+                    </button>
+                  )}
+                </div>
+                <span className="ml-auto text-sm text-gray-500 dark:text-gray-400">
+                  보유 총 칸 <span className="font-bold text-gray-800 dark:text-gray-100">{totalAvailableCells}</span>
+                </span>
+              </div>
+
+              {/* 직업 × 등급 카운트 테이블 (수동 모드에서 편집 가능) */}
               <div
                 className="rounded-xl border border-slate-200/80 dark:border-white/10
                   bg-slate-50 dark:bg-color-950/40 overflow-x-auto"
@@ -677,19 +1189,18 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
                           </div>
                         </td>
                         {BLOCK_GRADES.map((grade) => {
-                          const count = getCount(job, grade);
+                          const count = activeCounts.get(`${job}:${grade}`) ?? 0;
                           return (
                             <td key={grade} className="px-2 py-2 text-center">
                               <select
                                 value={count}
-                                onChange={() => {
-                                  /* 현재는 동작 없음 */
-                                }}
-                                className="w-[56px] text-center rounded-md border text-[12px] font-semibold
+                                disabled={!useManual}
+                                onChange={(e) => handleManualCountChange(job, grade, parseInt(e.target.value, 10))}
+                                className={`w-[56px] text-center rounded-md border text-[12px] font-semibold
                                   bg-white dark:bg-color-900 border-slate-300 dark:border-white/10
                                   text-gray-700 dark:text-gray-200
                                   focus:outline-none focus:ring-2 focus:ring-sky-300 dark:focus:ring-sky-600
-                                  py-1"
+                                  py-1 ${!useManual ? "opacity-60 cursor-not-allowed" : ""}`}
                               >
                                 {Array.from({ length: 11 }).map((_, n) => (
                                   <option key={n} value={n}>
@@ -704,6 +1215,76 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* 자동 배치 영역 (배지 + 버튼, 중앙정렬) + 상태 메시지 */}
+              <div className="flex flex-col items-center gap-2">
+                <div className="flex items-center justify-center gap-3 flex-wrap">
+                  {canAutoPlace && (
+                    <span
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-full
+                        text-[13px] font-extrabold
+                        text-emerald-700 dark:text-emerald-300
+                        bg-emerald-100 dark:bg-emerald-500/20
+                        border border-emerald-400/70 dark:border-emerald-500/60
+                        shadow-sm shadow-emerald-500/20
+                        animate-pulse"
+                    >
+                      <span aria-hidden>✓</span>
+                      <span>준비 완료</span>
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    disabled={!canAutoPlace || solveStatus === "running"}
+                    onClick={handleAutoPlace}
+                    className={`px-6 py-2.5 rounded-lg text-xl font-extrabold text-white transition-all ${
+                      canAutoPlace && solveStatus !== "running"
+                        ? "bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-600 hover:to-indigo-600"
+                        : "bg-slate-400 dark:bg-slate-600 opacity-50 cursor-not-allowed"
+                    }`}
+                    title={
+                      canAutoPlace
+                        ? "칠한 구역에 블록 자동 배치"
+                        : "칠한 칸 수가 보유 총 칸과 일치하고, 중앙 2×2 점유 + 끊어진 영역이 없어야 합니다."
+                    }
+                  >
+                    ⚡ 자동 배치
+                  </button>
+                </div>
+
+                {/* 솔버 상태 메시지 */}
+                {solveStatus === "running" && (
+                  <div className="flex items-center gap-2 text-[13px] text-sky-600 dark:text-sky-400">
+                    <span
+                      className="inline-block w-3 h-3 rounded-full border-2 border-sky-400 border-t-transparent animate-spin"
+                      aria-hidden
+                    />
+                    <span className="font-semibold">자동 배치 탐색 중…</span>
+                    <span className="tabular-nums text-gray-500 dark:text-gray-400">{(solveElapsedMs / 1000).toFixed(1)}s</span>
+                    <button
+                      type="button"
+                      onClick={handleCancelAutoPlace}
+                      className="ml-2 px-2 py-0.5 text-[11px] font-semibold rounded-md
+                        bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20"
+                    >
+                      취소
+                    </button>
+                  </div>
+                )}
+                {solveStatus === "unsolvable" && (
+                  <div className="text-[13px] font-bold text-red-600 dark:text-red-400">
+                    ✕ 선택한 블록 구성으로는 이 구역을 정확히 채울 수 없습니다.
+                  </div>
+                )}
+                {solveStatus === "timeout" && (
+                  <div className="text-[13px] font-bold text-amber-600 dark:text-amber-400">
+                    ⏱ 시간 초과 (60s). 구역이나 블록 구성을 조금 바꿔 다시 시도해 주세요.
+                  </div>
+                )}
+                {solveStatus === "error" && (
+                  <div className="text-[13px] font-bold text-red-600 dark:text-red-400">✕ 자동 배치 실행 중 오류가 발생했습니다.</div>
+                )}
               </div>
             </div>
           )}

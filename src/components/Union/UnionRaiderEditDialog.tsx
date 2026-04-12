@@ -251,6 +251,59 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
     return centerKeys.some((k) => grid.has(k));
   }, [grid]);
 
+  // 끊어진 영역(메인 컴포넌트에 속하지 않는 모든 셀) 계산.
+  // 중앙 2x2에 닿은 컴포넌트를 메인으로 선택하고, 중앙이 비었으면 가장 큰 컴포넌트를 메인으로 본다.
+  // 컴포넌트가 2개 이상일 때만 끊어진 것으로 간주한다.
+  const disconnectedCells = useMemo(() => {
+    const result = new Set<string>();
+    const occupied = new Set<string>(grid.keys());
+    if (occupied.size === 0) return result;
+
+    const visited = new Set<string>();
+    const components: Set<string>[] = [];
+    occupied.forEach((start) => {
+      if (visited.has(start)) return;
+      const comp = new Set<string>();
+      const queue: string[] = [start];
+      visited.add(start);
+      comp.add(start);
+      while (queue.length) {
+        const cur = queue.shift()!;
+        const [sx, sy] = cur.split(",").map(Number);
+        const neighbors: [number, number][] = [
+          [sx + 1, sy],
+          [sx - 1, sy],
+          [sx, sy + 1],
+          [sx, sy - 1],
+        ];
+        for (const [nx, ny] of neighbors) {
+          const nk = `${nx},${ny}`;
+          if (occupied.has(nk) && !visited.has(nk)) {
+            visited.add(nk);
+            comp.add(nk);
+            queue.push(nk);
+          }
+        }
+      }
+      components.push(comp);
+    });
+
+    if (components.length <= 1) return result;
+
+    // 메인 컴포넌트 선정: 중앙 2x2에 닿은 것 우선, 없으면 최대 크기
+    const centerKeys = ["0,0", "-1,0", "0,1", "-1,1"];
+    let main = components.find((c) => centerKeys.some((k) => c.has(k)));
+    if (!main) main = components.reduce((best, c) => (c.size > best.size ? c : best), components[0]);
+
+    components.forEach((c) => {
+      if (c === main) return;
+      c.forEach((k) => result.add(k));
+    });
+    return result;
+  }, [grid]);
+
+  const hasDisconnected = disconnectedCells.size > 0;
+
   // 선택된 블록의 메뉴 위치(그리드 컨테이너 기준 top-left)
   const menuAnchor = useMemo(() => {
     if (selectedBlockIndex === null) return null;
@@ -506,6 +559,7 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
                   const label = allLabels.get(key);
                   const isSelected = cell && cell.blockIndex === selectedBlockIndex;
                   const isOverlap = overlapCells.has(key);
+                  const isDisconnected = disconnectedCells.has(key);
                   return (
                     <div
                       key={key}
@@ -523,6 +577,12 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
                       )}
                       {isOverlap && (
                         <div className="absolute inset-0 ring-2 ring-red-500 ring-inset bg-red-500/40 pointer-events-none z-[25]" />
+                      )}
+                      {isDisconnected && !isOverlap && (
+                        <div
+                          className="absolute inset-0 ring-2 ring-red-500 ring-inset bg-red-500/30 pointer-events-none z-[24]"
+                          style={{ outline: "1px dashed rgba(255,255,255,0.6)", outlineOffset: -4 }}
+                        />
                       )}
                       {cell && iconCells.has(key) && BLOCK_ICONS[cell.blockType] && (
                         <div className="absolute inset-[3px] max-[600px]:inset-[2px] pointer-events-none z-10 flex items-center justify-center">
@@ -583,22 +643,35 @@ export const UnionRaiderEditDialog = ({ raider, presetNo, onClose }: Props) => {
           {/* 직업 × 등급 블록 개수 선택 */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between px-1 gap-2 min-h-[28px]">
-              {/* 좌측: 규칙 경고 칩 (없으면 공간만 차지) */}
-              {!hasCenterBlock ? (
-                <span
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
-                    text-[11px] font-bold
-                    bg-red-50 dark:bg-red-950/40
-                    text-red-600 dark:text-red-300
-                    border border-red-200 dark:border-red-800/60"
-                  title="중앙 2×2 영역 중 최소 한 칸은 블록으로 점유해야 합니다."
-                >
-                  <span aria-hidden>⚠</span>
-                  <span>중앙 2×2 영역이 비어 있음</span>
-                </span>
-              ) : (
-                <span />
-              )}
+              {/* 좌측: 규칙 경고 칩들 (없으면 공간만 차지). 끊어짐이 우선 표시. */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {hasDisconnected && (
+                  <span
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
+                      text-[11px] font-bold
+                      bg-red-50 dark:bg-red-950/40
+                      text-red-600 dark:text-red-300
+                      border border-red-200 dark:border-red-800/60"
+                    title="중앙 2×2와 이어지지 않은 블록 구역이 존재합니다."
+                  >
+                    <span aria-hidden>⚠</span>
+                    <span>끊어진 영역이 있습니다</span>
+                  </span>
+                )}
+                {!hasCenterBlock && (
+                  <span
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full
+                      text-[11px] font-bold
+                      bg-red-50 dark:bg-red-950/40
+                      text-red-600 dark:text-red-300
+                      border border-red-200 dark:border-red-800/60"
+                    title="중앙 2×2 영역 중 최소 한 칸은 블록으로 점유해야 합니다."
+                  >
+                    <span aria-hidden>⚠</span>
+                    <span>중앙 2×2 영역이 비어 있음</span>
+                  </span>
+                )}
+              </div>
               {/* 우측: 총합 */}
               <div className="flex items-center gap-3 text-md">
                 <span className="text-gray-500 dark:text-gray-400">

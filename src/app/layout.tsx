@@ -55,6 +55,16 @@ export default function RootLayout({
         </ThemeProvider>
         <Analytics />
         <Script src="https://openapi.nexon.com/js/analytics.js?app_id=208681" />
+        {/* Google Analytics (gtag.js) */}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-D9PFE0Y4ZE" strategy="afterInteractive" />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-D9PFE0Y4ZE');
+          `}
+        </Script>
       </body>
     </html>
   );

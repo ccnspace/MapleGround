@@ -36,6 +36,39 @@ import {
 const TIMEOUT_MS = 90_000;
 const TIMEOUT_MESSAGE = `⏱ 시간 초과 (${TIMEOUT_MS / 1000}s). 구역이나 블록 구성을 조금 바꿔 다시 시도해 주세요.`;
 
+// 색칠 구역 저장 (localStorage). 탭 전환/세션 간 재사용 목적.
+const SAVED_PAINTS_KEY = "unionAutoPlacer.savedPaints.v1";
+const MAX_SAVED_PAINTS = 5;
+
+type SavedPaint = {
+  cells: string[]; // "x,y" 키 배열
+  savedAt: number; // epoch ms
+};
+
+const loadSavedPaints = (): SavedPaint[] => {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(SAVED_PAINTS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((e): e is SavedPaint => !!e && Array.isArray(e.cells) && typeof e.savedAt === "number")
+      .slice(0, MAX_SAVED_PAINTS);
+  } catch {
+    return [];
+  }
+};
+
+const persistSavedPaints = (list: SavedPaint[]) => {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(SAVED_PAINTS_KEY, JSON.stringify(list));
+  } catch {
+    // storage full / disabled — 무시
+  }
+};
+
 type Props = {
   presetData: PresetData | null;
   presetNo: number;
@@ -68,6 +101,12 @@ export const UnionRaiderAutoPlacer = ({ presetData, presetNo, hidden }: Props) =
   const [groupMode, setGroupMode] = useState(false);
   const paintModeRef = useRef<"add" | "remove" | null>(null);
   const [isPainting, setIsPainting] = useState(false);
+
+  // 저장된 색칠 구역 (localStorage). 최초 마운트 시에만 읽어서 state 로 관리한다.
+  const [savedPaints, setSavedPaints] = useState<SavedPaint[]>([]);
+  useEffect(() => {
+    setSavedPaints(loadSavedPaints());
+  }, []);
   // 보유 블록 목록 섹션 펼침 상태 (기본: 접힘, useManual 전환 시 자동 펼침)
   const [isBlockListExpanded, setIsBlockListExpanded] = useState(false);
   const prevUseManualRef = useRef(useManual);
@@ -463,6 +502,41 @@ export const UnionRaiderAutoPlacer = ({ presetData, presetNo, hidden }: Props) =
     setSolveElapsedMs(0);
   };
 
+  // ── 색칠 구역 저장/불러오기/삭제 ──
+  const canSavePaint = paintedCells.size > 0 && savedPaints.length < MAX_SAVED_PAINTS;
+
+  const handleSavePaint = () => {
+    if (!canSavePaint) return;
+    openModal({
+      type: "confirm",
+      message: `현재 색칠한 ${paintedCells.size}칸을 저장하시겠어요?`,
+      confirmCallback: () => {
+        const entry: SavedPaint = { cells: Array.from(paintedCells), savedAt: Date.now() };
+        const next = [...savedPaints, entry];
+        setSavedPaints(next);
+        persistSavedPaints(next);
+      },
+    });
+  };
+
+  const handleLoadPaint = (idx: number) => {
+    const entry = savedPaints[idx];
+    if (!entry) return;
+    setPaintedCells(new Set(entry.cells));
+  };
+
+  const handleDeletePaint = (idx: number) => {
+    openModal({
+      type: "confirm",
+      message: "저장한 색칠 구역을 삭제하시겠어요?",
+      confirmCallback: () => {
+        const next = savedPaints.filter((_, i) => i !== idx);
+        setSavedPaints(next);
+        persistSavedPaints(next);
+      },
+    });
+  };
+
   return (
     <div className={hidden ? "hidden" : "flex flex-col gap-3"}>
       <p className="text-sm text-gray-500 dark:text-gray-400 px-1">원하는 구역을 직접 칠한 뒤, 보유한 블록으로 자동 배치를 실행하세요.</p>
@@ -617,6 +691,64 @@ export const UnionRaiderAutoPlacer = ({ presetData, presetNo, hidden }: Props) =
           보유 총 칸 <span className="font-bold text-gray-800 dark:text-gray-100">{totalAvailableCells}</span>
         </span>
       </div>
+
+      {/* 저장된 색칠 구역 (localStorage, 최대 MAX_SAVED_PAINTS 개). 클릭 시 불러오고 ×로 삭제. */}
+      <div className="flex flex-wrap items-center gap-2 px-1 py-1 text-sm">
+        <p className="font-bold text-gray-500 dark:text-gray-400">저장한 구역</p>
+        {savedPaints.length === 0 ? (
+          <span className="text-xs text-gray-400 dark:text-gray-500">저장된 구역이 없습니다</span>
+        ) : (
+          savedPaints.map((entry, idx) => (
+            <div
+              key={entry.savedAt}
+              className="inline-flex items-stretch rounded-md border border-slate-200 dark:border-white/10
+                bg-white dark:bg-color-900 overflow-hidden"
+            >
+              <button
+                type="button"
+                onClick={() => handleLoadPaint(idx)}
+                title={`${entry.cells.length}칸 · ${new Date(entry.savedAt).toLocaleString()} (클릭하여 불러오기)`}
+                className="px-2.5 py-0.5 text-sm font-semibold text-sky-700 dark:text-sky-300
+                  hover:bg-sky-50 dark:hover:bg-sky-900/30 transition-colors"
+              >
+                #{idx + 1}
+                <span className="ml-1 text-[11px] font-medium text-gray-500 dark:text-gray-400">({entry.cells.length}칸)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDeletePaint(idx)}
+                title="삭제"
+                aria-label={`저장 ${idx + 1} 삭제`}
+                className="px-1.5 text-gray-400 hover:text-red-500
+                  hover:bg-red-50 dark:hover:bg-red-900/20
+                  border-l border-slate-200 dark:border-white/10 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+          ))
+        )}
+        <button
+          type="button"
+          onClick={handleSavePaint}
+          disabled={!canSavePaint}
+          title={
+            paintedCells.size === 0
+              ? "먼저 색칠한 칸이 있어야 저장할 수 있습니다"
+              : savedPaints.length >= MAX_SAVED_PAINTS
+              ? `최대 ${MAX_SAVED_PAINTS}개까지만 저장할 수 있습니다`
+              : "현재 색칠한 구역을 저장"
+          }
+          className="ml-auto px-2 py-0.5 text-sm font-semibold rounded-md
+            border border-sky-300 dark:border-sky-700
+            text-sky-700 dark:text-sky-300
+            bg-sky-50/60 hover:bg-sky-100 dark:bg-sky-900/20 dark:hover:bg-sky-900/40
+            disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          ＋ 저장 <span className="text-[11px] font-medium opacity-70">({savedPaints.length}/{MAX_SAVED_PAINTS})</span>
+        </button>
+      </div>
+
       <div className="rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-color-950/40 overflow-hidden">
         {/* 헤더 */}
         <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">

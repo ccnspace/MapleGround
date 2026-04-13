@@ -303,7 +303,7 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
                 setSelectedPreset(no);
                 setHoveredBlock(null);
               }}
-              className={`px-3 py-1 rounded-md text-[12px] font-semibold transition-all ${
+              className={`px-3 py-1 max-[600px]:px-2 max-[600px]:py-0.5 rounded-md text-[12px] max-[600px]:text-xs font-semibold transition-all ${
                 selectedPreset === no
                   ? "bg-white dark:bg-color-800 text-black dark:text-white shadow-sm"
                   : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"

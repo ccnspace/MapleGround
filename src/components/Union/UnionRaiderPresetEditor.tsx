@@ -405,6 +405,9 @@ export const UnionRaiderPresetEditor = ({ presetData, hidden }: Props) => {
   return (
     <div className={hidden ? "hidden" : "flex flex-col gap-4"}>
       {/* 그리드 (편집 모드) */}
+      <p className="text-sm text-gray-500 dark:text-gray-400 px-1">
+        블록을 클릭하면 편집 메뉴가 나타납니다. 드래그하여 조작할 수 있습니다.
+      </p>
       <div className="flex justify-center">
         <div
           ref={gridContainerRef}
@@ -438,9 +441,7 @@ export const UnionRaiderPresetEditor = ({ presetData, hidden }: Props) => {
                   style={borderStyle}
                 >
                   {cell && <div className={`absolute inset-0 ${overlay} pointer-events-none`} />}
-                  {isSelected && (
-                    <div className="absolute inset-0 ring-2 ring-sky-400 ring-inset bg-sky-300/20 pointer-events-none z-20" />
-                  )}
+                  {isSelected && <div className="absolute inset-0 ring-2 ring-sky-400 ring-inset bg-sky-300/20 pointer-events-none z-20" />}
                   {isOverlap && (
                     <div className="absolute inset-0 ring-2 ring-red-500 ring-inset bg-red-500/40 pointer-events-none z-[25]" />
                   )}
@@ -585,9 +586,7 @@ export const UnionRaiderPresetEditor = ({ presetData, hidden }: Props) => {
               >
                 <span className="text-gray-600 dark:text-gray-300">{label.name}</span>
                 <span
-                  className={`font-extrabold ${
-                    active ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400 dark:text-gray-500"
-                  }`}
+                  className={`font-extrabold ${active ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400 dark:text-gray-500"}`}
                 >
                   {active ? "+" : ""}
                   {value}
@@ -632,9 +631,7 @@ export const UnionRaiderPresetEditor = ({ presetData, hidden }: Props) => {
               transition-colors"
                 title="그리드에 추가"
               >
-                {BLOCK_ICONS[block.block_type] && (
-                  <Image src={BLOCK_ICONS[block.block_type]} alt="" width={14} height={14} unoptimized />
-                )}
+                {BLOCK_ICONS[block.block_type] && <Image src={BLOCK_ICONS[block.block_type]} alt="" width={14} height={14} unoptimized />}
                 <span>{block.block_class}</span>
                 <span className="text-[10px] text-gray-400">Lv.{block.block_level}</span>
                 <span className="text-sky-500 dark:text-sky-400 ml-0.5">＋</span>

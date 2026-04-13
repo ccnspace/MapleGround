@@ -465,83 +465,7 @@ export const UnionRaiderAutoPlacer = ({ presetData, presetNo, hidden }: Props) =
 
   return (
     <div className={hidden ? "hidden" : "flex flex-col gap-3"}>
-      <p className="text-sm text-gray-500 dark:text-gray-400 px-1">
-        아래 그리드에서 원하는 구역을 직접 칠한 뒤, 보유한 블록으로 자동 배치를 실행하세요.
-      </p>
-
-      {/* 그리드 컨트롤 (그룹 선택) */}
-      <div className="flex flex-wrap items-center gap-3 px-1 py-1 text-md">
-        <p className="font-bold text-gray-500 dark:text-gray-400">그리드</p>
-        <label className="flex items-center gap-1.5 cursor-pointer select-none">
-          <input type="checkbox" checked={groupMode} onChange={(e) => setGroupMode(e.target.checked)} className="accent-sky-500" />
-          <span className="text-gray-600 dark:text-gray-300 font-semibold">그룹 선택</span>
-        </label>
-        <button
-          type="button"
-          onClick={() => setPaintedCells(new Set())}
-          disabled={paintedCells.size === 0}
-          className="px-2 py-0.5 text-sm font-semibold rounded-md
-            bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20
-            disabled:opacity-40 disabled:cursor-not-allowed"
-          title="색칠한 칸 전부 해제"
-        >
-          전체 해제
-        </button>
-        {solveStatus === "ok" && (
-          <button
-            type="button"
-            onClick={handleResetAutoPlaceResult}
-            className="px-2 py-0.5 text-sm font-semibold rounded-md
-              bg-amber-100 hover:bg-amber-200 text-amber-700
-              dark:bg-amber-900/30 dark:hover:bg-amber-900/50 dark:text-amber-300
-              border border-amber-300/60 dark:border-amber-700/60"
-            title="자동 배치 결과 되돌리기"
-          >
-            결과 리셋
-          </button>
-        )}
-        {/* 규칙 경고 칩 — 이 행에 inline 으로 들어가 layout shift 방지. 끊어짐 우선. */}
-        {hasPaintedDisconnected && (
-          <span
-            className="inline-flex items-center gap-1 px-2 rounded-full
-              text-sm font-bold
-              bg-red-50 dark:bg-red-950/40
-              text-red-600 dark:text-red-300
-              border border-red-200 dark:border-red-800/60"
-            title="중앙 2×2와 이어지지 않은 색칠 구역이 존재합니다."
-          >
-            <span aria-hidden>⚠</span>
-            <span>끊어진 영역 있음</span>
-          </span>
-        )}
-        {paintedCells.size > 0 && !hasPaintedCenter && (
-          <span
-            className="inline-flex items-center gap-1 px-2 rounded-full
-              text-sm font-bold
-              bg-red-50 dark:bg-red-950/40
-              text-red-600 dark:text-red-300
-              border border-red-200 dark:border-red-800/60"
-            title="중앙 2×2 영역 중 최소 한 칸은 색칠해야 합니다."
-          >
-            <span aria-hidden>⚠</span>
-            <span>중앙 2×2 비어 있음</span>
-          </span>
-        )}
-        <span className="ml-auto text-md text-gray-500 dark:text-gray-400">
-          칠한 칸{" "}
-          <span
-            className={`font-extrabold ${
-              paintedCells.size >= totalAvailableCells && totalAvailableCells > 0
-                ? "text-emerald-600 dark:text-emerald-400"
-                : "text-sky-600 dark:text-sky-400"
-            }`}
-          >
-            {paintedCells.size}
-          </span>
-          <span className="text-gray-400 mx-1">/</span>
-          보유 총 칸 <span className="font-bold text-gray-800 dark:text-gray-100">{totalAvailableCells}</span>
-        </span>
-      </div>
+      <p className="text-sm text-gray-500 dark:text-gray-400 px-1">원하는 구역을 직접 칠한 뒤, 보유한 블록으로 자동 배치를 실행하세요.</p>
 
       {/* 페인트 가능한 빈 그리드 */}
       <div className="flex justify-center">
@@ -615,153 +539,215 @@ export const UnionRaiderAutoPlacer = ({ presetData, presetNo, hidden }: Props) =
         </div>
       </div>
 
-      {/* 블록 목록 컨트롤 (소스 / 리셋·복구) */}
-      <div className="flex flex-wrap items-center gap-3 px-1 text-md">
+      {/*
+        보유 블록 목록 카드 — 제목/세그먼트/펼침 토글을 한 헤더에 모으고,
+        모드 설명·테이블을 본문에 배치한다. "보유 총 칸" 은 상단 그리드 컨트롤에
+        이미 노출되므로 여기서는 제거. "탐색 X초" 는 자동 배치 상태줄로 이동.
+      */}
+
+      {/* 그리드 컨트롤 (그룹 선택) */}
+      <div className="flex flex-wrap items-center gap-3 px-1 py-1 text-md">
+        <p className="font-bold text-gray-500 dark:text-gray-400">그리드</p>
+        <label className="flex items-center gap-1.5 cursor-pointer select-none">
+          <input type="checkbox" checked={groupMode} onChange={(e) => setGroupMode(e.target.checked)} className="accent-sky-500" />
+          <span className="text-gray-600 dark:text-gray-300 font-semibold">그룹 선택</span>
+        </label>
         <button
           type="button"
-          onClick={() => setIsBlockListExpanded((v) => !v)}
-          aria-expanded={isBlockListExpanded}
-          title={isBlockListExpanded ? "접기" : "펼치기"}
-          className={`group flex items-center gap-2 pl-2.5 pr-3 py-1.5 rounded-lg border text-sm font-bold transition-colors
-            ${
-              isBlockListExpanded
-                ? "bg-sky-50 dark:bg-sky-950/30 border-sky-200 dark:border-sky-800/60 text-sky-700 dark:text-sky-300"
-                : "bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 text-gray-700 dark:text-gray-200 hover:bg-slate-200 dark:hover:bg-white/10"
-            }`}
+          onClick={() => setPaintedCells(new Set())}
+          disabled={paintedCells.size === 0}
+          className="px-2 py-0.5 text-sm font-semibold rounded-md
+            bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20
+            disabled:opacity-40 disabled:cursor-not-allowed"
+          title="색칠한 칸 전부 해제"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden
-            className="w-4 h-4 transition-transform"
-            style={{ transform: isBlockListExpanded ? "rotate(90deg)" : "rotate(0deg)" }}
-          >
-            <path
-              fillRule="evenodd"
-              d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <span>보유 블록 목록</span>
-          <span
-            className={`text-[11px] font-semibold px-1.5 py-0.5 rounded
-              ${
-                isBlockListExpanded
-                  ? "bg-sky-100 dark:bg-sky-900/50"
-                  : "bg-white/60 dark:bg-white/10 text-gray-500 dark:text-gray-400"
-              }`}
-          >
-            {isBlockListExpanded ? "접기" : "펼치기"}
-          </span>
+          전체 해제
         </button>
-        {/* 세그먼트 컨트롤: 프리셋 ↔ 직접 선택 */}
-        <div
-          role="tablist"
-          aria-label="블록 데이터 소스"
-          className="flex gap-0.5 p-0.5 rounded-lg bg-slate-200 dark:bg-color-950/60 border border-slate-200 dark:border-white/5"
-        >
+        {solveStatus === "ok" && (
           <button
             type="button"
-            role="tab"
-            aria-selected={!useManual}
-            onClick={handleManualRestore}
-            className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors ${
-              !useManual
-                ? "bg-white dark:bg-color-800 text-sky-700 dark:text-sky-300 shadow-sm"
-                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-            }`}
-            title="현재 진입한 프리셋에 저장된 블록 구성을 사용합니다"
+            onClick={handleResetAutoPlaceResult}
+            className="px-2 py-0.5 text-sm font-semibold rounded-md
+              bg-violet-100 hover:bg-violet-200 text-violet-700 dark:text-violet-100
+              dark:bg-indigo-500/60 dark:hover:bg-indigo-500/50"
+            title="자동 배치 결과 되돌리기"
           >
-            프리셋 ({presetNo === 0 ? "기본" : `${presetNo}번`})
+            ⭮ 배치 결과 리셋
           </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={useManual}
-            onClick={handleManualReset}
-            className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors ${
-              useManual
-                ? "bg-white dark:bg-color-800 text-amber-700 dark:text-amber-300 shadow-sm"
-                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-            }`}
-            title="원하는 블록 개수를 직접 입력합니다"
+        )}
+        {/* 규칙 경고 칩 — 이 행에 inline 으로 들어가 layout shift 방지. 끊어짐 우선. */}
+        {hasPaintedDisconnected && (
+          <span
+            className="inline-flex items-center gap-1 px-2 rounded-full
+              text-sm font-bold
+              bg-red-50 dark:bg-red-950/40
+              text-red-600 dark:text-red-300
+              border border-red-200 dark:border-red-800/60"
+            title="중앙 2×2와 이어지지 않은 색칠 구역이 존재합니다."
           >
-            직접 선택
-          </button>
-        </div>
-        <span className="ml-auto text-sm text-gray-500 dark:text-gray-400">
+            <span aria-hidden>⚠</span>
+            <span>끊어진 영역 있음</span>
+          </span>
+        )}
+        {paintedCells.size > 0 && !hasPaintedCenter && (
+          <span
+            className="inline-flex items-center gap-1 px-2 rounded-full
+              text-sm font-bold
+              bg-red-50 dark:bg-red-950/40
+              text-red-600 dark:text-red-300
+              border border-red-200 dark:border-red-800/60"
+            title="중앙 2×2 영역 중 최소 한 칸은 색칠해야 합니다."
+          >
+            <span aria-hidden>⚠</span>
+            <span>중앙 2×2 비어 있음</span>
+          </span>
+        )}
+        <span className="ml-auto text-md text-gray-500 dark:text-gray-400">
+          칠한 칸{" "}
+          <span
+            className={`font-extrabold ${
+              paintedCells.size >= totalAvailableCells && totalAvailableCells > 0
+                ? "text-emerald-600 dark:text-emerald-400"
+                : "text-sky-600 dark:text-sky-400"
+            }`}
+          >
+            {paintedCells.size}
+          </span>
+          <span className="text-gray-400 mx-1">/</span>
           보유 총 칸 <span className="font-bold text-gray-800 dark:text-gray-100">{totalAvailableCells}</span>
-          {solveStatus === "ok" && <span className="ml-2 tabular-nums">· 탐색 {(solveElapsedMs / 1000).toFixed(2)}초</span>}
         </span>
       </div>
-
-      {/* 모드 설명 (접힘/펼침 상관없이 항상 노출) */}
-      <p className="px-1 text-sm text-gray-500 dark:text-gray-400">
-        {useManual
-          ? "ⓘ 직접 선택 — 각 직업/등급별로 사용할 블록 개수를 입력하세요."
-          : "ⓘ 프리셋 — 현재 진입한 프리셋에 저장된 블록 구성을 그대로 사용합니다."}
-      </p>
-
-      {/* 직업 × 등급 카운트 테이블 (수동 모드에서 편집 가능). 펼침/접힘 가능 */}
-      {isBlockListExpanded && (
-        <div
-          className="rounded-xl border border-slate-200/80 dark:border-white/10
-        bg-slate-50 dark:bg-color-950/40 overflow-x-auto"
-        >
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-200/80 dark:border-white/10">
-                <th className="text-left px-3 py-2 text-[12px] font-bold text-gray-500 dark:text-gray-400 w-[140px] max-[600px]:w-auto">
-                  직업
-                </th>
-                {BLOCK_GRADES.map((g) => (
-                  <th key={g} className="px-2 py-2 text-[12px] font-bold text-center">
-                    <span>{g}</span>
-                    <span className="ml-1 text-[10px] font-medium text-gray-400">({BLOCK_GRADE_CELL_COUNT[g]}칸)</span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {JOB_ORDER.map((job, i) => (
-                <tr key={job} className={i < JOB_ORDER.length - 1 ? "border-b border-slate-100 dark:border-white/5" : ""}>
-                  <td className="px-3 py-2 max-[600px]:px-2">
-                    <div className="flex items-center gap-2">
-                      {BLOCK_ICONS[job] && <Image src={BLOCK_ICONS[job]} alt={job} width={16} height={16} unoptimized />}
-                      <span className="font-bold text-[13px] max-[600px]:hidden">{job}</span>
-                    </div>
-                  </td>
-                  {BLOCK_GRADES.map((grade) => {
-                    const count = activeCounts.get(`${job}:${grade}`) ?? 0;
-                    return (
-                      <td key={grade} className="px-2 py-2 text-center">
-                        <input
-                          type="number"
-                          min={0}
-                          value={count}
-                          disabled={!useManual}
-                          onChange={(e) => {
-                            const raw = e.target.value;
-                            const parsed = raw === "" ? 0 : parseInt(raw, 10);
-                            if (Number.isNaN(parsed)) return;
-                            handleManualCountChange(job, grade, Math.max(0, parsed));
-                          }}
-                          className={`w-[56px] text-center rounded-md border text-[12px] font-semibold
-                          bg-white dark:bg-color-900 border-slate-300 dark:border-white/10
-                          text-gray-700 dark:text-gray-200
-                          focus:outline-none focus:ring-2 focus:ring-sky-300 dark:focus:ring-sky-600
-                          py-1 ${!useManual ? "opacity-60 cursor-not-allowed" : ""}`}
-                        />
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-color-950/40 overflow-hidden">
+        {/* 헤더 */}
+        <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
+          <p className="text-sm font-bold text-gray-700 dark:text-gray-200">보유 블록 목록</p>
+          <div className="flex items-center gap-2">
+            {/* 세그먼트 컨트롤: 프리셋 ↔ 직접 선택 */}
+            <div
+              role="tablist"
+              aria-label="블록 데이터 소스"
+              className="flex gap-0.5 p-0.5 rounded-lg bg-slate-200 dark:bg-color-950/60 border border-slate-200 dark:border-white/5"
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={!useManual}
+                onClick={handleManualRestore}
+                className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors ${
+                  !useManual
+                    ? "bg-white dark:bg-color-800 text-sky-700 dark:text-sky-300 shadow-sm"
+                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                }`}
+                title="현재 진입한 프리셋에 저장된 블록 구성을 사용합니다"
+              >
+                프리셋 ({presetNo === 0 ? "기본" : `${presetNo}번`})
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={useManual}
+                onClick={handleManualReset}
+                className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors ${
+                  useManual
+                    ? "bg-white dark:bg-color-800 text-amber-700 dark:text-amber-300 shadow-sm"
+                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                }`}
+                title="원하는 블록 개수를 직접 입력합니다"
+              >
+                직접 선택
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsBlockListExpanded((v) => !v)}
+              aria-expanded={isBlockListExpanded}
+              title={isBlockListExpanded ? "블록 목록 접기" : "블록 목록 펼치기"}
+              className="w-8 h-8 flex items-center justify-center rounded-md
+                text-gray-600 dark:text-gray-300
+                hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden
+                className="w-5 h-5 transition-transform"
+                style={{ transform: isBlockListExpanded ? "rotate(90deg)" : "rotate(0deg)" }}
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
-      )}
+
+        {/* 모드 설명 (접힘/펼침 상관없이 항상 노출) */}
+        <p className="px-3 pb-2 text-xs text-gray-500 dark:text-gray-400">
+          {useManual
+            ? "ⓘ 직접 선택 — 각 직업/등급별로 사용할 블록 개수를 입력하세요."
+            : "ⓘ 프리셋 — 현재 진입한 프리셋에 저장된 블록 구성을 그대로 사용합니다."}
+        </p>
+
+        {/* 직업 × 등급 카운트 테이블 (수동 모드에서 편집 가능). 펼침/접힘 가능 */}
+        {isBlockListExpanded && (
+          <div className="border-t border-slate-200/80 dark:border-white/10 overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-200/80 dark:border-white/10">
+                  <th className="text-left px-3 py-2 text-[12px] font-bold text-gray-500 dark:text-gray-400 w-[140px] max-[600px]:w-auto">
+                    직업
+                  </th>
+                  {BLOCK_GRADES.map((g) => (
+                    <th key={g} className="px-2 py-2 text-[12px] font-bold text-center">
+                      <span>{g}</span>
+                      <span className="ml-1 text-[10px] font-medium text-gray-400">({BLOCK_GRADE_CELL_COUNT[g]}칸)</span>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {JOB_ORDER.map((job, i) => (
+                  <tr key={job} className={i < JOB_ORDER.length - 1 ? "border-b border-slate-100 dark:border-white/5" : ""}>
+                    <td className="px-3 py-2 max-[600px]:px-2">
+                      <div className="flex items-center gap-2">
+                        {BLOCK_ICONS[job] && <Image src={BLOCK_ICONS[job]} alt={job} width={16} height={16} unoptimized />}
+                        <span className="font-bold text-[13px] max-[600px]:hidden">{job}</span>
+                      </div>
+                    </td>
+                    {BLOCK_GRADES.map((grade) => {
+                      const count = activeCounts.get(`${job}:${grade}`) ?? 0;
+                      return (
+                        <td key={grade} className="px-2 py-2 text-center">
+                          <input
+                            type="number"
+                            min={0}
+                            value={count}
+                            disabled={!useManual}
+                            onChange={(e) => {
+                              const raw = e.target.value;
+                              const parsed = raw === "" ? 0 : parseInt(raw, 10);
+                              if (Number.isNaN(parsed)) return;
+                              handleManualCountChange(job, grade, Math.max(0, parsed));
+                            }}
+                            className={`w-[56px] text-center rounded-md border text-[12px] font-semibold
+                            bg-white dark:bg-color-900 border-slate-300 dark:border-white/10
+                            text-gray-700 dark:text-gray-200
+                            focus:outline-none focus:ring-2 focus:ring-sky-300 dark:focus:ring-sky-600
+                            py-1 ${!useManual ? "opacity-60 cursor-not-allowed" : ""}`}
+                          />
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       {/* 자동 배치 영역 (배지 + 버튼, 중앙정렬) + 상태 메시지 */}
       <div className="flex flex-col items-center gap-2">
@@ -811,7 +797,7 @@ export const UnionRaiderAutoPlacer = ({ presetData, presetNo, hidden }: Props) =
           )}
         </div>
 
-        {/* 솔버 상태 메시지 (시간초과/오류 — unsolvable 은 공통 모달로 표시) */}
+        {/* 솔버 상태 메시지 (시간초과/오류/완료 — unsolvable 은 공통 모달로 표시) */}
         <div className="min-h-[20px] text-[13px] font-bold" aria-live="polite">
           {solveStatus === "running" && solveElapsedMs > 60000 && (
             <span className="text-amber-600 dark:text-amber-400">
@@ -819,8 +805,11 @@ export const UnionRaiderAutoPlacer = ({ presetData, presetNo, hidden }: Props) =
             </span>
           )}
           {solveStatus === "timeout" && <span className="text-amber-600 dark:text-amber-400">{TIMEOUT_MESSAGE}</span>}
-          {solveStatus === "error" && (
-            <span className="text-red-600 dark:text-red-400">✕ 자동 배치 실행 중 오류가 발생했습니다.</span>
+          {solveStatus === "error" && <span className="text-red-600 dark:text-red-400">✕ 자동 배치 실행 중 오류가 발생했습니다.</span>}
+          {solveStatus === "ok" && (
+            <span className="text-emerald-600 dark:text-emerald-400 tabular-nums">
+              ✓ 배치 완료 · 탐색 {(solveElapsedMs / 1000).toFixed(2)}초
+            </span>
           )}
         </div>
       </div>

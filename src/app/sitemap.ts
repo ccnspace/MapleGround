@@ -20,10 +20,10 @@ const ENTRIES: Entry[] = [
   { path: "/", changeFrequency: "weekly", priority: 1.0 },
   { path: "/main", changeFrequency: "weekly", priority: 0.9 },
   { path: "/main/exp", changeFrequency: "weekly", priority: 0.8 },
-  { path: "/main/union", changeFrequency: "weekly", priority: 0.8 },
+  { path: "/main/union", changeFrequency: "weekly", priority: 0.9 },
   { path: "/main/vs", changeFrequency: "weekly", priority: 0.8 },
-  { path: "/main/weapon", changeFrequency: "weekly", priority: 0.8 },
-  { path: "/main/boss", changeFrequency: "weekly", priority: 0.8 },
+  { path: "/main/weapon", changeFrequency: "weekly", priority: 0.9 },
+  { path: "/main/boss", changeFrequency: "weekly", priority: 0.9 },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

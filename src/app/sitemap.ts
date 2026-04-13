@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
 
+export const dynamic = "force-dynamic";
+
 // 배포 환경의 베이스 URL. `.env` 에 NEXT_PUBLIC_SITE_URL 을 지정해 사용한다.
 // Vercel 자동 주입 VERCEL_URL 을 폴백으로 사용하고, 로컬 개발 환경에서는 localhost 로 떨어진다.
 const BASE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
+  process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
 ).replace(/\/$/, "");
 
 type Entry = {

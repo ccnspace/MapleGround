@@ -7,6 +7,10 @@ import { NewLabel } from "./NewLabel";
 
 const NOTICE_DATA = [
   {
+    date: "2026.04.14",
+    data: `주간 보스 정산 기능이 추가되었습니다. 프리셋 기능으로 여러 캐릭터를 관리해 보세요.`,
+  },
+  {
     date: "2026.04.12",
     data: `유니온 정보가 추가되었습니다. 메뉴에서 만나보세요!`,
   },

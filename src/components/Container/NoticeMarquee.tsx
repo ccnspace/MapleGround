@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { NOTICES, type NoticeItem, type NoticeType } from "@/constants/notices";
+
+// 자동 순환 주기 (ms). 마우스 호버 시 일시정지.
+const CYCLE_INTERVAL_MS = 4000;
+const TRANSITION_MS = 500;
 
 const TYPE_BADGE: Record<NoticeType, { label: string; className: string }> = {
   update: {
@@ -128,8 +133,40 @@ const NoticeItemView = ({ item }: { item: NoticeItem }) => {
 };
 
 export const NoticeMarquee = () => {
-  if (NOTICES.length === 0) return null;
-  const notice = NOTICES[0];
+  const count = NOTICES.length;
+  // 2개 이상일 때만 룰렛 순환. 마지막에 첫 항목을 복제해 seamless loop 구현.
+  const shouldCycle = count > 1;
+  const items = shouldCycle ? [...NOTICES, NOTICES[0]] : NOTICES;
+
+  const [index, setIndex] = useState(0);
+  const [isInstantSnap, setIsInstantSnap] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+
+  // 일정 주기마다 다음 슬라이드로 이동 (호버 중이면 중단).
+  useEffect(() => {
+    if (!shouldCycle || isPaused) return;
+    const timer = setInterval(() => {
+      setIndex((i) => i + 1);
+    }, CYCLE_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [shouldCycle, isPaused]);
+
+  // 복제본(마지막 슬라이드) 도달 후 transitionEnd 에서 instantSnap 트리거 →
+  // 다음 프레임에 해제해 transition 을 재활성화. 사용자는 끊김 없이 무한 루프를 본다.
+  useEffect(() => {
+    if (!isInstantSnap) return;
+    const raf = requestAnimationFrame(() => setIsInstantSnap(false));
+    return () => cancelAnimationFrame(raf);
+  }, [isInstantSnap]);
+
+  const handleTransitionEnd = () => {
+    if (index >= count) {
+      setIsInstantSnap(true);
+      setIndex(0);
+    }
+  };
+
+  if (count === 0) return null;
 
   return (
     <div
@@ -137,7 +174,7 @@ export const NoticeMarquee = () => {
         bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100
         dark:from-color-950/80 dark:via-color-950/60 dark:to-color-950/80
         border border-slate-200/80 dark:border-white/5
-        flex items-center"
+        flex items-stretch"
       role="region"
       aria-label="사이트 공지"
     >
@@ -150,8 +187,29 @@ export const NoticeMarquee = () => {
         <span className="text-sm font-extrabold tracking-wider max-[600px]:hidden">공지</span>
       </div>
 
-      <div className="flex-1 min-w-0 px-4 max-[600px]:px-2 h-full flex items-center overflow-hidden">
-        <NoticeItemView item={notice} />
+      <div
+        className="flex-1 min-w-0 h-full overflow-hidden relative"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        <div
+          className="flex flex-col will-change-transform"
+          style={{
+            transform: `translateY(-${(index * 100) / items.length}%)`,
+            transition: isInstantSnap ? "none" : `transform ${TRANSITION_MS}ms cubic-bezier(0.33, 1, 0.68, 1)`,
+          }}
+          onTransitionEnd={handleTransitionEnd}
+        >
+          {items.map((item, i) => (
+            <div
+              key={`${item.id}-${i}`}
+              className="h-9 shrink-0 flex items-center px-4 max-[600px]:px-2 overflow-hidden"
+              aria-hidden={shouldCycle && i !== index && i !== (index === count ? 0 : index)}
+            >
+              <NoticeItemView item={item} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

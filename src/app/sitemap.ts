@@ -23,6 +23,7 @@ const ENTRIES: Entry[] = [
   { path: "/main/union", changeFrequency: "weekly", priority: 0.8 },
   { path: "/main/vs", changeFrequency: "weekly", priority: 0.8 },
   { path: "/main/weapon", changeFrequency: "weekly", priority: 0.8 },
+  { path: "/main/boss", changeFrequency: "weekly", priority: 0.8 },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

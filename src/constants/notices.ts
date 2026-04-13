@@ -29,4 +29,10 @@ export const NOTICES: NoticeItem[] = [
     date: "2026.04.12",
     type: "update",
   },
+  {
+    id: "union-autoplace-2026-04",
+    text: "[주간 보스 정산](/main/boss) 기능이 추가되었습니다. 프리셋 기능으로 여러 캐릭터를 관리해 보세요.",
+    date: "2026.04.14",
+    type: "update",
+  },
 ];

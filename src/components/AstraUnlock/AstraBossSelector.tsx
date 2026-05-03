@@ -1,0 +1,73 @@
+import Image from "next/image";
+import fierceIcon from "@/images/fierce.png";
+import { type AstraBoss, type AstraBossConfig, calculateAstraBossTrace } from "@/utils/astra";
+
+type Props = {
+  boss: AstraBoss;
+  config: AstraBossConfig;
+  onChange: (newConfig: AstraBossConfig) => void;
+};
+
+export const AstraBossSelector: React.FC<Props> = ({ boss, config, onChange }) => {
+  const trace = calculateAstraBossTrace(config, boss);
+  const partyOptions = Array.from({ length: boss.maxPartySize }, (_, i) => i + 1);
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 max-[600px]:gap-1.5 py-1.5 px-2 max-[600px]:px-1.5 rounded-md bg-slate-400/30 dark:bg-white/20 hover:bg-slate-300/70 dark:hover:bg-white/10 transition-colors text-xs">
+      <input
+        type="checkbox"
+        checked={config.isSelected}
+        onChange={(e) => onChange({ ...config, isSelected: e.target.checked })}
+        className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 rounded
+            border-gray-300 dark:border-gray-600
+            focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-1
+            bg-white dark:bg-gray-700 flex-shrink-0"
+      />
+      <p className="min-w-[64px] max-[600px]:min-w-[56px] font-bold text-gray-900 dark:text-gray-100 truncate">{boss.name}</p>
+      <select
+        value={config.difficulty}
+        onChange={(e) => onChange({ ...config, difficulty: e.target.value })}
+        className="h-6 w-16 max-[600px]:w-14 max-[600px]:text-[10px] px-1 rounded border-gray-300 dark:border-gray-600
+            bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+            focus:border-indigo-500 dark:focus:border-indigo-400
+            focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-1"
+      >
+        {boss.availableDifficulties.map((diff) => (
+          <option key={diff} value={diff}>
+            {diff}
+          </option>
+        ))}
+      </select>
+      <select
+        value={config.partySize}
+        onChange={(e) => onChange({ ...config, partySize: Number(e.target.value) })}
+        className="h-6 w-11 max-[600px]:w-10 max-[600px]:text-[10px] px-1 rounded border-gray-300 dark:border-gray-600
+            bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+            focus:border-indigo-500 dark:focus:border-indigo-400
+            focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-1"
+      >
+        {partyOptions.map((n) => (
+          <option key={n} value={n}>
+            {n}인
+          </option>
+        ))}
+      </select>
+      <div className="flex items-center gap-1">
+        <input
+          type="checkbox"
+          checked={config.firstWeekCleared}
+          onChange={(e) => onChange({ ...config, firstWeekCleared: e.target.checked })}
+          className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 rounded
+              border-gray-300 dark:border-gray-600
+              focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-1
+              bg-white dark:bg-gray-700 flex-shrink-0"
+        />
+        <span className="text-gray-600 dark:text-gray-400 whitespace-nowrap max-[600px]:text-[10px]">클리어</span>
+      </div>
+      <div className="ml-auto flex items-center gap-1 text-gray-900 dark:text-gray-100">
+        <Image src={fierceIcon} alt="격전의 흔적" width={16} height={16} unoptimized style={{ imageRendering: "pixelated" }} />
+        <span className="font-medium text-indigo-600 dark:text-indigo-300 max-[600px]:text-[10px]">{trace}</span>
+      </div>
+    </div>
+  );
+};

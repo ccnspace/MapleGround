@@ -8,6 +8,7 @@ type Props = {
 
 export const DestinyBossSelector: React.FC<Props> = ({ boss, config, onChange }) => {
   const trace = calculateBossTrace(config, boss);
+  const partyOptions = Array.from({ length: boss.maxPartySize }, (_, i) => i + 1);
 
   return (
     <div className="flex flex-wrap items-center gap-2 max-[600px]:gap-1.5 py-1.5 px-2 max-[600px]:px-1.5 rounded-md bg-slate-400/30 dark:bg-white/20 hover:bg-slate-300/70 dark:hover:bg-white/10 transition-colors text-xs">
@@ -43,7 +44,7 @@ export const DestinyBossSelector: React.FC<Props> = ({ boss, config, onChange })
             focus:border-indigo-500 dark:focus:border-indigo-400 
             focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-1"
       >
-        {[1, 2, 3, 4, 5, 6].map((n) => (
+        {partyOptions.map((n) => (
           <option key={n} value={n}>
             {n}인
           </option>

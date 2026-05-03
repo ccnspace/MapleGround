@@ -4,6 +4,9 @@ import {
   calculateWeeklyTotal,
   estimateLiberationDateWithResetDay,
   getRequiredTrace,
+  getRequiredTraceRange,
+  TIER1_LAST_STEP,
+  TIER2_LAST_STEP,
   MissionBossConfig,
   missionList,
   type BossConfig,
@@ -35,27 +38,67 @@ export const DestinyUnlock = ({ onSave }: { onSave: (params: DestinyUnlockData) 
   const [missionStep, setMissionStep] = useState(destinyUnlockInfo?.missionStep || 1);
   const [startDate, setStartDate] = useState(destinyUnlockInfo?.startDate || "");
   const [baseTrace, setBaseTrace] = useState(destinyUnlockInfo?.baseTrace || 0);
-  const [configs, setConfigs] = useState<BossConfig[]>(destinyUnlockInfo?.bossConfig || DEFAULT_BOSS_CONFIG);
+  const [configs, setConfigs] = useState<BossConfig[]>(() => {
+    const persisted = destinyUnlockInfo?.bossConfig;
+    if (!persisted) return DEFAULT_BOSS_CONFIG;
+    return persisted.map((c) => {
+      const cap = bossList.find((b) => b.name === c.name)?.maxPartySize ?? 6;
+      return { ...c, partySize: Math.min(c.partySize, cap) };
+    });
+  });
   const [missionConfigs, setMissionConfigs] = useState<MissionBossConfig[]>(destinyUnlockInfo?.missionConfig || DEFAULT_MISSION_CONFIG);
 
   const isAllUnselected = configs.every((config) => !config.isSelected);
   const baseWeeklyTotal = calculateWeeklyTotal(configs, bossList, false);
-  const required = getRequiredTrace(missionStep);
-  const { liberationDate, liberationRecords } = useMemo(() => {
-    if (!startDate || isAllUnselected) return { liberationDate: "정보 없음", records: [] };
+  const tier1RequiredFromStep = getRequiredTraceRange(missionStep, TIER1_LAST_STEP);
+  const tier2RequiredFromStep = getRequiredTrace(missionStep);
+  const tier1TotalRequired = getRequiredTraceRange(1, TIER1_LAST_STEP);
+  const tier2TotalRequired = getRequiredTraceRange(TIER1_LAST_STEP + 1, TIER2_LAST_STEP);
+  const isTier1Done = missionStep > TIER1_LAST_STEP;
 
-    const { liberationDate, liberationRecords } = estimateLiberationDateWithResetDay({
+  const { tier1Date, tier2Date, liberationRecords } = useMemo(() => {
+    if (!startDate || isAllUnselected) {
+      return { tier1Date: "정보 없음", tier2Date: "정보 없음", liberationRecords: [] };
+    }
+
+    const tier1 = isTier1Done
+      ? null
+      : estimateLiberationDateWithResetDay({
+          startDateStr: startDate,
+          bossConfigs: configs,
+          missionConfigs,
+          requiredTrace: tier1RequiredFromStep,
+          bossList,
+          missionStep,
+          baseTrace,
+        });
+
+    const tier2 = estimateLiberationDateWithResetDay({
       startDateStr: startDate,
       bossConfigs: configs,
-      missionConfigs: missionConfigs,
-      requiredTrace: required,
+      missionConfigs,
+      requiredTrace: tier2RequiredFromStep,
       bossList,
       missionStep,
       baseTrace,
     });
 
-    return { liberationDate, liberationRecords };
-  }, [startDate, isAllUnselected, configs, required, missionStep, baseTrace, missionConfigs]);
+    return {
+      tier1Date: tier1 ? tier1.liberationDate : "이미 완료",
+      tier2Date: tier2.liberationDate,
+      liberationRecords: tier2.liberationRecords,
+    };
+  }, [
+    startDate,
+    isAllUnselected,
+    configs,
+    missionConfigs,
+    tier1RequiredFromStep,
+    tier2RequiredFromStep,
+    missionStep,
+    baseTrace,
+    isTier1Done,
+  ]);
 
   const updateConfig = (updated: BossConfig) => {
     setConfigs((prev) => prev.map((c) => (c.name === updated.name ? updated : c)));
@@ -89,12 +132,27 @@ export const DestinyUnlock = ({ onSave }: { onSave: (params: DestinyUnlockData) 
   return (
     <div className="flex flex-col gap-3 w-full">
       <div
-        className="flex sticky top-0 justify-between items-center
+        className="flex sticky top-0 flex-col gap-2
         border-2 border-sky-400
-        bg-slate-300/95 dark:bg-black/70 rounded-lg pt-2 pb-2 px-3 max-[600px]:px-2 z-10"
+        bg-slate-300/95 dark:bg-black/70 rounded-lg pt-2.5 pb-3 px-3 max-[600px]:px-2 z-10"
       >
         <span className="text-md max-[600px]:text-sm font-bold text-gray-700 dark:text-gray-200">🗓️ 예상 해방 날짜</span>
-        <span className="font-bold text-slate-900 dark:text-white text-base max-[600px]:text-sm">{liberationDate}</span>
+        <div className="grid grid-cols-2 max-[600px]:grid-cols-1 gap-2 max-[600px]:gap-1.5">
+          <div
+            className="flex flex-col items-center justify-center gap-1 px-2 py-2 max-[600px]:py-1.5 rounded-md bg-white/70 dark:bg-white/10
+            max-[600px]:flex-row max-[600px]:justify-between"
+          >
+            <span className="text-[12px] max-[600px]:text-xs font-bold tracking-wide text-sky-700 dark:text-sky-300">1차 해방</span>
+            <span className="text-lg max-[600px]:text-base font-extrabold tabular-nums text-slate-900 dark:text-white">{tier1Date}</span>
+          </div>
+          <div
+            className="flex flex-col items-center justify-center gap-1 px-2 py-2 max-[600px]:py-1.5 rounded-md bg-white/70 dark:bg-white/10
+            max-[600px]:flex-row max-[600px]:justify-between"
+          >
+            <span className="text-[12px] max-[600px]:text-xs font-bold tracking-wide text-sky-700 dark:text-sky-300">2차 해방</span>
+            <span className="text-lg max-[600px]:text-base font-extrabold tabular-nums text-slate-900 dark:text-white">{tier2Date}</span>
+          </div>
+        </div>
       </div>
       <div className="flex flex-col gap-2">
         <div className="flex flex-col gap-2">
@@ -200,7 +258,7 @@ export const DestinyUnlock = ({ onSave }: { onSave: (params: DestinyUnlockData) 
             return (
               <DestinyMissionBossSelector
                 key={mission.name}
-                bossName={`${mission.name} (${mission.difficulty})`}
+                bossName={`${mission.name}`}
                 config={missionConfig}
                 onChange={updateMissionConfig}
               />
@@ -216,8 +274,12 @@ export const DestinyUnlock = ({ onSave }: { onSave: (params: DestinyUnlockData) 
             <span className="font-bold text-gray-700 dark:text-gray-300">{baseWeeklyTotal}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="font-bold text-gray-700 dark:text-gray-400">총 필요 대적자의 결의</span>
-            <span className="font-bold text-gray-700 dark:text-gray-300">{required}</span>
+            <span className="font-bold text-gray-700 dark:text-gray-400">1차 해방 필요 대적자의 결의</span>
+            <span className="font-bold text-gray-700 dark:text-gray-300">{isTier1Done ? "이미 완료" : tier1TotalRequired}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="font-bold text-gray-700 dark:text-gray-400">2차 해방 필요 대적자의 결의</span>
+            <span className="font-bold text-gray-700 dark:text-gray-300">{tier2TotalRequired}</span>
           </div>
         </div>
       </div>

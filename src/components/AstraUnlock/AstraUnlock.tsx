@@ -120,7 +120,7 @@ export const AstraUnlock = ({ onSave }: { onSave: (params: AstraUnlockData) => v
                 className="flex flex-col items-center justify-center gap-1 px-2 py-2 max-[600px]:py-1.5 rounded-md bg-white/70 dark:bg-white/10
                 max-[600px]:flex-row max-[600px]:justify-between"
               >
-                <span className="text-[11px] max-[600px]:text-xs font-bold tracking-wide text-purple-700 dark:text-purple-300">
+                <span className="text-[12px] max-[600px]:text-xs font-bold tracking-wide text-purple-700 dark:text-purple-300">
                   {STAGE_LABEL[idx]}
                 </span>
                 <span

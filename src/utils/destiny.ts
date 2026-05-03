@@ -3,6 +3,7 @@ export type Boss = {
   type: "weekly";
   rewards: Record<string, number>; // 난이도별 대적자의 결의
   availableDifficulties: string[];
+  maxPartySize: 3 | 6;
 };
 
 export type BossConfig = {
@@ -26,40 +27,61 @@ export type Mission = {
 };
 
 export const missionList: Mission[] = [
-  { index: 1, name: "선택받은 세렌", difficulty: "하드", requiredTrace: 2000 },
-  { index: 2, name: "감시자 칼로스", difficulty: "카오스", requiredTrace: 2500 },
-  { index: 3, name: "사도 카링", difficulty: "하드", requiredTrace: 3000 },
+  { index: 1, name: "선택받은 세렌(하드)", difficulty: "하드", requiredTrace: 2000 },
+  { index: 2, name: "감시자 칼로스(카오스)", difficulty: "카오스", requiredTrace: 2500 },
+  { index: 3, name: "사도 카링(하드)", difficulty: "하드", requiredTrace: 3000 },
+  { index: 4, name: "최초의 대적자(하드)", difficulty: "하드", requiredTrace: 10000 },
+  { index: 5, name: "림보(하드)", difficulty: "하드", requiredTrace: 12500 },
+  { index: 6, name: "발드릭스(하드)", difficulty: "하드", requiredTrace: 15000 },
 ];
 
+export const TIER1_LAST_STEP = 3;
+export const TIER2_LAST_STEP = 6;
+
+export function getRequiredTraceRange(fromStep: number, toStep: number): number {
+  if (fromStep > toStep) return 0;
+  return missionList.slice(fromStep - 1, toStep).reduce((sum, m) => sum + m.requiredTrace, 0);
+}
+
 export const bossList: Boss[] = [
-  { name: "선택받은 세렌", type: "weekly", rewards: { 하드: 6, 익스트림: 80 }, availableDifficulties: ["하드", "익스트림"] },
+  {
+    name: "선택받은 세렌",
+    type: "weekly",
+    rewards: { 하드: 6, 익스트림: 80 },
+    availableDifficulties: ["하드", "익스트림"],
+    maxPartySize: 6,
+  },
   {
     name: "감시자 칼로스",
     type: "weekly",
     rewards: { 노멀: 10, 카오스: 70, 익스트림: 400 },
     availableDifficulties: ["노멀", "카오스", "익스트림"],
+    maxPartySize: 6,
   },
   {
     name: "최초의 대적자",
     type: "weekly",
     rewards: { 노멀: 20, 하드: 120, 익스트림: 500 },
     availableDifficulties: ["노멀", "하드", "익스트림"],
+    maxPartySize: 3,
   },
   {
     name: "사도 카링",
     type: "weekly",
     rewards: { 노멀: 20, 하드: 160, 익스트림: 1200 },
     availableDifficulties: ["노멀", "하드", "익스트림"],
+    maxPartySize: 6,
   },
   {
     name: "찬란한 흉성",
     type: "weekly",
     rewards: { 노멀: 20, 하드: 380 },
     availableDifficulties: ["노멀", "하드"],
+    maxPartySize: 3,
   },
-  { name: "림보", type: "weekly", rewards: { 노멀: 120, 하드: 360 }, availableDifficulties: ["노멀", "하드"] },
-  { name: "발드릭스", type: "weekly", rewards: { 노멀: 150, 하드: 450 }, availableDifficulties: ["노멀", "하드"] },
-  { name: "유피테르", type: "weekly", rewards: { 노멀: 160, 하드: 500 }, availableDifficulties: ["노멀", "하드"] },
+  { name: "림보", type: "weekly", rewards: { 노멀: 120, 하드: 360 }, availableDifficulties: ["노멀", "하드"], maxPartySize: 3 },
+  { name: "발드릭스", type: "weekly", rewards: { 노멀: 150, 하드: 450 }, availableDifficulties: ["노멀", "하드"], maxPartySize: 3 },
+  { name: "유피테르", type: "weekly", rewards: { 노멀: 160, 하드: 500 }, availableDifficulties: ["노멀", "하드"], maxPartySize: 3 },
 ];
 
 export function calculateBossTrace(config: BossConfig, boss: Boss): number {

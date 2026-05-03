@@ -258,7 +258,7 @@ export const DestinyUnlock = ({ onSave }: { onSave: (params: DestinyUnlockData) 
             return (
               <DestinyMissionBossSelector
                 key={mission.name}
-                bossName={`${mission.name}`}
+                bossName={`${mission.name} (${mission.difficulty})`}
                 config={missionConfig}
                 onChange={updateMissionConfig}
               />

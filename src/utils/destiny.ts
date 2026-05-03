@@ -27,12 +27,12 @@ export type Mission = {
 };
 
 export const missionList: Mission[] = [
-  { index: 1, name: "선택받은 세렌(하드)", difficulty: "하드", requiredTrace: 2000 },
-  { index: 2, name: "감시자 칼로스(카오스)", difficulty: "카오스", requiredTrace: 2500 },
-  { index: 3, name: "사도 카링(하드)", difficulty: "하드", requiredTrace: 3000 },
-  { index: 4, name: "최초의 대적자(하드)", difficulty: "하드", requiredTrace: 10000 },
-  { index: 5, name: "림보(하드)", difficulty: "하드", requiredTrace: 12500 },
-  { index: 6, name: "발드릭스(하드)", difficulty: "하드", requiredTrace: 15000 },
+  { index: 1, name: "선택받은 세렌", difficulty: "하드", requiredTrace: 2000 },
+  { index: 2, name: "감시자 칼로스", difficulty: "카오스", requiredTrace: 2500 },
+  { index: 3, name: "사도 카링", difficulty: "하드", requiredTrace: 3000 },
+  { index: 4, name: "최초의 대적자", difficulty: "하드", requiredTrace: 10000 },
+  { index: 5, name: "림보", difficulty: "하드", requiredTrace: 12500 },
+  { index: 6, name: "발드릭스", difficulty: "하드", requiredTrace: 15000 },
 ];
 
 export const TIER1_LAST_STEP = 3;

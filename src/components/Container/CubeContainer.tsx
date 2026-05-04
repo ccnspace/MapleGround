@@ -4,9 +4,8 @@ import { useShallow } from "zustand/react/shallow";
 import { useThrottle } from "@/hooks/useThrottle";
 import { useCubeStore } from "@/stores/cube";
 import { CubeSimulator } from "@/utils/CubeSimulator";
-import potentialImg from "@/images/potentialBg.png";
 import { useCubeSimulation } from "@/hooks/useCubeSimulation";
-import { isFullyContainedInArray } from "@/utils/arrayUtils";
+import { matchesAutoResetTarget } from "@/utils/cubeOptionMatcher";
 import { NOT_SELECTED, POTENTIAL_CUBE, ADDITIONAL_POTENTIAL_CUBE } from "@/consts/Cube";
 import { usePotentialInfo } from "@/hooks/usePotentialInfo";
 import { Divider } from "../Equip/Divider";
@@ -138,7 +137,8 @@ const CubeContainer = () => {
       const filteredOptions = [...speedOptions].filter((item) => item !== NOT_SELECTED);
       if (!filteredOptions.length) return;
 
-      const isFullyMatched = isFullyContainedInArray(filteredOptions, newOptions);
+      // 같은 옵션 종류에 더 좋은 수치가 나온 경우도 매칭으로 인정 (예: 사용자 STR +10% vs 결과 STR +13%).
+      const isFullyMatched = matchesAutoResetTarget(filteredOptions, newOptions);
 
       if (isFullyMatched) {
         setSpeedMode(false);

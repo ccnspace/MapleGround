@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useShallow } from "zustand/shallow";
 import { BOSS_CRYSTAL_PRICES, BOSS_DIFFICULTIES } from "@/constants/bossCrystals";
 import { useBossIncomeStore } from "@/stores/bossIncome";
+import { computeBossIncome, computeBossShare } from "@/utils/bossIncome";
 import { countThursdaysInMonth } from "@/utils/thursdayCount";
 import { BossSettlementRow } from "@/components/Boss/BossSettlementRow";
 import { BossSummaryCard } from "@/components/Boss/BossSummaryCard";
@@ -36,10 +37,11 @@ export const BossSettlementContent = () => {
     let weeklyCount = 0;
     for (const [boss, sel] of Object.entries(selections)) {
       if (!sel.enabled) continue;
-      const price = BOSS_CRYSTAL_PRICES[boss]?.[sel.difficulty] ?? 0;
-      if (boss === MONTHLY_BOSS) monthly += price;
+      // 파티원 수에 따라 1/n 분배된 실수령액 사용.
+      const share = computeBossShare(boss, sel);
+      if (boss === MONTHLY_BOSS) monthly += share;
       else {
-        weekly += price;
+        weekly += share;
         weeklyCount++;
       }
       count++;
@@ -55,12 +57,9 @@ export const BossSettlementContent = () => {
     let weekly = 0;
     let monthly = 0;
     for (const p of presets) {
-      for (const [boss, sel] of Object.entries(p.selections)) {
-        if (!sel.enabled) continue;
-        const price = BOSS_CRYSTAL_PRICES[boss]?.[sel.difficulty] ?? 0;
-        if (boss === MONTHLY_BOSS) monthly += price;
-        else weekly += price;
-      }
+      const inc = computeBossIncome(p.selections);
+      weekly += inc.weekly;
+      monthly += inc.monthly;
     }
     return { weekly, monthly };
   }, [presets]);
@@ -68,13 +67,13 @@ export const BossSettlementContent = () => {
   const [sortOrder, setSortOrder] = useState<SortOrder>("none");
   const cycleSort = () => setSortOrder((p) => (p === "none" ? "desc" : p === "desc" ? "asc" : "none"));
 
-  // 정렬용 effective 가격 — 선택된 난이도가 있으면 그 가격, 없으면 Row 가 기본으로 노출하는
-  // "제공 난이도 중 가장 높은 등급" 의 가격으로 계산 (Row 의 previewDifficulty 와 동일 규칙).
+  // 정렬용 effective 가격 — 선택된 난이도가 있으면 그 가격(파티원 수 1/n 분배 적용), 없으면
+  // Row 가 기본으로 노출하는 "제공 난이도 중 가장 높은 등급" 의 가격(파티 1명 기준)으로 계산.
   const sortedWeeklyBosses = useMemo(() => {
     if (sortOrder === "none") return weeklyBosses;
     const getPrice = (boss: string): number => {
       const sel = selections[boss];
-      if (sel) return BOSS_CRYSTAL_PRICES[boss]?.[sel.difficulty] ?? 0;
+      if (sel) return computeBossShare(boss, sel);
       const available = BOSS_DIFFICULTIES.filter((d) => BOSS_CRYSTAL_PRICES[boss]?.[d] !== undefined);
       const last = available[available.length - 1];
       return last ? BOSS_CRYSTAL_PRICES[boss]?.[last] ?? 0 : 0;
@@ -258,6 +257,12 @@ export const BossSettlementContent = () => {
           <div className="w-10 max-[600px]:w-8 shrink-0" aria-hidden />
           <span className="flex-1 min-w-0">보스</span>
           <span className="shrink-0">난이도</span>
+          <span
+            className="shrink-0 w-[60px] max-[600px]:w-[52px] text-right"
+            title="파티원 수 — 메소가 1/n 로 분배됩니다"
+          >
+            파티
+          </span>
           <button
             type="button"
             onClick={cycleSort}

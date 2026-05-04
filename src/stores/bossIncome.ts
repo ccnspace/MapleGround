@@ -1,10 +1,28 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import { BOSS_CRYSTAL_PRICES, type BossDifficulty } from "@/constants/bossCrystals";
+import { BOSS_CRYSTAL_PRICES, getBossMaxPartySize, type BossDifficulty } from "@/constants/bossCrystals";
+
+// 파티원 수 — 메이플 인게임 보스 파티 최대 6명 (솔로 = 1).
+export const MIN_PARTY_SIZE = 1;
+export const MAX_PARTY_SIZE = 6;
 
 export type BossSelection = {
   enabled: boolean;
   difficulty: BossDifficulty;
+  // 파티원 수. 메소가 1/n 로 분배되므로 수익 계산에 사용됨. undefined = 1 (솔로).
+  partySize?: number;
+};
+
+// `enabled`/`difficulty` 없이 `partySize` 만 들고 있는 부분 객체에도 호출 가능하도록 시그니처는 느슨하게.
+// bossName 을 넘기면 그 보스의 인게임 상한(`getBossMaxPartySize`) 으로 clamp 한다 — 기존 저장 데이터에
+// 보스 상한보다 큰 값이 있어도 표시/계산 시 자동 보정된다.
+export const effectivePartySize = (sel: { partySize?: number } | undefined | null, bossName?: string): number => {
+  if (!sel) return 1;
+  const n = sel.partySize ?? 1;
+  if (!Number.isFinite(n) || n < MIN_PARTY_SIZE) return MIN_PARTY_SIZE;
+  const cap = bossName ? getBossMaxPartySize(bossName) : MAX_PARTY_SIZE;
+  if (n > cap) return cap;
+  return Math.floor(n);
 };
 
 export type Selections = Record<string /* boss */, BossSelection>;
@@ -31,6 +49,8 @@ type BossIncomeState = {
 type BossIncomeAction = {
   toggleBoss: (boss: string) => void;
   setDifficulty: (boss: string, difficulty: BossDifficulty) => void;
+  // 보스의 파티원 수 변경 (1~6). 활성화되어 있지 않은 보스에도 미리 설정 가능.
+  setPartySize: (boss: string, partySize: number) => void;
   // 여러 보스를 한 번에 enable/disable (일괄 선택/해제). difficulty 를 함께 지정하면 난이도도 설정.
   setBossesEnabled: (updates: Array<{ boss: string; enabled: boolean; difficulty?: BossDifficulty }>) => void;
   clearCurrent: () => void;
@@ -61,6 +81,7 @@ const cloneSelections = (selections: Selections): Selections => {
 };
 
 // 두 Selections 가 "유의미하게" 같은지 비교. disabled 엔트리는 선택되지 않은 것과 동일하게 취급.
+// 파티원 수도 비교에 포함 — 파티원만 바꿔도 "변경됨" 으로 인식되어야 함.
 export const selectionsEqual = (a: Selections, b: Selections): boolean => {
   const entriesA = Object.entries(a).filter(([, s]) => s.enabled);
   const entriesB = Object.entries(b).filter(([, s]) => s.enabled);
@@ -69,6 +90,7 @@ export const selectionsEqual = (a: Selections, b: Selections): boolean => {
   for (const [boss, sel] of entriesA) {
     const other = mapB.get(boss);
     if (!other || other.difficulty !== sel.difficulty) return false;
+    if (effectivePartySize(sel) !== effectivePartySize(other)) return false;
   }
   return true;
 };
@@ -97,7 +119,18 @@ export const useBossIncomeStore = create<BossIncomeState & BossIncomeAction>()(
         setDifficulty: (boss, difficulty) => {
           const prev = get().current;
           const cur = prev[boss];
-          const next: BossSelection = { enabled: cur?.enabled ?? true, difficulty };
+          // 기존 partySize 등 다른 필드는 보존.
+          const next: BossSelection = { ...(cur ?? {}), enabled: cur?.enabled ?? true, difficulty };
+          set({ current: { ...prev, [boss]: next } });
+        },
+        setPartySize: (boss, partySize) => {
+          const cap = getBossMaxPartySize(boss);
+          const clamped = Math.min(cap, Math.max(MIN_PARTY_SIZE, Math.floor(partySize)));
+          const prev = get().current;
+          const cur = prev[boss];
+          const next: BossSelection = cur
+            ? { ...cur, partySize: clamped }
+            : { enabled: false, difficulty: pickDefaultDifficulty(boss), partySize: clamped };
           set({ current: { ...prev, [boss]: next } });
         },
         setBossesEnabled: (updates) => {
@@ -107,6 +140,7 @@ export const useBossIncomeStore = create<BossIncomeState & BossIncomeAction>()(
             const existing = next[boss];
             if (enabled) {
               next[boss] = {
+                ...(existing ?? {}),
                 enabled: true,
                 difficulty: difficulty ?? existing?.difficulty ?? pickDefaultDifficulty(boss),
               };

@@ -1,8 +1,16 @@
 "use client";
 
+import { useMemo } from "react";
 import Image from "next/image";
-import { BOSS_CRYSTAL_PRICES, BOSS_DIFFICULTIES, BOSS_DIFFICULTY_LABEL, BOSS_IMAGES, type BossDifficulty } from "@/constants/bossCrystals";
-import { useBossIncomeStore, type BossSelection } from "@/stores/bossIncome";
+import {
+  BOSS_CRYSTAL_PRICES,
+  BOSS_DIFFICULTIES,
+  BOSS_DIFFICULTY_LABEL,
+  BOSS_IMAGES,
+  getBossMaxPartySize,
+  type BossDifficulty,
+} from "@/constants/bossCrystals";
+import { effectivePartySize, MIN_PARTY_SIZE, useBossIncomeStore, type BossSelection } from "@/stores/bossIncome";
 import { formatKoreanNumber } from "@/utils/formatKoreanNum";
 
 type Props = {
@@ -41,12 +49,22 @@ const DIFFICULTY_STYLES: Record<BossDifficulty, { active: string; idle: string }
 export const BossSettlementRow = ({ boss, selection, disabled = false, disabledReason }: Props) => {
   const toggleBoss = useBossIncomeStore((s) => s.toggleBoss);
   const setDifficulty = useBossIncomeStore((s) => s.setDifficulty);
+  const setPartySize = useBossIncomeStore((s) => s.setPartySize);
 
   const enabled = selection?.enabled ?? false;
   // 아직 선택된 난이도가 없으면 UI 에선 첫 번째 제공 난이도를 "미리보기" 로 보여준다.
   const availableDifficulties = BOSS_DIFFICULTIES.filter((d) => BOSS_CRYSTAL_PRICES[boss]?.[d] !== undefined);
   const previewDifficulty: BossDifficulty = selection?.difficulty ?? availableDifficulties[availableDifficulties.length - 1];
-  const currentPrice = BOSS_CRYSTAL_PRICES[boss]?.[previewDifficulty] ?? 0;
+  // 보스별 인게임 파티 상한 — 일부 보스는 3인까지만 허용. effectivePartySize 가 이 값으로 clamp 한다.
+  const bossMaxParty = getBossMaxPartySize(boss);
+  const partySizeOptions = useMemo(
+    () => Array.from({ length: bossMaxParty - MIN_PARTY_SIZE + 1 }, (_, i) => i + MIN_PARTY_SIZE),
+    [bossMaxParty]
+  );
+  const partySize = effectivePartySize(selection, boss);
+  const fullPrice = BOSS_CRYSTAL_PRICES[boss]?.[previewDifficulty] ?? 0;
+  // 파티원 수에 따라 사용자가 실제로 받는 분배 수익(메소가 1/n 로 분배).
+  const sharePrice = Math.floor(fullPrice / partySize);
   const image = BOSS_IMAGES[boss];
 
   return (
@@ -119,16 +137,47 @@ export const BossSettlementRow = ({ boss, selection, disabled = false, disabledR
         })}
       </div>
 
-      {/* 가격 */}
+      {/* 파티원 수 — 메소가 1/n 로 분배됨. 활성 상태가 아니어도 미리 설정 가능. */}
+      <div className="shrink-0 w-[60px] max-[600px]:w-[52px] flex justify-end">
+        <select
+          aria-label={`${boss} 파티원 수`}
+          value={partySize}
+          onChange={(e) => setPartySize(boss, Number(e.target.value))}
+          disabled={disabled}
+          title={partySize > 1 ? `파티 ${partySize}명 — 메소가 1/${partySize}로 분배됩니다` : "솔로 클리어 (분배 없음)"}
+          className={`text-[12px] max-[600px]:text-[11px] font-bold tabular-nums
+            px-1.5 py-0.5 rounded
+            bg-white dark:bg-color-900
+            border border-slate-200 dark:border-white/10
+            text-gray-700 dark:text-gray-200
+            cursor-pointer
+            focus:outline-none focus:ring-2 focus:ring-emerald-300 dark:focus:ring-emerald-600
+            disabled:opacity-50 disabled:cursor-not-allowed`}
+        >
+          {partySizeOptions.map((n) => (
+            <option key={n} value={n}>
+              {n}명
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* 가격 (파티원 수에 따라 1/n 분배된 실수령액) */}
       <div className="flex flex-col items-end shrink-0 min-w-[96px] max-[600px]:min-w-[76px]">
         <span
           className={`text-[15px] max-[600px]:text-[13px] font-extrabold tabular-nums leading-tight
             ${enabled ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400 dark:text-gray-500"}`}
         >
-          {currentPrice.toLocaleString()}
+          {sharePrice.toLocaleString()}
         </span>
-        <span className="text-[10px] max-[600px]:text-[9px] text-gray-400 dark:text-gray-500 leading-tight">
-          {formatKoreanNumber(currentPrice)}
+        <span className="text-[10px] max-[600px]:text-[9px] text-gray-400 dark:text-gray-500 leading-tight tabular-nums">
+          {partySize > 1 ? (
+            <>
+              <span className="opacity-80">÷{partySize}</span> · {formatKoreanNumber(sharePrice)}
+            </>
+          ) : (
+            formatKoreanNumber(sharePrice)
+          )}
         </span>
       </div>
     </div>

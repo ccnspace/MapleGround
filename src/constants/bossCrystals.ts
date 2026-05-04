@@ -99,6 +99,20 @@ export const getBossCrystalPrice = (boss: string, difficulty: BossDifficulty): n
   return BOSS_CRYSTAL_PRICES[boss]?.[difficulty] ?? null;
 };
 
+// 인게임 보스별 파티원 수 상한. 등재되지 않은 보스는 기본값(`DEFAULT_MAX_PARTY_SIZE`) 적용.
+// 일부 신규 보스(유피테르/발드릭스/림보/찬란한 흉성/카링/최초의 대적자) 는 인게임에서 3인까지만 입장 가능.
+export const DEFAULT_MAX_PARTY_SIZE = 6;
+export const BOSS_MAX_PARTY_SIZE_OVERRIDE: Record<string, number> = {
+  "최초의 대적자": 3,
+  카링: 3,
+  "찬란한 흉성": 3,
+  림보: 3,
+  발드릭스: 3,
+  유피테르: 3,
+};
+
+export const getBossMaxPartySize = (boss: string): number => BOSS_MAX_PARTY_SIZE_OVERRIDE[boss] ?? DEFAULT_MAX_PARTY_SIZE;
+
 // 보스명 → 이미지. 키는 BOSS_CRYSTAL_PRICES 의 키와 1:1 대응.
 // 핑크빈/파풀라투스 는 사용 가능한 에셋이 카오스 버전뿐이라 동일 이미지를 재사용한다.
 export const BOSS_IMAGES: Record<string, StaticImageData> = {

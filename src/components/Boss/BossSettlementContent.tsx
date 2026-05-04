@@ -8,6 +8,7 @@ import { countThursdaysInMonth } from "@/utils/thursdayCount";
 import { BossSettlementRow } from "@/components/Boss/BossSettlementRow";
 import { BossSummaryCard } from "@/components/Boss/BossSummaryCard";
 import { BossPresetManager } from "@/components/Boss/BossPresetManager";
+import { BossPresetTotalsCard } from "@/components/Boss/BossPresetTotalsCard";
 import { BossItemTargetCard } from "@/components/Boss/BossItemTargetCard";
 import { QUICK_SELECT_PRESETS, type QuickSelectPreset } from "@/components/Boss/bossQuickSelectPresets";
 
@@ -20,6 +21,7 @@ type SortOrder = "none" | "desc" | "asc";
 
 export const BossSettlementContent = () => {
   const selections = useBossIncomeStore(useShallow((state) => state.current));
+  const presets = useBossIncomeStore(useShallow((state) => state.presets));
   const clearCurrent = useBossIncomeStore((s) => s.clearCurrent);
   const setBossesEnabled = useBossIncomeStore((s) => s.setBossesEnabled);
 
@@ -47,6 +49,21 @@ export const BossSettlementContent = () => {
 
   const thursdays = useMemo(() => countThursdaysInMonth(), []);
   const thisMonthEstimate = weeklyTotal * thursdays + monthlyTotal;
+
+  // 저장된 프리셋들의 주간/월간 수익 합산 — 목표 가격 계산기의 "프리셋 합산" 모드용.
+  const presetTotals = useMemo(() => {
+    let weekly = 0;
+    let monthly = 0;
+    for (const p of presets) {
+      for (const [boss, sel] of Object.entries(p.selections)) {
+        if (!sel.enabled) continue;
+        const price = BOSS_CRYSTAL_PRICES[boss]?.[sel.difficulty] ?? 0;
+        if (boss === MONTHLY_BOSS) monthly += price;
+        else weekly += price;
+      }
+    }
+    return { weekly, monthly };
+  }, [presets]);
 
   const [sortOrder, setSortOrder] = useState<SortOrder>("none");
   const cycleSort = () => setSortOrder((p) => (p === "none" ? "desc" : p === "desc" ? "asc" : "none"));
@@ -131,8 +148,17 @@ export const BossSettlementContent = () => {
         <BossPresetManager />
       </div>
 
+      {/* 저장된 프리셋(캐릭터)별 수익 합산 — 프리셋이 1개 이상일 때만 노출 */}
+      <BossPresetTotalsCard />
+
       {/* 목표 아이템 가격 → 도달 시점 계산기 */}
-      <BossItemTargetCard weeklyTotal={weeklyTotal} monthlyTotal={monthlyTotal} />
+      <BossItemTargetCard
+        weeklyTotal={weeklyTotal}
+        monthlyTotal={monthlyTotal}
+        presetWeeklyTotal={presetTotals.weekly}
+        presetMonthlyTotal={presetTotals.monthly}
+        presetCount={presets.length}
+      />
 
       {/* 월간 보스 섹션 */}
       <section className="flex flex-col gap-2">

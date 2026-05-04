@@ -28,13 +28,14 @@ const STATUS_BADGE: Record<SaveState, { label: string; className: string }> = {
 };
 
 export const BossPresetManager = () => {
-  const { presets, current, activePresetId, savePreset, updateActivePreset, loadPreset, deletePreset } = useBossIncomeStore(
+  const { presets, current, activePresetId, savePreset, updateActivePreset, renamePreset, loadPreset, deletePreset } = useBossIncomeStore(
     useShallow((s) => ({
       presets: s.presets,
       current: s.current,
       activePresetId: s.activePresetId,
       savePreset: s.savePreset,
       updateActivePreset: s.updateActivePreset,
+      renamePreset: s.renamePreset,
       loadPreset: s.loadPreset,
       deletePreset: s.deletePreset,
     }))
@@ -55,9 +56,38 @@ export const BossPresetManager = () => {
   const [name, setName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // 프리셋 이름 인라인 수정 상태.
+  const [editingPresetId, setEditingPresetId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState("");
+  const renameInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (isSaveFormOpen) inputRef.current?.focus();
   }, [isSaveFormOpen]);
+
+  useEffect(() => {
+    if (editingPresetId && renameInputRef.current) {
+      renameInputRef.current.focus();
+      renameInputRef.current.select();
+    }
+  }, [editingPresetId]);
+
+  const editingTrimmed = editingName.trim();
+  const editingDuplicate = presets.some((p) => p.id !== editingPresetId && p.name === editingTrimmed);
+  const canSubmitRename = editingTrimmed.length > 0 && !editingDuplicate;
+
+  const startRename = (id: string, currentName: string) => {
+    setEditingPresetId(id);
+    setEditingName(currentName);
+  };
+  const cancelRename = () => {
+    setEditingPresetId(null);
+    setEditingName("");
+  };
+  const submitRename = () => {
+    if (!editingPresetId || !canSubmitRename) return;
+    if (renamePreset(editingPresetId, editingTrimmed)) cancelRename();
+  };
 
   const trimmed = name.trim();
   const duplicateName = presets.some((p) => p.name === trimmed);
@@ -282,6 +312,67 @@ export const BossPresetManager = () => {
           {presets.map((preset) => {
             const enabledCount = Object.values(preset.selections).filter((s) => s.enabled).length;
             const isActive = preset.id === activePresetId;
+            const isEditing = preset.id === editingPresetId;
+
+            if (isEditing) {
+              return (
+                <form
+                  key={preset.id}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    submitRename();
+                  }}
+                  className="inline-flex items-stretch rounded-md border overflow-hidden
+                    border-sky-400 dark:border-sky-500/70 bg-white dark:bg-color-900
+                    ring-1 ring-sky-300/60 dark:ring-sky-600/40"
+                  title={editingDuplicate ? "같은 이름의 프리셋이 이미 있습니다" : ""}
+                >
+                  <input
+                    ref={renameInputRef}
+                    type="text"
+                    value={editingName}
+                    onChange={(e) => setEditingName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") {
+                        e.preventDefault();
+                        cancelRename();
+                      }
+                    }}
+                    maxLength={24}
+                    aria-label={`${preset.name} 새 이름`}
+                    className={`px-2.5 py-1 text-sm font-semibold w-[140px] max-[600px]:w-[110px]
+                      bg-transparent text-gray-800 dark:text-gray-100
+                      placeholder:text-gray-400 dark:placeholder:text-gray-500
+                      focus:outline-none
+                      ${editingDuplicate ? "text-rose-600 dark:text-rose-300" : ""}`}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!canSubmitRename}
+                    title={editingDuplicate ? "같은 이름의 프리셋이 이미 있습니다" : "이름 저장"}
+                    aria-label="이름 저장"
+                    className="px-1.5 text-emerald-600 hover:text-white hover:bg-emerald-500
+                      dark:text-emerald-400 dark:hover:text-white dark:hover:bg-emerald-500
+                      border-l border-slate-200 dark:border-white/10 transition-colors
+                      disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-emerald-600 dark:disabled:hover:text-emerald-400"
+                  >
+                    <CheckIcon />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={cancelRename}
+                    title="취소 (Esc)"
+                    aria-label="이름 변경 취소"
+                    className="px-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200
+                      hover:bg-slate-100 dark:hover:bg-white/10
+                      border-l border-slate-200 dark:border-white/10 transition-colors"
+                  >
+                    ✕
+                  </button>
+                </form>
+              );
+            }
+
             return (
               <div
                 key={preset.id}
@@ -307,6 +398,17 @@ export const BossPresetManager = () => {
                 >
                   <span>{preset.name}</span>
                   <span className="ml-1 text-[11px] font-medium text-gray-400 dark:text-gray-500">({enabledCount})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => startRename(preset.id, preset.name)}
+                  title="이름 변경"
+                  aria-label={`${preset.name} 이름 변경`}
+                  className="px-1.5 text-gray-400 hover:text-sky-600 dark:hover:text-sky-300
+                    hover:bg-sky-50 dark:hover:bg-sky-900/30
+                    border-l border-slate-200 dark:border-white/10 transition-colors"
+                >
+                  <PencilIcon />
                 </button>
                 <button
                   type="button"
@@ -338,5 +440,21 @@ const SaveIcon = () => (
 const RevertIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3.5 h-3.5">
     <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+  </svg>
+);
+
+const PencilIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3.5 h-3.5">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.862 4.487Zm0 0L19.5 7.125"
+    />
+  </svg>
+);
+
+const CheckIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-3.5 h-3.5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
   </svg>
 );

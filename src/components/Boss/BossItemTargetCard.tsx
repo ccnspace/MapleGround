@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { formatKoreanNumber } from "@/utils/formatKoreanNum";
 import { parseKoreanPrice } from "@/utils/parseKoreanPrice";
@@ -8,6 +8,16 @@ import { parseKoreanPrice } from "@/utils/parseKoreanPrice";
 type Props = {
   weeklyTotal: number;
   monthlyTotal: number;
+  presetWeeklyTotal: number;
+  presetMonthlyTotal: number;
+  presetCount: number;
+};
+
+type CalcMode = "current" | "presets";
+
+const MODE_LABEL: Record<CalcMode, string> = {
+  current: "현재 선택",
+  presets: "프리셋 합산",
 };
 
 // 시뮬레이션 상한 — 무한 루프 방지 + UI 상 "장기간 소요" 처리.
@@ -65,9 +75,18 @@ const simulateWeeksUntilTarget = (
   return { kind: "tooLong" };
 };
 
-export const BossItemTargetCard = ({ weeklyTotal, monthlyTotal }: Props) => {
+export const BossItemTargetCard = ({ weeklyTotal, monthlyTotal, presetWeeklyTotal, presetMonthlyTotal, presetCount }: Props) => {
   const [rawInput, setRawInput] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
+  const [mode, setMode] = useState<CalcMode>("current");
+
+  // 프리셋이 모두 삭제되면 "프리셋 합산" 모드를 유지할 수 없으므로 현재 선택으로 폴백.
+  useEffect(() => {
+    if (mode === "presets" && presetCount === 0) setMode("current");
+  }, [mode, presetCount]);
+
+  const activeWeekly = mode === "current" ? weeklyTotal : presetWeeklyTotal;
+  const activeMonthly = mode === "current" ? monthlyTotal : presetMonthlyTotal;
 
   const parsedPrice = useMemo(() => parseKoreanPrice(rawInput), [rawInput]);
 
@@ -80,8 +99,8 @@ export const BossItemTargetCard = ({ weeklyTotal, monthlyTotal }: Props) => {
 
   const result = useMemo<SimulationResult | null>(() => {
     if (parsedPrice === null || parsedPrice <= 0) return null;
-    return simulateWeeksUntilTarget(parsedPrice, weeklyTotal, monthlyTotal);
-  }, [parsedPrice, weeklyTotal, monthlyTotal]);
+    return simulateWeeksUntilTarget(parsedPrice, activeWeekly, activeMonthly);
+  }, [parsedPrice, activeWeekly, activeMonthly]);
 
   const showInputError = rawInput.length > 0 && parsedPrice === null;
 
@@ -122,6 +141,16 @@ export const BossItemTargetCard = ({ weeklyTotal, monthlyTotal }: Props) => {
               {collapsedSummary}
             </span>
           )}
+          {!isExpanded && (
+            <span
+              className="px-2 py-0.5 rounded-full text-[10px] font-bold
+                bg-slate-100 dark:bg-white/10
+                text-gray-600 dark:text-gray-300
+                border border-slate-200 dark:border-white/10"
+            >
+              {MODE_LABEL[mode]} 기준
+            </span>
+          )}
           {isExpanded && (
             <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400 max-[600px]:hidden">
               이번 주부터 누적 시 도달 시점을 계산해드립니다
@@ -153,6 +182,31 @@ export const BossItemTargetCard = ({ weeklyTotal, monthlyTotal }: Props) => {
       {/* 본문 */}
       {isExpanded && (
         <div id="boss-target-body" className="flex flex-col gap-3 px-4 pb-4 pt-1">
+          {/* 계산 기준 토글 */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[12px] font-bold text-gray-600 dark:text-gray-300 px-1">계산 기준</span>
+            <div
+              role="tablist"
+              aria-label="계산 기준 선택"
+              className="inline-flex items-center gap-0.5 p-0.5 rounded-lg
+                bg-slate-100 dark:bg-color-950/60
+                border border-slate-200 dark:border-white/10"
+            >
+              <ModeButton active={mode === "current"} onClick={() => setMode("current")} title="현재 화면에서 선택한 보스 기준으로 계산">
+                현재 선택
+              </ModeButton>
+              <ModeButton
+                active={mode === "presets"}
+                disabled={presetCount === 0}
+                onClick={() => setMode("presets")}
+                title={presetCount === 0 ? "저장된 프리셋이 없습니다" : `저장된 ${presetCount}개 프리셋의 합산 수익으로 계산`}
+              >
+                프리셋 합산
+                <span className="ml-1 text-[10px] font-bold opacity-70 tabular-nums">{presetCount}개</span>
+              </ModeButton>
+            </div>
+          </div>
+
           {/* 입력 영역 */}
           <div className="flex flex-col gap-1.5">
             <label htmlFor="boss-target-price-input" className="text-[12px] font-bold text-gray-600 dark:text-gray-300 px-1">
@@ -204,8 +258,10 @@ export const BossItemTargetCard = ({ weeklyTotal, monthlyTotal }: Props) => {
           <ResultPanel
             result={result}
             hasInput={parsedPrice !== null && parsedPrice > 0}
-            weeklyTotal={weeklyTotal}
-            monthlyTotal={monthlyTotal}
+            weeklyTotal={activeWeekly}
+            monthlyTotal={activeMonthly}
+            mode={mode}
+            presetCount={presetCount}
           />
         </div>
       )}
@@ -213,29 +269,73 @@ export const BossItemTargetCard = ({ weeklyTotal, monthlyTotal }: Props) => {
   );
 };
 
+const ModeButton = ({
+  active,
+  disabled,
+  onClick,
+  title,
+  children,
+}: {
+  active: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <button
+    type="button"
+    role="tab"
+    aria-selected={active}
+    onClick={onClick}
+    disabled={disabled}
+    title={title}
+    className={`px-3 py-1 rounded-md text-[12px] font-bold transition-colors whitespace-nowrap
+      ${
+        active
+          ? "bg-white dark:bg-color-900 shadow-sm text-gray-800 dark:text-gray-100 border border-slate-200 dark:border-white/10"
+          : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+      }
+      disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-gray-500 dark:disabled:hover:text-gray-400`}
+  >
+    {children}
+  </button>
+);
+
 const ResultPanel = ({
   result,
   hasInput,
   weeklyTotal,
   monthlyTotal,
+  mode,
+  presetCount,
 }: {
   result: SimulationResult | null;
   hasInput: boolean;
   weeklyTotal: number;
   monthlyTotal: number;
+  mode: CalcMode;
+  presetCount: number;
 }) => {
+  const modeBadge =
+    mode === "presets"
+      ? `프리셋 ${presetCount}개 합산 기준`
+      : "현재 선택 기준";
+
   // 입력 전 — 안내 문구
   if (!hasInput || !result) {
     const hasIncome = weeklyTotal > 0 || monthlyTotal > 0;
+    const emptyMessage = hasIncome
+      ? "원하는 아이템 가격을 입력하면 도달 예상 시점을 보여드려요."
+      : mode === "presets"
+      ? "선택된 보스가 있는 프리셋이 없어요. 보스를 선택해 프리셋을 저장해주세요."
+      : "보스를 선택하면 누적 수익을 기준으로 도달 시점을 계산할 수 있어요.";
     return (
       <div
         className="flex items-center justify-center px-4 py-4 rounded-lg
           bg-white/60 dark:bg-color-950/40 border border-dashed border-amber-300/70 dark:border-white/10
           text-[13px] font-medium text-gray-500 dark:text-gray-400 text-center"
       >
-        {hasIncome
-          ? "원하는 아이템 가격을 입력하면 도달 예상 시점을 보여드려요."
-          : "보스를 선택하면 누적 수익을 기준으로 도달 시점을 계산할 수 있어요."}
+        {emptyMessage}
       </div>
     );
   }
@@ -247,7 +347,9 @@ const ResultPanel = ({
           bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50
           text-[13px] font-semibold text-rose-600 dark:text-rose-300 text-center"
       >
-        선택된 보스가 없어요. 먼저 주간/월간 보스를 선택해주세요.
+        {mode === "presets"
+          ? "프리셋들에 선택된 보스가 없어요. 보스를 선택한 프리셋을 저장해주세요."
+          : "선택된 보스가 없어요. 먼저 주간/월간 보스를 선택해주세요."}
       </div>
     );
   }
@@ -274,7 +376,16 @@ const ResultPanel = ({
         border border-amber-400/50 dark:border-white/10"
     >
       <div className="flex items-baseline justify-between gap-3 flex-wrap">
-        <span className="text-[13px] font-bold text-amber-700 dark:text-amber-300">예상 도달 시점</span>
+        <div className="flex items-baseline gap-2 flex-wrap">
+          <span className="text-[13px] font-bold text-amber-700 dark:text-amber-300">예상 도달 시점</span>
+          <span
+            className="px-1.5 py-0.5 rounded-full text-[10px] font-bold
+              bg-white/70 dark:bg-white/10 text-gray-600 dark:text-gray-300
+              border border-slate-200 dark:border-white/10"
+          >
+            {modeBadge}
+          </span>
+        </div>
         <span className="text-[12px] font-medium text-gray-600 dark:text-gray-400 tabular-nums">{dateLabel}</span>
       </div>
       <div className="flex items-baseline justify-end gap-1.5 flex-wrap leading-tight">

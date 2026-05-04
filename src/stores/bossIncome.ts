@@ -37,6 +37,8 @@ type BossIncomeAction = {
   savePreset: (name: string) => BossPreset | null;
   // 현재 활성 프리셋에 current 를 덮어쓴다. 활성 프리셋이 없으면 no-op.
   updateActivePreset: () => BossPreset | null;
+  // 프리셋 이름 변경. 이름이 비었거나 다른 프리셋과 중복이면 false.
+  renamePreset: (id: string, name: string) => boolean;
   loadPreset: (id: string) => void;
   deletePreset: (id: string) => void;
 };
@@ -143,6 +145,18 @@ export const useBossIncomeStore = create<BossIncomeState & BossIncomeAction>()(
           nextPresets[idx] = updated;
           set({ presets: nextPresets });
           return updated;
+        },
+        renamePreset: (id, name) => {
+          const trimmed = name.trim();
+          if (!trimmed) return false;
+          const { presets } = get();
+          if (presets.some((p) => p.id !== id && p.name === trimmed)) return false;
+          const idx = presets.findIndex((p) => p.id === id);
+          if (idx === -1) return false;
+          const next = [...presets];
+          next[idx] = { ...next[idx], name: trimmed };
+          set({ presets: next });
+          return true;
         },
         loadPreset: (id) => {
           const preset = get().presets.find((p) => p.id === id);

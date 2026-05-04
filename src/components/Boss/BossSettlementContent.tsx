@@ -8,6 +8,7 @@ import { countThursdaysInMonth } from "@/utils/thursdayCount";
 import { BossSettlementRow } from "@/components/Boss/BossSettlementRow";
 import { BossSummaryCard } from "@/components/Boss/BossSummaryCard";
 import { BossPresetManager } from "@/components/Boss/BossPresetManager";
+import { BossItemTargetCard } from "@/components/Boss/BossItemTargetCard";
 import { QUICK_SELECT_PRESETS, type QuickSelectPreset } from "@/components/Boss/bossQuickSelectPresets";
 
 // 월간 보스는 별도 섹션으로 분리
@@ -129,6 +130,9 @@ export const BossSettlementContent = () => {
         />
         <BossPresetManager />
       </div>
+
+      {/* 목표 아이템 가격 → 도달 시점 계산기 */}
+      <BossItemTargetCard weeklyTotal={weeklyTotal} monthlyTotal={monthlyTotal} />
 
       {/* 월간 보스 섹션 */}
       <section className="flex flex-col gap-2">

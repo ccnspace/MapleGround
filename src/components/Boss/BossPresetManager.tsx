@@ -7,31 +7,23 @@ import { openModal } from "@/utils/openModal";
 
 type SaveState = "noSelection" | "unsaved" | "synced" | "modified";
 
-// 저장 상태별 스타일 — "현재 프리셋" 배너 전체 배경색/테두리색 + 큼직한 뱃지 색을 동시에 결정.
-const STATUS_STYLES: Record<SaveState, { label: string; banner: string; badge: string; nameClass: string }> = {
+// 상태별 작은 뱃지 스타일. 배너 자체는 항상 중성(슬레이트) 톤이고, 강조는 이 뱃지에서만 발생.
+const STATUS_BADGE: Record<SaveState, { label: string; className: string }> = {
   noSelection: {
     label: "선택 없음",
-    banner: "bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10",
-    badge: "bg-slate-500 text-white",
-    nameClass: "text-gray-400 dark:text-gray-500",
+    className: "bg-slate-200 text-slate-600 dark:bg-white/10 dark:text-gray-300",
   },
   unsaved: {
     label: "● 저장 전",
-    banner: "bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700/60",
-    badge: "bg-amber-500 text-white",
-    nameClass: "text-gray-400 dark:text-gray-500",
+    className: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
   },
   synced: {
-    label: "✓ 저장 완료됨",
-    banner: "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-700/60",
-    badge: "bg-emerald-500 text-white",
-    nameClass: "text-emerald-700 dark:text-emerald-200",
+    label: "✓ 저장됨",
+    className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300",
   },
   modified: {
-    label: "● 변경됨 (저장 전)",
-    banner: "bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700/60",
-    badge: "bg-amber-500 text-white",
-    nameClass: "text-amber-700 dark:text-amber-200",
+    label: "● 변경됨",
+    className: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300",
   },
 };
 
@@ -59,7 +51,6 @@ export const BossPresetManager = () => {
 
   const atLimit = presets.length >= MAX_BOSS_PRESETS;
 
-  // 저장 폼 노출 토글
   const [isSaveFormOpen, setIsSaveFormOpen] = useState(false);
   const [name, setName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -98,8 +89,17 @@ export const BossPresetManager = () => {
     });
   };
 
+  const handleRevert = () => {
+    if (!activePreset || !isDirty) return;
+    openModal({
+      type: "confirm",
+      message: `변경사항을 되돌릴까요?\n"${activePreset.name}" 프리셋의 마지막 저장 상태로 돌아갑니다.`,
+      confirmCallback: () => loadPreset(activePreset.id),
+    });
+  };
+
   const handleLoad = (id: string, presetName: string) => {
-    if (id === activePresetId && !isDirty) return; // 이미 동일한 프리셋이 그대로 로드돼 있음
+    if (id === activePresetId && !isDirty) return;
     if (!isDirty && !hasSelections) {
       loadPreset(id);
       return;
@@ -119,7 +119,7 @@ export const BossPresetManager = () => {
     });
   };
 
-  const statusStyle = STATUS_STYLES[status];
+  const badge = STATUS_BADGE[status];
   const saveHint = atLimit
     ? `최대 ${MAX_BOSS_PRESETS}개까지 저장할 수 있습니다`
     : !hasSelections
@@ -132,7 +132,7 @@ export const BossPresetManager = () => {
 
   return (
     <div
-      className="flex flex-col gap-2.5 p-3 rounded-xl border
+      className="flex flex-col gap-3 p-3 rounded-xl border
         border-slate-200/80 dark:border-white/10
         bg-slate-50 dark:bg-color-950/40 h-full"
     >
@@ -154,35 +154,58 @@ export const BossPresetManager = () => {
         </span>
       </div>
 
-      {/* 현재 프리셋 배너 — 상태에 따라 배경색·뱃지 색이 함께 변해 한눈에 들어오게. */}
-      <div className={`flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-lg border-2 transition-colors ${statusStyle.banner}`}>
+      {/* 현재 프리셋 배너 — 배경은 중성 톤으로 고정, 상태는 작은 뱃지로만 표시. */}
+      <div
+        className="flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-lg
+          bg-white dark:bg-color-900/60
+          border border-slate-200 dark:border-white/10"
+      >
         <div className="flex flex-col min-w-0 leading-tight">
-          <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 tracking-wider">현재 선택중인 프리셋</span>
-          <span className={`text-lg max-[600px]:text-base font-extrabold truncate ${statusStyle.nameClass}`}>
+          <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 tracking-wider">현재 선택중인 프리셋</span>
+          <span
+            className={`text-lg max-[600px]:text-base font-extrabold truncate
+              ${activePreset ? "text-gray-800 dark:text-gray-100" : "text-gray-400 dark:text-gray-500"}`}
+          >
             {activePreset ? activePreset.name : "— 저장되지 않음 —"}
           </span>
         </div>
         <span
-          className={`inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-extrabold shadow-sm whitespace-nowrap shrink-0 ${statusStyle.badge}`}
+          className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-extrabold whitespace-nowrap shrink-0 ${badge.className}`}
         >
-          {statusStyle.label}
+          {badge.label}
         </span>
       </div>
 
-      {/* 액션 버튼 — 덮어쓰기 / 새 프리셋 저장 토글 */}
-      <div className="flex items-center gap-2 flex-wrap px-1">
+      {/* 액션 버튼 — 활성 프리셋 + 변경 상태에 따라 노출 분기. */}
+      <div className="flex items-center gap-1.5 flex-wrap px-1">
         {activePreset && (
-          <button
-            type="button"
-            onClick={handleOverwrite}
-            disabled={!isDirty}
-            title={isDirty ? "현재 프리셋에 덮어쓰기" : "변경된 내용이 없습니다"}
-            className="px-3 py-1 rounded-md text-[12px] font-bold whitespace-nowrap transition-colors
-              bg-emerald-500 hover:bg-emerald-600 text-white
-              disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-slate-400 dark:disabled:bg-slate-600"
-          >
-            💾 현재 프리셋에 저장
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={handleOverwrite}
+              disabled={!isDirty}
+              title={isDirty ? "현재 프리셋에 덮어쓰기" : "변경된 내용이 없습니다"}
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-md text-[12px] font-bold whitespace-nowrap transition-colors
+                bg-emerald-500 hover:bg-emerald-600 text-white
+                disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-slate-300 dark:disabled:bg-white/10
+                disabled:text-gray-500 dark:disabled:text-gray-500"
+            >
+              <SaveIcon /> 저장
+            </button>
+            <button
+              type="button"
+              onClick={handleRevert}
+              disabled={!isDirty}
+              title={isDirty ? "마지막 저장 상태로 되돌리기" : "변경된 내용이 없습니다"}
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-md text-[12px] font-bold whitespace-nowrap transition-colors
+                bg-white hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10
+                text-gray-600 dark:text-gray-300
+                border border-slate-200 dark:border-white/10
+                disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <RevertIcon /> 되돌리기
+            </button>
+          </>
         )}
         <button
           type="button"
@@ -197,13 +220,15 @@ export const BossPresetManager = () => {
               ? "저장 취소"
               : "새 이름으로 저장"
           }
-          className={`px-3 py-1 rounded-md text-[12px] font-bold whitespace-nowrap transition-colors
+          className={`inline-flex items-center gap-1 px-3 py-1 rounded-md text-[12px] font-bold whitespace-nowrap transition-colors
             ${
               isSaveFormOpen
                 ? "bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20 text-gray-700 dark:text-gray-200"
+                : activePreset
+                ? "bg-white hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300 border border-slate-200 dark:border-white/10"
                 : "bg-sky-500 hover:bg-sky-600 text-white"
             }
-            disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-slate-400 dark:disabled:bg-slate-600`}
+            disabled:opacity-40 disabled:cursor-not-allowed`}
         >
           {isSaveFormOpen ? "✕ 취소" : "＋ 새 이름으로 저장"}
         </button>
@@ -238,7 +263,8 @@ export const BossPresetManager = () => {
             title={saveHint}
             className="px-3 py-1.5 rounded-md text-sm font-bold whitespace-nowrap
               bg-sky-500 hover:bg-sky-600 text-white
-              disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-slate-400 dark:disabled:bg-slate-600
+              disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-slate-300 dark:disabled:bg-white/10
+              disabled:text-gray-500 dark:disabled:text-gray-500
               transition-colors"
           >
             저장
@@ -246,7 +272,7 @@ export const BossPresetManager = () => {
         </form>
       )}
 
-      {/* 프리셋 목록 */}
+      {/* 프리셋 목록 — 활성 프리셋만 sky 액센트, 나머지는 중성 톤. */}
       {presets.length === 0 ? (
         <p className="px-1 py-1 text-[12px] text-gray-500 dark:text-gray-400">
           저장된 프리셋이 없습니다. 보스를 선택한 뒤 <span className="font-bold">＋ 새 이름으로 저장</span> 을 눌러 보세요.
@@ -259,11 +285,11 @@ export const BossPresetManager = () => {
             return (
               <div
                 key={preset.id}
-                className={`inline-flex items-stretch rounded-md border overflow-hidden
+                className={`inline-flex items-stretch rounded-md border overflow-hidden transition-colors
                   ${
                     isActive
-                      ? "border-sky-400 dark:border-sky-500/70 bg-sky-50 dark:bg-sky-900/30 ring-1 ring-sky-300/60 dark:ring-sky-600/40"
-                      : "border-slate-200 dark:border-white/10 bg-white dark:bg-color-900"
+                      ? "border-sky-400 dark:border-sky-500/70 bg-sky-50 dark:bg-sky-900/30"
+                      : "border-slate-200 dark:border-white/10 bg-white dark:bg-color-900/60"
                   }`}
               >
                 <button
@@ -276,19 +302,19 @@ export const BossPresetManager = () => {
                     ${
                       isActive
                         ? "text-sky-700 dark:text-sky-200"
-                        : "text-sky-700 dark:text-sky-300 hover:bg-sky-50 dark:hover:bg-sky-900/30"
+                        : "text-gray-700 dark:text-gray-200 hover:bg-slate-50 dark:hover:bg-white/5"
                     }`}
                 >
                   <span>{preset.name}</span>
-                  <span className="ml-1 text-[11px] font-medium text-gray-500 dark:text-gray-400">({enabledCount})</span>
+                  <span className="ml-1 text-[11px] font-medium text-gray-400 dark:text-gray-500">({enabledCount})</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => handleDelete(preset.id, preset.name)}
                   title="삭제"
                   aria-label={`${preset.name} 삭제`}
-                  className="px-1.5 text-gray-400 hover:text-red-500
-                    hover:bg-red-50 dark:hover:bg-red-900/20
+                  className="px-1.5 text-gray-400 hover:text-rose-500
+                    hover:bg-rose-50 dark:hover:bg-rose-900/20
                     border-l border-slate-200 dark:border-white/10 transition-colors"
                 >
                   ✕
@@ -301,3 +327,16 @@ export const BossPresetManager = () => {
     </div>
   );
 };
+
+const SaveIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3.5 h-3.5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 3.75H5.25A1.5 1.5 0 0 0 3.75 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V7.5L16.5 3.75Z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 3.75v5.25h7.5V3.75M7.5 20.25v-6.75h9v6.75" />
+  </svg>
+);
+
+const RevertIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3.5 h-3.5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+  </svg>
+);

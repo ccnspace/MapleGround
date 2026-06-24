@@ -84,6 +84,8 @@ export type Union = {
 /** /maplestory/v1/user/union-raider */
 export type UnionRaider = {
   date: string | null;
+  /** 유니온 효과 (2025.06 신설). 예: "INT 75 증가", "마력 15 증가" */
+  union_state_stat: string[];
   union_raider_stat: string[];
   union_occupied_stat: string[];
   union_inner_stat: UnionInnerStat[];

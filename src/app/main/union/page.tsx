@@ -23,7 +23,8 @@ const CHAMPION_BADGE_IMAGES = [championBadge1, championBadge2, championBadge3, c
 type TabType = "artifact" | "champion" | "raider";
 
 // ── 등급 스타일 ──
-const getUnionGradeBg = (grade: string) => {
+const getUnionGradeBg = (grade?: string | null) => {
+  if (!grade) return "from-slate-500 to-slate-400";
   if (grade.includes("슈프림")) return "from-violet-700 via-gray-900 to-cyan-500";
   if (grade.includes("그랜드 마스터")) return "from-violet-800 via-gray-900 to-black";
   if (grade.includes("마스터")) return "from-yellow-500 via-amber-400 to-yellow-600";
@@ -32,7 +33,8 @@ const getUnionGradeBg = (grade: string) => {
   return "from-slate-500 to-slate-400";
 };
 
-const getChampionGradeText = (grade: string) => {
+const getChampionGradeText = (grade?: string | null) => {
+  if (!grade) return "text-slate-400";
   if (grade === "SSS") return "text-red-400";
   if (grade === "SS") return "text-yellow-400";
   if (grade === "S") return "text-violet-400";
@@ -41,7 +43,8 @@ const getChampionGradeText = (grade: string) => {
   return "text-slate-400";
 };
 
-const getChampionCardBorder = (grade: string) => {
+const getChampionCardBorder = (grade?: string | null) => {
+  if (!grade) return "border-slate-300/50 dark:border-slate-600/50";
   if (grade === "SSS") return "border-red-400/60";
   if (grade === "SS") return "border-yellow-400/60";
   if (grade === "S") return "border-violet-400/55";
@@ -50,7 +53,8 @@ const getChampionCardBorder = (grade: string) => {
   return "border-slate-300/50 dark:border-slate-600/50";
 };
 
-const getChampionGradeStyle = (grade: string) => {
+const getChampionGradeStyle = (grade?: string | null) => {
+  if (!grade) return "bg-slate-500 text-white";
   if (grade === "SSS") return "bg-gradient-to-br from-red-500 to-rose-600 text-white";
   if (grade === "SS") return "bg-gradient-to-br from-yellow-400 to-amber-500 text-white";
   if (grade === "S") return "bg-gradient-to-br from-violet-400 to-purple-500 text-white";
@@ -59,13 +63,13 @@ const getChampionGradeStyle = (grade: string) => {
   return "bg-slate-500 text-white";
 };
 
-const getUnionTextColor = (grade: string) => {
-  if (grade.includes("베테랑")) return "text-gray-700";
+const getUnionTextColor = (grade?: string | null) => {
+  if (grade?.includes("베테랑")) return "text-gray-700";
   return "text-white";
 };
 
-const getUnionSubTextColor = (grade: string) => {
-  if (grade.includes("베테랑")) return "text-gray-500";
+const getUnionSubTextColor = (grade?: string | null) => {
+  if (grade?.includes("베테랑")) return "text-gray-500";
   return "text-white/50";
 };
 
@@ -84,7 +88,7 @@ const UnionInfoPanel = ({ union, artifact }: { union: Union; artifact: UnionArti
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.15),transparent_60%)]" />
         <p className={`relative ${getUnionTextColor(union.union_grade)}/90 text-[11px] font-bold tracking-[0.2em] uppercase`}>
-          {union.union_grade}
+          {union.union_grade ?? "-"}
         </p>
         <div className="relative flex flex-col items-center">
           <p className={`${getUnionSubTextColor(union.union_grade)} text-[10px] font-semibold tracking-[0.15em]`}>TOTAL LEVEL</p>
@@ -93,7 +97,7 @@ const UnionInfoPanel = ({ union, artifact }: { union: Union; artifact: UnionArti
               union.union_grade
             )} font-extrabold text-5xl tracking-tight [text-shadow:_0_2px_8px_rgb(0_0_0/_0.3)]`}
           >
-            {union.union_level.toLocaleString()}
+            {union.union_level?.toLocaleString() ?? "-"}
           </p>
         </div>
         {championPower && (
@@ -104,7 +108,7 @@ const UnionInfoPanel = ({ union, artifact }: { union: Union; artifact: UnionArti
         )}
         <div className="relative flex flex-col items-center">
           <p className={`${getUnionSubTextColor(union.union_grade)} text-[10px] font-semibold tracking-[0.15em]`}>ARTIFACT LEVEL</p>
-          <p className={`${getUnionTextColor(union.union_grade)} font-bold text-3xl`}>{union.union_artifact_level}</p>
+          <p className={`${getUnionTextColor(union.union_grade)} font-bold text-3xl`}>{union.union_artifact_level ?? "-"}</p>
         </div>
       </div>
 
@@ -113,9 +117,9 @@ const UnionInfoPanel = ({ union, artifact }: { union: Union; artifact: UnionArti
         className="flex flex-col bg-slate-50 dark:bg-color-950/50 backdrop-blur-sm rounded-2xl
           border border-slate-200/80 dark:border-white/5 overflow-hidden"
       >
-        <StatRow label="아티팩트 EXP" value={union.union_artifact_exp.toLocaleString()} />
-        <StatRow label="아티팩트 포인트" value={union.union_artifact_point.toLocaleString()} />
-        {artifact && <StatRow label="잔여 AP" value={artifact.union_artifact_remain_ap.toLocaleString()} isLast />}
+        <StatRow label="아티팩트 EXP" value={union.union_artifact_exp?.toLocaleString() ?? "-"} />
+        <StatRow label="아티팩트 포인트" value={union.union_artifact_point?.toLocaleString() ?? "-"} />
+        {artifact && <StatRow label="잔여 AP" value={artifact.union_artifact_remain_ap?.toLocaleString() ?? "-"} isLast />}
       </div>
     </div>
   );
@@ -133,7 +137,7 @@ const ArtifactTab = ({ artifact }: { artifact: UnionArtifact }) => (
   <div className="flex flex-col gap-5">
     {/* 크리스탈 그리드 */}
     <div className="grid grid-cols-3 gap-3 max-[600px]:grid-cols-2">
-      {artifact.union_artifact_crystal.map((crystal, i) => {
+      {artifact.union_artifact_crystal?.map((crystal, i) => {
         const isValid = crystal.validity_flag === "0";
         return (
           <div
@@ -151,7 +155,7 @@ const ArtifactTab = ({ artifact }: { artifact: UnionArtifact }) => (
               {/* 레벨(별) + 상태 */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-0.5">
-                  {Array.from({ length: Math.min(crystal.level, 5) }).map((_, s) => (
+                  {Array.from({ length: Math.min(crystal.level ?? 0, 5) }).map((_, s) => (
                     <span key={s} className="text-cyan-300 text-[10px]">
                       &#9670;
                     </span>
@@ -178,7 +182,7 @@ const ArtifactTab = ({ artifact }: { artifact: UnionArtifact }) => (
     </div>
 
     {/* 아티팩트 효과 목록 */}
-    {artifact.union_artifact_effect.length > 0 && (
+    {artifact.union_artifact_effect?.length > 0 && (
       <div
         className="flex flex-col bg-slate-50 dark:bg-color-950/50 backdrop-blur-sm rounded-2xl
           border border-slate-200/80 dark:border-white/5 overflow-hidden"
@@ -208,7 +212,7 @@ const ChampionTab = ({ champion }: { champion: UnionChampion }) => (
   <div className="flex flex-col gap-5">
     {/* 챔피언 그리드 */}
     <div className="grid grid-cols-3 gap-3 max-[600px]:grid-cols-2">
-      {champion.union_champion.map((champ, i) => (
+      {champion.union_champion?.map((champ, i) => (
         <div
           key={i}
           className={`flex flex-col gap-2 px-3 py-2.5 rounded-xl border bg-slate-50 dark:bg-color-950/50 ${getChampionCardBorder(
@@ -227,7 +231,7 @@ const ChampionTab = ({ champion }: { champion: UnionChampion }) => (
           </div>
 
           {/* 휘장 */}
-          {champ.champion_badge_info.length > 0 && (
+          {champ.champion_badge_info?.length > 0 && (
             <div className="flex flex-row items-end justify-center gap-1.5 mt-auto">
               {champ.champion_badge_info.map((badge, j) => {
                 const badgeImage = CHAMPION_BADGE_IMAGES[j];
@@ -265,7 +269,7 @@ const ChampionTab = ({ champion }: { champion: UnionChampion }) => (
     </div>
 
     {/* 총 휘장 효과 */}
-    {champion.champion_badge_total_info.length > 0 && (
+    {champion.champion_badge_total_info?.length > 0 && (
       <div
         className="flex flex-col bg-slate-50 dark:bg-color-950/50 backdrop-blur-sm rounded-2xl
           border border-slate-200/80 dark:border-white/5 overflow-hidden"

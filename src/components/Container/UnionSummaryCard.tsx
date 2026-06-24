@@ -8,7 +8,8 @@ import { ContainerWrapper } from "./ContainerWrapper";
 import Link from "next/link";
 import { Spinner } from "../svg/Spinner";
 
-const getChampionGradeStyle = (grade: string) => {
+const getChampionGradeStyle = (grade?: string | null) => {
+  if (!grade) return "bg-slate-500 text-white";
   if (grade === "SSS") return "bg-gradient-to-br from-red-500 to-rose-600 text-white";
   if (grade === "SS") return "bg-gradient-to-br from-yellow-400 to-amber-500 text-white";
   if (grade === "S") return "bg-gradient-to-br from-violet-400 to-purple-500 text-white";
@@ -17,7 +18,15 @@ const getChampionGradeStyle = (grade: string) => {
   return "bg-slate-500 text-white";
 };
 
-const getGradeBg = (grade: string) => {
+// "INT 75 증가" → { name: "INT", value: "75 증가" }
+const parseStateStat = (raw: string) => {
+  const match = raw.match(/^(.*?)\s*([\d,]+(?:\.\d+)?\s*%?\s*(?:증가|감소)?)$/);
+  if (match && /\d/.test(match[2])) return { name: match[1].trim(), value: match[2].trim() };
+  return { name: raw, value: "" };
+};
+
+const getGradeBg = (grade?: string | null) => {
+  if (!grade) return "bg-slate-400 text-white";
   if (grade.includes("슈프림")) return "bg-gradient-to-r from-violet-700 via-gray-900 to-cyan-500 text-white";
   if (grade.includes("그랜드 마스터")) return "bg-gradient-to-r from-violet-800 via-gray-900 to-black text-white";
   if (grade.includes("마스터")) return "bg-gradient-to-r from-yellow-500 via-amber-400 to-yellow-600 text-white";
@@ -34,7 +43,7 @@ export const UnionSummaryCard = () => {
       fetchStatus: state.fetchStatus,
       unionData: nickname ? state.unionAttributes?.[nickname] : null,
       fetchUnionInfo: state.fetchUnionInfo,
-    }))
+    })),
   );
 
   useEffect(() => {
@@ -46,6 +55,7 @@ export const UnionSummaryCard = () => {
 
   const union = unionData?.union;
   const champion = unionData?.unionChampion;
+  const stateStats = unionData?.unionRaider?.union_state_stat ?? [];
 
   return (
     <ContainerWrapper className="!min-w-0" innerClassName="h-[410px] overflow-y-auto">
@@ -68,28 +78,36 @@ export const UnionSummaryCard = () => {
           <div className="flex flex-col gap-3">
             {/* 등급 + 레벨 */}
             <div className="flex items-center gap-3 px-3 py-4 rounded-lg bg-slate-200/50 dark:bg-white/5">
-              <span className={`text-xs font-bold px-3 py-1.5 rounded-md ${getGradeBg(union.union_grade)}`}>{union.union_grade}</span>
-              <span className="font-extrabold text-2xl">Lv.{union.union_level.toLocaleString()}</span>
+              <span className={`text-xs font-bold px-3 py-1.5 rounded-md ${getGradeBg(union.union_grade)}`}>
+                {union.union_grade ?? "-"}
+              </span>
+              <span className="font-extrabold text-2xl">Lv.{union.union_level?.toLocaleString() ?? "-"}</span>
             </div>
 
-            {/* 스탯 행들 */}
-            <div className="flex flex-col text-sm">
-              <div className="flex justify-between items-center py-1.5 border-b border-dashed border-slate-300 dark:border-white/10">
-                <span className="text-gray-500 dark:text-gray-400">아티팩트 레벨</span>
-                <span className="font-bold">{union.union_artifact_level}</span>
+            {/* 유니온 효과 */}
+            {stateStats.length > 0 && (
+              <div className="flex flex-col gap-1.5">
+                <p className="font-bold text-sm px-1 text-gray-600 dark:text-gray-300">유니온 효과</p>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {stateStats.map((raw, i) => {
+                    const { name, value } = parseStateStat(raw);
+                    return (
+                      <div key={i} className="flex flex-col gap-0.5 px-2.5 py-1.5 rounded-lg bg-slate-200/60 dark:bg-white/5">
+                        <span className="text-[13px] text-gray-600 dark:text-gray-300 truncate" title={name}>
+                          {name}
+                        </span>
+                        {value ? (
+                          <span className="font-bold text-sm text-purple-600 dark:text-purple-300 truncate leading-tight">{value}</span>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              <div className="flex justify-between items-center py-1.5 border-b border-dashed border-slate-300 dark:border-white/10">
-                <span className="text-gray-500 dark:text-gray-400">아티팩트 EXP</span>
-                <span className="font-bold">{union.union_artifact_exp.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between items-center py-1.5 border-b border-dashed border-slate-300 dark:border-white/10">
-                <span className="text-gray-500 dark:text-gray-400">아티팩트 포인트</span>
-                <span className="font-bold">{union.union_artifact_point.toLocaleString()}</span>
-              </div>
-            </div>
+            )}
 
             {/* 챔피언 목록 */}
-            {champion && champion.union_champion.length > 0 && (
+            {champion && champion.union_champion?.length > 0 && (
               <div className="flex flex-col gap-2 mt-1">
                 <p className="font-bold text-sm px-1 text-gray-600 dark:text-gray-300">챔피언</p>
                 <div className="grid grid-cols-2 gap-1.5">
@@ -101,7 +119,7 @@ export const UnionSummaryCard = () => {
                     >
                       <span
                         className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded shrink-0 ${getChampionGradeStyle(
-                          champ.champion_grade
+                          champ.champion_grade,
                         )}`}
                       >
                         {champ.champion_grade}

@@ -24,9 +24,9 @@ export type NoticeItem = {
 
 export const NOTICES: NoticeItem[] = [
   {
-    id: "union-autoplace-2026-04",
-    text: "[유니온 자동 배치](/main/union) 기능이 추가되었습니다. 인게임 UI처럼 직접 편집도 가능합니다.",
-    date: "2026.04.12",
+    id: "union-autoplace-2026-06",
+    text: "[유니온](/main/union) 정보 영역이 최신화 되었습니다. 내 유니온 스탯 정보를 확인해 보세요.",
+    date: "2026.06.24",
     type: "update",
   },
   {

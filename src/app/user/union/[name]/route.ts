@@ -62,6 +62,7 @@ export async function GET(request: NextRequest, { params }: { params: { name: st
     const responses = [] as { name: string; data: unknown }[];
     for (let i = 0; i < requestUrls.length; i++) {
       const data = await fetchUnionInfo(requestUrls[i]);
+      console.log("data", data);
       responses.push({ name: endpoints[i], data });
     }
 

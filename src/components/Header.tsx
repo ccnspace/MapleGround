@@ -41,7 +41,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: "메인", pathname: "/main", isUpdated: false, requiresNickname: true },
-  { label: "메이플 유니온", pathname: "/main/union", isUpdated: true, requiresNickname: true, tag: "빠른 자동 배치!" },
+  { label: "메이플 유니온", pathname: "/main/union", isUpdated: true, requiresNickname: true },
   { label: "주간보스 정산", pathname: "/main/boss", isUpdated: true, requiresNickname: false },
   { label: "과거vs현재", pathname: "/main/vs", isUpdated: false, requiresNickname: true },
   { label: "경험치 효율 계산", pathname: "/main/exp", isUpdated: false, requiresNickname: false },

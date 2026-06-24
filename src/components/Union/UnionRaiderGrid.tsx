@@ -146,6 +146,52 @@ const BLOCK_COLORS: Record<string, { bg: string }> = {
 const getBlockStyle = (blockType: string) => BLOCK_TYPE_STYLES[blockType] ?? { overlay: "bg-slate-500/30", dot: "bg-slate-500" };
 const getBlockColor = (blockType: string) => BLOCK_COLORS[blockType] ?? { bg: "bg-[#c8b078]" };
 
+// "INT 75 증가" → { name: "INT", value: "75", suffix: "증가" }
+const parseStateStat = (raw: string) => {
+  const match = raw.match(/^(.*?)\s*([\d,]+(?:\.\d+)?\s*%?)\s*(증가|감소)?$/);
+  if (match && match[2]) {
+    return { name: match[1].trim(), value: match[2].replace(/\s+/g, ""), suffix: match[3] ?? "" };
+  }
+  return { name: raw, value: "", suffix: "" };
+};
+
+// 유니온 효과 패널 (union_state_stat)
+const UnionStateStatPanel = ({ stats }: { stats: string[] }) => (
+  <div className="flex flex-col bg-slate-50 dark:bg-color-950/50 backdrop-blur-sm rounded-2xl border border-slate-200/80 dark:border-white/5 overflow-hidden">
+    <div className="flex items-center gap-2 px-4 pt-4 pb-1">
+      <span className="flex items-center justify-center w-5 h-5 rounded-md bg-gradient-to-br from-violet-500 to-indigo-500 text-white text-[11px]">
+        &#10022;
+      </span>
+      <p className="font-bold text-sm text-violet-600 dark:text-violet-400">유니온 효과</p>
+      <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500">{stats.length}</span>
+    </div>
+    <div className="grid grid-cols-2 min-[600px]:grid-cols-3 gap-2.5 p-4 pt-2">
+      {stats.map((raw, i) => {
+        const { name, value, suffix } = parseStateStat(raw);
+        return (
+          <div
+            key={i}
+            className="flex flex-col gap-0.5 px-3.5 py-2.5 rounded-xl bg-white dark:bg-white/5
+              border border-slate-200/70 dark:border-white/5"
+          >
+            <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 truncate" title={name}>
+              {name}
+            </span>
+            {value ? (
+              <div className="flex items-baseline gap-1">
+                <span className="text-lg font-extrabold text-violet-600 dark:text-violet-400 leading-none">{value}</span>
+                {suffix && <span className="text-[11px] text-gray-400 dark:text-gray-500">{suffix}</span>}
+              </div>
+            ) : (
+              <span className="text-sm font-bold leading-tight">{raw}</span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  </div>
+);
+
 type CellInfo = {
   blockType: string;
   blockClass: string;
@@ -179,6 +225,7 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
   const [hoveredBlock, setHoveredBlock] = useState<number | null>(null);
   const [selectedPreset, setSelectedPreset] = useState<number>(0);
   const [editDialogTab, setEditDialogTab] = useState<EditDialogTab | null>(null);
+  const [gridExpanded, setGridExpanded] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
 
   const handleSaveImage = useCallback(async () => {
@@ -291,193 +338,229 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
 
   const hoveredBlockInfo = hoveredBlock !== null ? blocks[hoveredBlock] : null;
 
+  const stateStats = raider.union_state_stat ?? [];
+  // 공격대 배치(블록/점령/내부 효과) 정보는 2025.06 이후 미제공 → 과거 날짜 조회 시에만 존재
+  const hasGridData = (raider.union_block?.length ?? 0) > 0;
+
   return (
     <div className="flex flex-col gap-4">
-      {/* 프리셋 선택 */}
-      <div className="flex items-center gap-2">
-        <div className="flex gap-1 p-1 rounded-lg bg-slate-200 dark:bg-color-950/50 border border-slate-200 dark:border-white/5">
-          {[0, 1, 2, 3, 4, 5].map((no) => (
-            <button
-              key={no}
-              onClick={() => {
-                setSelectedPreset(no);
-                setHoveredBlock(null);
-              }}
-              className={`px-3 py-1 max-[600px]:px-2 max-[600px]:py-0.5 rounded-md text-[12px] max-[600px]:text-xs font-semibold transition-all ${
-                selectedPreset === no
-                  ? "bg-white dark:bg-color-800 text-black dark:text-white shadow-sm"
-                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-              }`}
-            >
-              {no === 0 ? "적용 중" : `${no}`}
-            </button>
-          ))}
-        </div>
-        {selectedPreset === 0 && <span className="text-[11px] text-gray-400 dark:text-gray-500">(프리셋 {raider.use_preset_no})</span>}
+      {/* 메인: 유니온 효과 */}
+      {stateStats.length > 0 && <UnionStateStatPanel stats={stateStats} />}
+
+      {/* 공격대 배치도 (과거 기록) — 접기/펴기 */}
+      <div className="flex flex-col bg-slate-50 dark:bg-color-950/50 rounded-2xl border border-slate-200/80 dark:border-white/5 overflow-hidden">
         <button
-          onClick={handleSaveImage}
-          className="ml-auto px-3 py-1 rounded-md text-[12px] font-semibold text-gray-500 dark:text-gray-400
+          type="button"
+          onClick={() => setGridExpanded((v) => !v)}
+          className="flex items-center justify-between gap-2 w-full px-4 py-3 text-left hover:bg-slate-100/60 dark:hover:bg-white/5 transition-colors"
+        >
+          <div className="flex items-baseline gap-2">
+            <span className="font-bold text-sm">공격대 배치도</span>
+            <span className="text-[11px] text-gray-400 dark:text-gray-500">과거 기록 (~2025.05)</span>
+          </div>
+          <span className={`text-gray-400 dark:text-gray-500 text-xs transition-transform ${gridExpanded ? "rotate-180" : ""}`}>
+            &#9660;
+          </span>
+        </button>
+
+        {gridExpanded && (
+          <div className="flex flex-col gap-4 px-4 pb-4 pt-2 border-t border-slate-200/80 dark:border-white/5">
+            {hasGridData ? (
+              <>
+                {/* 프리셋 선택 */}
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1 p-1 rounded-lg bg-slate-200 dark:bg-color-950/50 border border-slate-200 dark:border-white/5">
+                    {[0, 1, 2, 3, 4, 5].map((no) => (
+                      <button
+                        key={no}
+                        onClick={() => {
+                          setSelectedPreset(no);
+                          setHoveredBlock(null);
+                        }}
+                        className={`px-3 py-1 max-[600px]:px-2 max-[600px]:py-0.5 rounded-md text-[12px] max-[600px]:text-xs font-semibold transition-all ${
+                          selectedPreset === no
+                            ? "bg-white dark:bg-color-800 text-black dark:text-white shadow-sm"
+                            : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                        }`}
+                      >
+                        {no === 0 ? "적용 중" : `${no}`}
+                      </button>
+                    ))}
+                  </div>
+                  {selectedPreset === 0 && (
+                    <span className="text-[11px] text-gray-400 dark:text-gray-500">(프리셋 {raider.use_preset_no})</span>
+                  )}
+                  <button
+                    onClick={handleSaveImage}
+                    className="ml-auto px-3 py-1 rounded-md text-[12px] font-semibold text-gray-500 dark:text-gray-400
             bg-slate-200 dark:bg-color-950/50 border border-slate-200 dark:border-white/5
             hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-        >
-          이미지 저장
-        </button>
-      </div>
+                  >
+                    이미지 저장
+                  </button>
+                </div>
 
-      {editDialogTab && (
-        <UnionRaiderEditDialog
-          raider={raider}
-          presetNo={selectedPreset}
-          initialTab={editDialogTab}
-          onClose={() => setEditDialogTab(null)}
-        />
-      )}
+                {editDialogTab && (
+                  <UnionRaiderEditDialog
+                    raider={raider}
+                    presetNo={selectedPreset}
+                    initialTab={editDialogTab}
+                    onClose={() => setEditDialogTab(null)}
+                  />
+                )}
 
-      <div className="flex justify-center" ref={gridRef}>
-        <div
-          className="relative w-full max-w-[624px] grid border border-[#c0c4cc] dark:border-[#3a3e48] rounded-lg overflow-hidden"
-          style={{
-            gridTemplateColumns: `repeat(${COLS}, 1fr)`,
-            gridTemplateRows: `repeat(${ROWS}, 1fr)`,
-          }}
-        >
-          {rows.map((y) =>
-            cols.map((x) => {
-              const key = `${x},${y}`;
-              const cell = grid.get(key);
-              const isCenter = (x === 0 && y === 0) || (x === -1 && y === 0) || (x === 0 && y === 1) || (x === -1 && y === 1);
-              const isHovered = cell && cell.blockIndex === hoveredBlock;
-              const borderStyle = borderStyles.get(key) ?? {};
-              const label = allLabels.get(key);
-              return (
-                <div
-                  key={key}
-                  className={`relative aspect-square border border-[rgba(255,255,255,0.06)]
+                <div className="flex justify-center" ref={gridRef}>
+                  <div
+                    className="relative w-full max-w-[624px] grid border border-[#c0c4cc] dark:border-[#3a3e48] rounded-lg overflow-hidden"
+                    style={{
+                      gridTemplateColumns: `repeat(${COLS}, 1fr)`,
+                      gridTemplateRows: `repeat(${ROWS}, 1fr)`,
+                    }}
+                  >
+                    {rows.map((y) =>
+                      cols.map((x) => {
+                        const key = `${x},${y}`;
+                        const cell = grid.get(key);
+                        const isCenter = (x === 0 && y === 0) || (x === -1 && y === 0) || (x === 0 && y === 1) || (x === -1 && y === 1);
+                        const isHovered = cell && cell.blockIndex === hoveredBlock;
+                        const borderStyle = borderStyles.get(key) ?? {};
+                        const label = allLabels.get(key);
+                        return (
+                          <div
+                            key={key}
+                            className={`relative aspect-square border border-[rgba(255,255,255,0.06)]
                     ${cell ? `${BLOCK_BASE} cursor-pointer` : ""}
                     ${!cell && isCenter ? "bg-[#4a5060]" : ""}
                     ${!cell && !isCenter ? "bg-[#2e3038]" : ""}
                   `}
-                  style={borderStyle}
-                  onMouseEnter={() => cell && setHoveredBlock(cell.blockIndex)}
-                  onMouseLeave={() => setHoveredBlock(null)}
-                >
-                  {cell && isHovered && (
-                    <div className={`absolute inset-0 ${getBlockStyle(cell.blockType).overlay} z-20 pointer-events-none`} />
-                  )}
-                  {cell && iconCells.has(key) && BLOCK_ICONS[cell.blockType] && (
-                    <div className="absolute inset-[3px] max-[600px]:inset-[2px] pointer-events-none z-10 flex items-center justify-center">
-                      <Image
-                        src={BLOCK_ICONS[cell.blockType]}
-                        alt={cell.blockType}
-                        width={18}
-                        height={18}
-                        className="w-full h-full object-contain"
-                        unoptimized
-                      />
-                    </div>
-                  )}
-                  {label && (
-                    <span
-                      className="absolute z-30 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap
+                            style={borderStyle}
+                            onMouseEnter={() => cell && setHoveredBlock(cell.blockIndex)}
+                            onMouseLeave={() => setHoveredBlock(null)}
+                          >
+                            {cell && isHovered && (
+                              <div className={`absolute inset-0 ${getBlockStyle(cell.blockType).overlay} z-20 pointer-events-none`} />
+                            )}
+                            {cell && iconCells.has(key) && BLOCK_ICONS[cell.blockType] && (
+                              <div className="absolute inset-[3px] max-[600px]:inset-[2px] pointer-events-none z-10 flex items-center justify-center">
+                                <Image
+                                  src={BLOCK_ICONS[cell.blockType]}
+                                  alt={cell.blockType}
+                                  width={18}
+                                  height={18}
+                                  className="w-full h-full object-contain"
+                                  unoptimized
+                                />
+                              </div>
+                            )}
+                            {label && (
+                              <span
+                                className="absolute z-30 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap
                       text-[11px] max-[600px]:text-[8px] font-bold text-white pointer-events-none
                       bg-black/30 px-1.5 rounded-md opacity-80"
-                    >
-                      {label}
-                    </span>
-                  )}
+                              >
+                                {label}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      }),
+                    )}
+                  </div>
                 </div>
-              );
-            })
-          )}
-        </div>
-      </div>
 
-      {/* 유니온 편집 / 자동 배치 진입 버튼 */}
-      <div className="flex items-center justify-center gap-3">
-        <button
-          type="button"
-          onClick={() => setEditDialogTab("new")}
-          className="px-5 py-2.5 rounded-lg text-lg max-[600px]:text-sm font-extrabold text-white transition-all
-            bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-600 hover:to-indigo-600
-            shadow-md shadow-sky-500/30 hover:-translate-y-1"
-        >
-          ⚡ 유니온 자동 배치
-        </button>
-        <button
-          type="button"
-          onClick={() => setEditDialogTab("edit")}
-          className="px-5 py-2.5 rounded-lg text-lg max-[600px]:text-sm font-bold
+                {/* 유니온 편집 버튼 */}
+                <div className="flex items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditDialogTab("edit")}
+                    className="px-5 py-2.5 rounded-lg text-lg max-[600px]:text-sm font-bold
             bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20
             text-gray-700 dark:text-gray-100 transition-colors"
-        >
-          현재 유니온 편집
-        </button>
-      </div>
+                  >
+                    현재 유니온 편집
+                  </button>
+                </div>
 
-      {/* 호버 정보 or 범례 */}
-      {hoveredBlockInfo ? (
-        <div className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-slate-50 dark:bg-color-950/50 border border-slate-200/80 dark:border-white/5">
-          <div className="flex items-center gap-1.5">
-            {BLOCK_ICONS[hoveredBlockInfo.block_type] && (
-              <Image src={BLOCK_ICONS[hoveredBlockInfo.block_type]} alt={hoveredBlockInfo.block_type} width={18} height={18} unoptimized />
+                {/* 호버 정보 or 범례 */}
+                {hoveredBlockInfo ? (
+                  <div className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-slate-50 dark:bg-color-950/50 border border-slate-200/80 dark:border-white/5">
+                    <div className="flex items-center gap-1.5">
+                      {BLOCK_ICONS[hoveredBlockInfo.block_type] && (
+                        <Image
+                          src={BLOCK_ICONS[hoveredBlockInfo.block_type]}
+                          alt={hoveredBlockInfo.block_type}
+                          width={18}
+                          height={18}
+                          unoptimized
+                        />
+                      )}
+                      <span className="font-bold text-sm">{hoveredBlockInfo.block_class}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">Lv.{hoveredBlockInfo.block_level}</span>
+                      <span className="text-sm text-gray-400 dark:text-gray-500">{hoveredBlockInfo.block_type}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap items-center justify-center gap-3 px-4 py-3 rounded-xl bg-slate-50 dark:bg-color-950/50 border border-slate-200/80 dark:border-white/5">
+                    {Object.keys(BLOCK_ICONS).map((type) => (
+                      <div key={type} className="flex items-center gap-1.5">
+                        <Image src={BLOCK_ICONS[type]} alt={type} width={16} height={16} unoptimized />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{type}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* 공격대원 효과 + 점령 효과 */}
+                <div className="grid grid-cols-1 min-[600px]:grid-cols-2 gap-4">
+                  {(presetData?.union_raider_stat?.length ?? 0) > 0 && (
+                    <div className="flex flex-col bg-slate-50 dark:bg-color-950/50 backdrop-blur-sm rounded-2xl border border-slate-200/80 dark:border-white/5 overflow-hidden max-h-[320px]">
+                      <div className="px-4 pt-3.5 pb-2 shrink-0">
+                        <p className="font-bold text-sm text-sky-600 dark:text-sky-400">공격대원 효과</p>
+                      </div>
+                      <div className="overflow-y-auto">
+                        {presetData?.union_raider_stat.map((stat, i) => (
+                          <div
+                            key={i}
+                            className={`flex items-center text-[13px] px-4 py-2 ${
+                              i < presetData?.union_raider_stat.length - 1 ? "border-b border-slate-100 dark:border-white/5" : ""
+                            }`}
+                          >
+                            <span className="font-medium">{stat}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {(presetData?.union_occupied_stat?.length ?? 0) > 0 && (
+                    <div className="flex flex-col bg-slate-50 dark:bg-color-950/50 backdrop-blur-sm rounded-2xl border border-slate-200/80 dark:border-white/5 overflow-hidden max-h-[320px]">
+                      <div className="px-4 pt-3.5 pb-2 shrink-0">
+                        <p className="font-bold text-sm text-emerald-600 dark:text-emerald-400">점령 효과</p>
+                      </div>
+                      <div className="overflow-y-auto">
+                        {presetData?.union_occupied_stat.map((stat, i) => (
+                          <div
+                            key={i}
+                            className={`flex items-center text-[13px] px-4 py-2 ${
+                              i < presetData?.union_occupied_stat.length - 1 ? "border-b border-slate-100 dark:border-white/5" : ""
+                            }`}
+                          >
+                            <span className="font-medium">{stat}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-1.5 py-10 text-center">
+                <p className="font-semibold text-sm text-gray-500 dark:text-gray-400">공격대 배치 정보가 없습니다.</p>
+                <p className="text-[12px] text-gray-400 dark:text-gray-500">2025년 6월부터 미제공되며, 이전 날짜를 조회하면 표시됩니다.</p>
+              </div>
             )}
-            <span className="font-bold text-sm">{hoveredBlockInfo.block_class}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-sm text-gray-500 dark:text-gray-400">Lv.{hoveredBlockInfo.block_level}</span>
-            <span className="text-sm text-gray-400 dark:text-gray-500">{hoveredBlockInfo.block_type}</span>
-          </div>
-        </div>
-      ) : (
-        <div className="flex flex-wrap items-center justify-center gap-3 px-4 py-3 rounded-xl bg-slate-50 dark:bg-color-950/50 border border-slate-200/80 dark:border-white/5">
-          {Object.keys(BLOCK_ICONS).map((type) => (
-            <div key={type} className="flex items-center gap-1.5">
-              <Image src={BLOCK_ICONS[type]} alt={type} width={16} height={16} unoptimized />
-              <span className="text-sm text-gray-600 dark:text-gray-400">{type}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* 공격대원 효과 + 점령 효과 */}
-      <div className="grid grid-cols-1 min-[600px]:grid-cols-2 gap-4">
-        {(presetData?.union_raider_stat?.length ?? 0) > 0 && (
-          <div className="flex flex-col bg-slate-50 dark:bg-color-950/50 backdrop-blur-sm rounded-2xl border border-slate-200/80 dark:border-white/5 overflow-hidden max-h-[320px]">
-            <div className="px-4 pt-3.5 pb-2 shrink-0">
-              <p className="font-bold text-sm text-sky-600 dark:text-sky-400">공격대원 효과</p>
-            </div>
-            <div className="overflow-y-auto">
-              {presetData?.union_raider_stat.map((stat, i) => (
-                <div
-                  key={i}
-                  className={`flex items-center text-[13px] px-4 py-2 ${
-                    i < presetData?.union_raider_stat.length - 1 ? "border-b border-slate-100 dark:border-white/5" : ""
-                  }`}
-                >
-                  <span className="font-medium">{stat}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {(presetData?.union_occupied_stat?.length ?? 0) > 0 && (
-          <div className="flex flex-col bg-slate-50 dark:bg-color-950/50 backdrop-blur-sm rounded-2xl border border-slate-200/80 dark:border-white/5 overflow-hidden max-h-[320px]">
-            <div className="px-4 pt-3.5 pb-2 shrink-0">
-              <p className="font-bold text-sm text-emerald-600 dark:text-emerald-400">점령 효과</p>
-            </div>
-            <div className="overflow-y-auto">
-              {presetData?.union_occupied_stat.map((stat, i) => (
-                <div
-                  key={i}
-                  className={`flex items-center text-[13px] px-4 py-2 ${
-                    i < presetData?.union_occupied_stat.length - 1 ? "border-b border-slate-100 dark:border-white/5" : ""
-                  }`}
-                >
-                  <span className="font-medium">{stat}</span>
-                </div>
-              ))}
-            </div>
           </div>
         )}
       </div>

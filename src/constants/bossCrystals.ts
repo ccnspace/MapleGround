@@ -54,45 +54,41 @@ export const BOSS_DIFFICULTY_BY_LABEL: Record<string, BossDifficulty> = {
 // 보스별 (난이도 → 강렬한 힘의 결정 가격) 매핑.
 // 등재되지 않은 난이도는 해당 보스가 그 난이도를 제공하지 않는다는 뜻.
 export const BOSS_CRYSTAL_PRICES: Record<string, Partial<Record<BossDifficulty, number>>> = {
-  시그너스: { EASY: 4_550_000, NORMAL: 7_500_000 },
-  힐라: { HARD: 5_750_000 },
-  핑크빈: { CHAOS: 6_580_000 },
   자쿰: { CHAOS: 8_080_000 },
   블러디퀸: { CHAOS: 8_140_000 },
   반반: { CHAOS: 8_150_000 },
   피에르: { CHAOS: 8_170_000 },
   매그너스: { HARD: 8_560_000 },
   벨룸: { CHAOS: 9_280_000 },
-  파풀라투스: { CHAOS: 13_800_000 },
-  스우: { NORMAL: 17_600_000, HARD: 54_200_000, EXTREME: 604_000_000 },
-  데미안: { NORMAL: 18_400_000, HARD: 51_500_000 },
-  "가디언 엔젤 슬라임": { NORMAL: 26_800_000, CHAOS: 79_100_000 },
-  루시드: { EASY: 31_400_000, NORMAL: 37_500_000, HARD: 66_200_000 },
-  윌: { EASY: 34_000_000, NORMAL: 43_300_000, HARD: 81_200_000 },
-  더스크: { NORMAL: 46_300_000, CHAOS: 73_500_000 },
-  듄켈: { NORMAL: 50_000_000, HARD: 99_400_000 },
-  "진 힐라": { NORMAL: 74_900_000, HARD: 112_000_000 },
-  "선택받은 세렌": { NORMAL: 266_000_000, HARD: 396_000_000, EXTREME: 3_150_000_000 },
-  "감시자 칼로스": { EASY: 311_000_000, NORMAL: 561_000_000, CHAOS: 1_340_000_000, EXTREME: 4_320_000_000 },
-  "최초의 대적자": { EASY: 324_000_000, NORMAL: 589_000_000, HARD: 1_510_000_000, EXTREME: 4_960_000_000 },
-  카링: { EASY: 419_000_000, NORMAL: 714_000_000, HARD: 1_830_000_000, EXTREME: 5_670_000_000 },
-  "찬란한 흉성": { NORMAL: 658_000_000, HARD: 2_819_000_000 },
-  림보: { NORMAL: 1_080_000_000, HARD: 2_510_000_000 },
-  발드릭스: { NORMAL: 1_440_000_000, HARD: 3_240_000_000 },
-  유피테르: { NORMAL: 1_700_000_000, HARD: 5_100_000_000 },
-  "검은 마법사": { HARD: 700_000_000, EXTREME: 9_200_000_000 },
+  파풀라투스: { CHAOS: 13_100_000 },
+  스우: { NORMAL: 16_700_000, HARD: 51_500_000, EXTREME: 574_000_000 },
+  데미안: { NORMAL: 17_500_000, HARD: 48_900_000 },
+  "가디언 엔젤 슬라임": { NORMAL: 25_500_000, CHAOS: 75_100_000 },
+  루시드: { EASY: 29_800_000, NORMAL: 35_600_000, HARD: 62_900_000 },
+  윌: { EASY: 32_300_000, NORMAL: 41_100_000, HARD: 77_100_000 },
+  더스크: { NORMAL: 44_000_000, CHAOS: 69_800_000 },
+  듄켈: { NORMAL: 47_500_000, HARD: 94_400_000 },
+  "진 힐라": { NORMAL: 71_200_000, HARD: 106_000_000 },
+  "선택받은 세렌": { NORMAL: 239_000_000, HARD: 356_000_000, EXTREME: 2_835_000_000 },
+  "감시자 칼로스": { EASY: 280_000_000, NORMAL: 505_000_000, CHAOS: 1_273_000_000, EXTREME: 4_104_000_000 },
+  "최초의 대적자": { EASY: 308_000_000, NORMAL: 560_000_000, HARD: 1_435_000_000, EXTREME: 4_712_000_000 },
+  카링: { EASY: 377_000_000, NORMAL: 678_000_000, HARD: 1_739_000_000, EXTREME: 5_387_000_000 },
+  "찬란한 흉성": { NORMAL: 625_000_000, HARD: 2_678_000_000 },
+  림보: { NORMAL: 1_026_000_000, HARD: 2_385_000_000 },
+  발드릭스: { NORMAL: 1_368_000_000, HARD: 3_078_000_000 },
+  유피테르: { NORMAL: 1_615_000_000, HARD: 4_845_000_000 },
+  "검은 마법사": { HARD: 665_000_000, EXTREME: 8_740_000_000 },
 };
 
 export type BossCrystalEntry = { boss: string; difficulty: BossDifficulty; price: number };
 
 // (보스, 난이도, 가격) 플랫 리스트. 가격순 정렬 등 iteration 용도로 사용.
-export const BOSS_CRYSTALS: ReadonlyArray<BossCrystalEntry> = Object.entries(BOSS_CRYSTAL_PRICES).flatMap(
-  ([boss, priceByDifficulty]) =>
-    (Object.entries(priceByDifficulty) as Array<[BossDifficulty, number]>).map(([difficulty, price]) => ({
-      boss,
-      difficulty,
-      price,
-    }))
+export const BOSS_CRYSTALS: ReadonlyArray<BossCrystalEntry> = Object.entries(BOSS_CRYSTAL_PRICES).flatMap(([boss, priceByDifficulty]) =>
+  (Object.entries(priceByDifficulty) as Array<[BossDifficulty, number]>).map(([difficulty, price]) => ({
+    boss,
+    difficulty,
+    price,
+  }))
 );
 
 export const getBossCrystalPrice = (boss: string, difficulty: BossDifficulty): number | null => {

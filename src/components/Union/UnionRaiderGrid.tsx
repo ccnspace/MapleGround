@@ -339,7 +339,7 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
   const hoveredBlockInfo = hoveredBlock !== null ? blocks[hoveredBlock] : null;
 
   const stateStats = raider.union_state_stat ?? [];
-  // 공격대 배치(블록/점령/내부 효과) 정보는 2025.06 이후 미제공 → 과거 날짜 조회 시에만 존재
+  // 공격대 배치(블록/점령/내부 효과) 정보는 2026.06 이후 미제공 → 과거 날짜 조회 시에만 존재
   const hasGridData = (raider.union_block?.length ?? 0) > 0;
 
   return (
@@ -356,7 +356,7 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
         >
           <div className="flex items-baseline gap-2">
             <span className="font-bold text-sm">공격대 배치도</span>
-            <span className="text-[11px] text-gray-400 dark:text-gray-500">과거 기록 (~2025.05)</span>
+            <span className="text-[11px] text-gray-400 dark:text-gray-500">과거 기록 (~2026.05)</span>
           </div>
           <span className={`text-gray-400 dark:text-gray-500 text-xs transition-transform ${gridExpanded ? "rotate-180" : ""}`}>
             &#9660;
@@ -463,7 +463,7 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
                             )}
                           </div>
                         );
-                      }),
+                      })
                     )}
                   </div>
                 </div>
@@ -558,7 +558,7 @@ export const UnionRaiderGrid = ({ raider }: Props) => {
             ) : (
               <div className="flex flex-col items-center justify-center gap-1.5 py-10 text-center">
                 <p className="font-semibold text-sm text-gray-500 dark:text-gray-400">공격대 배치 정보가 없습니다.</p>
-                <p className="text-[12px] text-gray-400 dark:text-gray-500">2025년 6월부터 미제공되며, 이전 날짜를 조회하면 표시됩니다.</p>
+                <p className="text-[12px] text-gray-400 dark:text-gray-500">2026년 6월 overdrive 업데이트 이후부터는 미제공됩니다.</p>
               </div>
             )}
           </div>

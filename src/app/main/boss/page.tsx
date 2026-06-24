@@ -31,7 +31,7 @@ const BossPageContent = () => {
       <div className="flex max-[600px]:pt-0.5 px-2 w-[1366px] flex-col max-[600px]:w-full max-[600px]:px-0.5 gap-5">
         <div className="flex flex-col gap-4">
           <CommonTitle title="💰 주간보스 정산">
-            <span className="px-2 py-0.5 text-xs font-bold text-white bg-red-500 rounded-full">NEW</span>
+            <span className="px-2 py-0.5 text-xs font-bold text-white bg-red-500 rounded-full">NEW (26년 6월 업데이트 반영)</span>
           </CommonTitle>
         </div>
         <BossSettlementContent />
